@@ -72,7 +72,9 @@ test('the tab title counts the decisions waiting for the developer (F26)', async
   request,
 }) => {
   await page.goto('/');
-  const before = Number(/^\((\d+)\)/.exec(await page.title())?.[1] ?? 0);
+  // What already waits comes from the API: the page may not have loaded it yet.
+  const waiting = (await developerCall(request, 'listWaitingForMe', {})) as { items: unknown[] };
+  const before = waiting.items.length;
   const key = await createTicket(request, 'Pick the date format');
   const front = await agent(request, 'front-title');
   await front('takeTicket', { key, role: 'front' });
