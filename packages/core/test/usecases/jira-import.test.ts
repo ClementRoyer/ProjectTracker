@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import type { JiraIssue } from '../../src/domain';
-import { getTicket, listNovelties, loadFromJira, setPriority } from '../../src/usecases';
+import {
+  getTicket,
+  listNovelties,
+  listTickets,
+  loadFromJira,
+  previewJiraLoad,
+  setPriority,
+} from '../../src/usecases';
 import { testContext } from './context';
 
 const issue = (key: string, changes: Partial<JiraIssue> = {}): JiraIssue => ({
@@ -59,8 +66,8 @@ describe('loading from Jira (F2)', () => {
     expect(second.ok && second.value.changed).toEqual(['DEMO-1']);
     const ticket = getTicket(ctx, { key: 'DEMO-1' });
     expect(ticket.ok && ticket.value.entries.slice(-2).map((e) => e.body)).toEqual([
-      'Statut Jira : To Do → In Progress',
-      'Product owner : Keep it simple.',
+      'Jira status: To Do → In Progress',
+      'Product owner: Keep it simple.',
     ]);
     const third = await loadFromJira(ctx, {});
     expect(third.ok && third.value.changed).toEqual([]);
@@ -108,5 +115,22 @@ describe('loading from Jira (F2)', () => {
     await loadFromJira(ctx, {});
     const reloaded = getTicket(ctx, { key: 'DEMO-1' });
     expect(reloaded.ok && reloaded.value.priority).toBe('low');
+  });
+});
+
+describe('counting what a Jira load would bring (ADR 0052)', () => {
+  it('counts the issues read and the new ones, and writes nothing', async () => {
+    const ctx = withJira([issue('DEMO-1')]);
+    await loadFromJira(ctx, {});
+    ctx.jira = () => Promise.resolve([issue('DEMO-1'), issue('DEMO-2'), issue('DEMO-3')]);
+    const preview = await previewJiraLoad(ctx, {});
+    expect(preview.ok && preview.value).toEqual({ read: 3, created: ['DEMO-2', 'DEMO-3'] });
+    const tickets = listTickets(ctx, { includeClosed: true });
+    expect(tickets.ok && tickets.value.tickets.map((ticket) => ticket.key)).toEqual(['DEMO-1']);
+  });
+
+  it('says when Jira is not configured', async () => {
+    const preview = await previewJiraLoad(testContext(), {});
+    expect(preview.ok ? '' : preview.error).toBe('jiraNotConfigured');
   });
 });

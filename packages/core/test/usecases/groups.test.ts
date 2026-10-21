@@ -25,8 +25,8 @@ describe('ticket groups (F31, ADR 0040)', () => {
     const ticket = getTicket(ctx, { key: 'LOC-1' });
     expect(ticket.ok && ticket.value.group).toBeNull();
     expect(ticket.ok && ticket.value.entries.slice(-2).map((entry) => entry.body)).toEqual([
-      'Groupe : Search',
-      'Groupe : aucun',
+      'Group: Search',
+      'Group: none',
     ]);
   });
 });

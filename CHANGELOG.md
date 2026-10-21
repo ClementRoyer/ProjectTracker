@@ -4,6 +4,26 @@ Every published version of project-tracker, newest first. The format follows [Ke
 
 ## [Unreleased]
 
+## [2.0.5] - 2026-10-21
+
+### Added
+
+- Jira parent tickets: `jira.parents` loads only the children of these issues; the installer asks for them ([ADR 0052](docs/adr/0052-installation-retours-du-premier-deploiement.md)).
+- On a new install with Jira, the installer counts the tickets a load would bring and offers to load them.
+- `stop-front.sh` and `stop-back.sh`.
+- A project folder holding one git repository per application: the installer finds them and offers to follow them all, on install and on each update ([ADR 0054](docs/adr/0054-detection-des-depots.md)).
+
+### Changed
+
+- Everything speaks English: the page, the CLI, the server, the installer, the launcher and the instructions given to agents. Journal entries written before stay as they were ([ADR 0053](docs/adr/0053-tout-en-anglais.md)).
+- The server and the launcher run in the background: the install gives the prompt back with the dashboard URL; an update restarts them.
+- A new install proposes a free port, not used by another project.
+- The install scripts speak English, with colours and spacing.
+
+### Fixed
+
+- No more Node warnings when the server starts.
+
 ## [2.0.4] - 2026-10-21
 
 ### Added
@@ -48,7 +68,8 @@ First public version: a full rewrite of project-tracker.
 - Back-end agents on another machine through a launcher, without SSH.
 - Install and start scripts from the GitHub releases, with a checksum check.
 
-[Unreleased]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.4...HEAD
+[Unreleased]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.5...HEAD
+[2.0.5]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.4...v2.0.5
 [2.0.4]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.2...v2.0.3
 [2.0.2]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.1...v2.0.2

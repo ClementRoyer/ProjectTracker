@@ -14,15 +14,15 @@ import {
   waitingItem,
 } from './ticket';
 
-// Descriptions are read by agents and shown in the CLI help: they are in French (ADR 0006).
+// Descriptions are read by agents and shown in the CLI help: they are in English (ADR 0053).
 
 export const createTicket = defineOperation({
   name: 'createTicket',
-  description: 'Crée un ticket local, qui ne part jamais vers Jira.',
+  description: 'Creates a local ticket, which never goes to Jira.',
   callers: ['developer', 'agent'],
   input: z.object({
-    title: z.string().describe('Le titre, en une phrase'),
-    initialRequest: z.string().optional().describe('La demande, si elle dit plus que le titre'),
+    title: z.string().describe('The title, in one sentence'),
+    initialRequest: z.string().optional().describe('The request, if it says more than the title'),
   }),
   output: z.object({ key: z.string() }),
 });
@@ -30,7 +30,7 @@ export const createTicket = defineOperation({
 export const listTickets = defineOperation({
   name: 'listTickets',
   readOnly: true,
-  description: 'Liste les tickets et leur situation.',
+  description: 'Lists the tickets and their situation.',
   callers: ['developer', 'agent'],
   input: z.object({ includeClosed: z.boolean().optional() }),
   output: z.object({ tickets: z.array(ticketSummary) }),
@@ -39,7 +39,7 @@ export const listTickets = defineOperation({
 export const getTicket = defineOperation({
   name: 'getTicket',
   readOnly: true,
-  description: 'Rend la fiche d’un ticket : demande initiale, situation et journal complet.',
+  description: 'Returns the sheet of a ticket: initial request, situation and full journal.',
   callers: ['developer', 'agent'],
   input: z.object({ key: ticketKey }),
   output: ticketDetail,
@@ -48,7 +48,7 @@ export const getTicket = defineOperation({
 export const reportProgress = defineOperation({
   name: 'reportProgress',
   description:
-    'Rapporte l’avancement dans la phase courante : pas démarré, en cours (avec où on en est), fait.',
+    'Reports progress in the current phase: not started, in progress (with where things stand), done.',
   callers: ['developer', 'agent'],
   input: z.object({ key: ticketKey, progress }),
   output: z.object({ situation }),
@@ -56,8 +56,7 @@ export const reportProgress = defineOperation({
 
 export const changePhase = defineOperation({
   name: 'changePhase',
-  description:
-    'Fait passer le ticket dans une autre phase ; l’avancement repart de « pas démarré ».',
+  description: 'Moves the ticket to another phase; progress restarts at "not started".',
   callers: ['developer', 'agent'],
   input: z.object({ key: ticketKey, phase }),
   output: z.object({ situation }),
@@ -65,8 +64,7 @@ export const changePhase = defineOperation({
 
 export const closeTicket = defineOperation({
   name: 'closeTicket',
-  description:
-    'Déclare le ticket terminé, après une validation en qualité faite. Le développeur seul.',
+  description: 'Declares the ticket closed, after QA validation is done. The developer only.',
   callers: ['developer'],
   input: z.object({ key: ticketKey }),
   output: z.object({ situation }),
@@ -75,7 +73,7 @@ export const closeTicket = defineOperation({
 export const setPriority = defineOperation({
   name: 'setPriority',
   description:
-    'Règle la priorité du ticket ; à fichier tenu libéré, la demande back-end du ticket le plus prioritaire passe en premier.',
+    'Sets the ticket priority; when a held file is released, the back-end request of the highest-priority ticket goes first.',
   callers: ['developer'],
   input: z.object({ key: ticketKey, priority }),
   output: z.object({ priority }),
@@ -84,7 +82,7 @@ export const setPriority = defineOperation({
 export const setDueDate = defineOperation({
   name: 'setDueDate',
   description:
-    'Règle l’échéance d’un ticket local (AAAA-MM-JJ), ou l’enlève avec null ; celle d’un ticket Jira vient de Jira.',
+    'Sets the due date of a local ticket (YYYY-MM-DD), or removes it with null; a Jira ticket due date comes from Jira.',
   callers: ['developer'],
   input: z.object({ key: ticketKey, dueDate: z.iso.date().nullable() }),
   output: z.object({ dueDate: z.string().nullable() }),
@@ -93,7 +91,7 @@ export const setDueDate = defineOperation({
 export const setSize = defineOperation({
   name: 'setSize',
   description:
-    'Estime la taille du ticket (petite, moyenne, grande), par exemple à l’analyse ; null l’enlève.',
+    'Estimates the ticket size (small, medium, large), for example during analysis; null removes it.',
   callers: ['developer', 'agent'],
   input: z.object({ key: ticketKey, size: size.nullable() }),
   output: z.object({ size: size.nullable() }),
@@ -102,7 +100,7 @@ export const setSize = defineOperation({
 export const setGroup = defineOperation({
   name: 'setGroup',
   description:
-    'Range le ticket dans un groupe nommé (créé à la première utilisation), ou l’en sort avec null.',
+    'Puts the ticket in a named group (created on first use), or takes it out with null.',
   callers: ['developer'],
   input: z.object({ key: ticketKey, group: z.string().min(1).nullable() }),
   output: z.object({ group: z.string().nullable() }),
@@ -111,7 +109,7 @@ export const setGroup = defineOperation({
 export const setWorktree = defineOperation({
   name: 'setWorktree',
   description:
-    'Note le dossier de travail du ticket (chemin depuis la racine du projet) et sa branche ; « tracker worktree add » le fait.',
+    'Records the ticket working folder (path from the project root) and its branch; "tracker worktree add" does it.',
   callers: ['developer', 'agent'],
   input: z.object({ key: ticketKey, path: z.string().min(1), branch: z.string().min(1) }),
   output: z.object({ path: z.string(), branch: z.string() }),
@@ -120,7 +118,7 @@ export const setWorktree = defineOperation({
 export const forgetWorktree = defineOperation({
   name: 'forgetWorktree',
   description:
-    'Oublie le dossier de travail du ticket, une fois retiré ; « tracker worktree remove » le fait.',
+    'Forgets the ticket working folder, once removed; "tracker worktree remove" does it.',
   callers: ['developer', 'agent'],
   input: z.object({ key: ticketKey }),
   output: z.object({}),
@@ -130,7 +128,7 @@ export const listWorktrees = defineOperation({
   name: 'listWorktrees',
   readOnly: true,
   description:
-    'Les dossiers de travail des tickets ouverts, avec leurs branches : ce que l’aperçu réunit.',
+    'The working folders of the open tickets, with their branches: what the preview merges.',
   callers: ['developer', 'agent'],
   input: z.object({}),
   output: z.object({
@@ -140,14 +138,14 @@ export const listWorktrees = defineOperation({
 
 const previewConflict = z.object({
   key: z.string(),
-  files: z.array(z.string()).describe('Les fichiers en conflit'),
-  with: z.array(z.string()).describe('Les tickets déjà réunis qui modifient ces fichiers'),
+  files: z.array(z.string()).describe('The conflicting files'),
+  with: z.array(z.string()).describe('The tickets already merged that change these files'),
 });
 
 export const recordPreview = defineOperation({
   name: 'recordPreview',
   description:
-    'Note une reconstruction de l’aperçu : tickets réunis et tickets laissés de côté pour conflit ; « tracker preview build » le fait.',
+    'Records a preview rebuild: tickets merged and tickets left out because of a conflict; "tracker preview build" does it.',
   callers: ['developer', 'agent'],
   input: z.object({ included: z.array(z.string()), conflicts: z.array(previewConflict) }),
   output: z.object({ builtAt: z.string() }),
@@ -156,7 +154,7 @@ export const recordPreview = defineOperation({
 export const getPreview = defineOperation({
   name: 'getPreview',
   readOnly: true,
-  description: 'La dernière reconstruction de l’aperçu, ou null s’il n’a jamais été construit.',
+  description: 'The last preview rebuild, or null if it was never built.',
   callers: ['developer', 'agent'],
   input: z.object({}),
   output: z.object({
@@ -174,7 +172,7 @@ export const suggestNext = defineOperation({
   name: 'suggestNext',
   readOnly: true,
   description:
-    'Les tickets à prendre ensuite, au plus trois, avec leurs raisons : échéance, priorité, presque fini, gain rapide.',
+    'The tickets to take next, at most three, with their reasons: due date, priority, almost done, quick win.',
   callers: ['developer'],
   input: z.object({}),
   output: z.object({
@@ -187,7 +185,7 @@ export const suggestNext = defineOperation({
 export const declareWait = defineOperation({
   name: 'declareWait',
   description:
-    'Déclare ce que le ticket attend hors de l’outil (utilisateur final, partenaire), ou lève l’attente avec null.',
+    'Declares what the ticket waits for outside the tool (end user, partner), or clears the wait with null.',
   callers: ['developer', 'agent'],
   input: z.object({
     key: ticketKey,
@@ -199,7 +197,7 @@ export const declareWait = defineOperation({
 export const recordEntry = defineOperation({
   name: 'recordEntry',
   description:
-    'Ajoute au journal un point d’avancement, une décision (avec sa raison), un retour d’utilisateur ou un échange, mot pour mot.',
+    'Adds to the journal a progress update, a decision (with its reason), end-user feedback or an exchange, word for word.',
   callers: ['developer', 'agent'],
   input: z.object({
     key: ticketKey,
@@ -208,7 +206,7 @@ export const recordEntry = defineOperation({
     attachments: z
       .array(z.string())
       .optional()
-      .describe('Identifiants de pièces jointes du ticket (tracker attach)'),
+      .describe('Ids of the ticket attachments (tracker attach)'),
   }),
   output: z.object({ entryId: z.string() }),
 });
@@ -216,7 +214,7 @@ export const recordEntry = defineOperation({
 export const recordTestRun = defineOperation({
   name: 'recordTestRun',
   description:
-    'Enregistre un passage de tests du ticket : automatiques, visuels ou par l’utilisateur, réussi ou non, avec une note (par exemple « 14 sur 16 »).',
+    'Records a test run of the ticket: automatic, visual or by the user, passed or not, with a note (for example "14 of 16").',
   callers: ['developer', 'agent'],
   input: z.object({
     key: ticketKey,
@@ -230,7 +228,7 @@ export const recordTestRun = defineOperation({
 export const listNovelties = defineOperation({
   name: 'listNovelties',
   readOnly: true,
-  description: 'Ce qui a changé depuis la dernière visite du développeur.',
+  description: 'What has changed since the last visit of the developer.',
   callers: ['developer'],
   input: z.object({}),
   output: z.object({ since: z.string().nullable(), entries: z.array(novelty) }),
@@ -238,7 +236,7 @@ export const listNovelties = defineOperation({
 
 export const markVisited = defineOperation({
   name: 'markVisited',
-  description: 'Note que le développeur a vu les nouveautés.',
+  description: 'Records that the developer has seen the updates.',
   callers: ['developer'],
   input: z.object({}),
   output: z.object({ at: z.string() }),
@@ -246,7 +244,7 @@ export const markVisited = defineOperation({
 
 export const markTicketRead = defineOperation({
   name: 'markTicketRead',
-  description: 'Note que le développeur a lu le ticket : son point « nouveautés » s’efface.',
+  description: 'Records that the developer has read the ticket: its "updates" marker disappears.',
   callers: ['developer'],
   input: z.object({ key: ticketKey }),
   output: z.object({ at: z.string() }),
@@ -256,7 +254,7 @@ export const listWaitingForMe = defineOperation({
   name: 'listWaitingForMe',
   readOnly: true,
   description:
-    'Tout ce qui attend une réponse ou une action du développeur, du plus ancien au plus récent.',
+    'Everything waiting for an answer or an action from the developer, from the oldest to the newest.',
   callers: ['developer'],
   input: z.object({}),
   output: z.object({ items: z.array(waitingItem) }),
@@ -265,21 +263,21 @@ export const listWaitingForMe = defineOperation({
 export const deliverBatch = defineOperation({
   name: 'deliverBatch',
   description:
-    'Note qu’un lot de tickets est livré en qualité ; chaque ticket passe en livraison en qualité, fait.',
+    'Records that a set of tickets is delivered to QA; each ticket moves to QA delivery, done.',
   callers: ['developer'],
   input: z.object({ name: z.string(), keys: z.array(ticketKey).min(1) }),
   output: deliveryBatch.extend({
     changelog: z
       .object({ written: z.number(), missing: z.array(z.string()) })
       .nullable()
-      .describe('Ce que la livraison a ajouté au changelog ; null sans changelog'),
+      .describe('What the delivery added to the changelog; null without a changelog'),
   }),
 });
 
 export const validateBatch = defineOperation({
   name: 'validateBatch',
   description:
-    'Note que la livraison est validée en qualité ; chaque ticket passe en validation en qualité, faite.',
+    'Records that the delivery is validated in QA; each ticket moves to QA validation, done.',
   callers: ['developer'],
   input: z.object({ batchId: z.string() }),
   output: deliveryBatch,
@@ -288,7 +286,7 @@ export const validateBatch = defineOperation({
 export const proposeChangelog = defineOperation({
   name: 'proposeChangelog',
   description:
-    'Propose la ligne de changelog du ticket, en une phrase pour l’utilisateur final ; le développeur la relira avant la livraison.',
+    'Proposes the ticket changelog line, in one sentence for the end user; the developer will review it before the delivery.',
   callers: ['developer', 'agent'],
   input: z.object({ key: ticketKey, line: z.string().min(1) }),
   output: z.object({ entryId: z.string() }),
@@ -296,7 +294,7 @@ export const proposeChangelog = defineOperation({
 
 export const acceptChangelog = defineOperation({
   name: 'acceptChangelog',
-  description: 'Accepte, éventuellement reformulée, la ligne de changelog du ticket.',
+  description: 'Accepts the ticket changelog line, possibly reworded.',
   callers: ['developer'],
   input: z.object({ key: ticketKey, line: z.string().min(1) }),
   output: z.object({ entryId: z.string() }),
@@ -305,7 +303,7 @@ export const acceptChangelog = defineOperation({
 export const listBatches = defineOperation({
   name: 'listBatches',
   readOnly: true,
-  description: 'Liste les livraisons en qualité, la plus récente d’abord.',
+  description: 'Lists the QA deliveries, the most recent first.',
   callers: ['developer'],
   input: z.object({}),
   output: z.object({ batches: z.array(deliveryBatch) }),
@@ -314,7 +312,7 @@ export const listBatches = defineOperation({
 export const reportChangedFiles = defineOperation({
   name: 'reportChangedFiles',
   description:
-    'Rapporte les fichiers que le ticket modifie (relevés par la CLI) ; rend les autres tickets qui touchent les mêmes fichiers.',
+    'Reports the files the ticket changes (collected by the CLI); returns the other tickets that touch the same files.',
   callers: ['developer', 'agent'],
   input: z.object({ key: ticketKey, files: z.array(z.string()) }),
   output: z.object({
@@ -325,7 +323,7 @@ export const reportChangedFiles = defineOperation({
 export const loadFromJira = defineOperation({
   name: 'loadFromJira',
   description:
-    'Charge de Jira les tickets assignés au développeur sur le projet : crée les nouveaux, note ce qui a changé. Rien n’est écrit dans Jira.',
+    'Loads from Jira the tickets assigned to the developer on the project: creates the new ones, records what changed. Nothing is written to Jira.',
   callers: ['developer'],
   input: z.object({}),
   output: z.object({
@@ -336,11 +334,21 @@ export const loadFromJira = defineOperation({
   }),
 });
 
+export const previewJiraLoad = defineOperation({
+  name: 'previewJiraLoad',
+  readOnly: true,
+  description:
+    'Counts what a Jira import would bring (tickets read, new ones), without writing anything to Jira or to the tracker.',
+  callers: ['developer'],
+  input: z.object({}),
+  output: z.object({ read: z.number(), created: z.array(z.string()) }),
+});
+
 export const listDocuments = defineOperation({
   name: 'listDocuments',
   readOnly: true,
   description:
-    'Les documents de référence du projet (chemins depuis sa racine), à lire avant de travailler.',
+    'The reference documents of the project (paths from its root), to read before working.',
   callers: ['developer', 'agent'],
   input: z.object({}),
   output: z.object({ documents: z.array(z.object({ path: z.string() })) }),
@@ -349,7 +357,7 @@ export const listDocuments = defineOperation({
 export const readDocument = defineOperation({
   name: 'readDocument',
   readOnly: true,
-  description: 'Rend le texte d’un document de référence du projet.',
+  description: 'Returns the text of a reference document of the project.',
   callers: ['developer', 'agent'],
   input: z.object({ path: z.string() }),
   output: z.object({ path: z.string(), content: z.string() }),
@@ -386,6 +394,7 @@ export const ticketOperations = [
   acceptChangelog,
   reportChangedFiles,
   loadFromJira,
+  previewJiraLoad,
   listDocuments,
   readDocument,
 ] as const;

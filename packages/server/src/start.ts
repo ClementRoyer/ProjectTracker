@@ -23,11 +23,11 @@ export async function startServer(
 ): Promise<RunningServer> {
   if (!existsSync(configFile)) {
     throw new Error(
-      `Configuration introuvable : ${configFile}. Crée un fichier tracker.config.json (au minimum « {} ») dans le dossier de l'outil.`,
+      `Configuration not found: ${configFile}. Create a tracker.config.json file (at least "{}") in the tool's folder.`,
     );
   }
   const config = parseConfig(JSON.parse(readFileSync(configFile, 'utf8')));
-  if (!config.ok) throw new Error(`Configuration invalide (${configFile}) :\n${config.error}`);
+  if (!config.ok) throw new Error(`Invalid configuration (${configFile}):\n${config.error}`);
   const folder = dirname(configFile);
   const database = resolve(folder, config.value.database);
   const db = openDatabase(database);
@@ -88,9 +88,10 @@ function jiraOf(config: Config): JiraReader | undefined {
   const token = process.env[config.jira.tokenEnv];
   if (!email || !token) {
     console.warn(
-      `Jira : ${config.jira.emailEnv} et ${config.jira.tokenEnv} doivent être définies pour charger Jira.`,
+      `Jira: ${config.jira.emailEnv} and ${config.jira.tokenEnv} must be set to import from Jira.`,
     );
     return undefined;
   }
-  return jiraReader({ baseUrl: config.jira.baseUrl, project: config.jira.project, email, token });
+  const { baseUrl, project, parents } = config.jira;
+  return jiraReader({ baseUrl, project, ...(parents ? { parents } : {}), email, token });
 }

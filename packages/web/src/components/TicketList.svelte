@@ -40,29 +40,30 @@
 {#if waitingCount > 0}
   <button type="button" class="triage" onclick={onTriage}>
     <strong>
-      {waitingCount === 1 ? '1 décision t’attend' : `${String(waitingCount)} décisions t’attendent`}
+      {waitingCount === 1
+        ? '1 decision waits for you'
+        : `${String(waitingCount)} decisions wait for you`}
     </strong>
-    <span>Les traiter une par une, du plus ancien au plus récent</span>
+    <span>Handle them one by one, oldest first</span>
   </button>
 {/if}
 
 {@render children?.()}
 
 <div class="tools">
-  <label for="sortList">Trier par</label>
+  <label for="sortList">Sort by</label>
   <select id="sortList" bind:value={order}>
-    <option value="wait">Attente la plus ancienne</option>
-    <option value="activity">Dernière activité</option>
-    <option value="phase">Phase la plus avancée</option>
-    <option value="priority">Priorité</option>
-    <option value="key">Clé du ticket</option>
+    <option value="wait">Oldest wait</option>
+    <option value="activity">Latest activity</option>
+    <option value="phase">Most advanced phase</option>
+    <option value="priority">Priority</option>
+    <option value="key">Ticket key</option>
   </select>
-  <button type="button" onclick={toggleAll}>{allCollapsed ? 'Tout déplier' : 'Tout replier'}</button
-  >
+  <button type="button" onclick={toggleAll}>{allCollapsed ? 'Expand all' : 'Collapse all'}</button>
 </div>
 
 {#if tickets.length === 0}
-  <p class="empty">Aucun ticket. Crée-en un, ou charge tes tickets Jira.</p>
+  <p class="empty">No tickets. Create one, or load your Jira tickets.</p>
 {/if}
 
 {#each groups as group (group.id)}

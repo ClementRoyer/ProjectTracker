@@ -32,6 +32,8 @@ const artefact = (): string => {
   for (const dir of ['web', 'claude']) mkdirSync(join(dist, dir));
   writeFileSync(join(dist, 'VERSION'), '2.0.0');
   writeFileSync(join(dist, 'start-front.sh'), '');
+  writeFileSync(join(dist, 'stop-front.sh'), '');
+  writeFileSync(join(dist, 'package.json'), '{"type":"module"}');
   return dist;
 };
 

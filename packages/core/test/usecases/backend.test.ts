@@ -157,7 +157,7 @@ describe('back-end requests (ADR 0010)', () => {
     });
     const ticket = getTicket(ctx, { key: 'LOC-1' });
     expect(ticket.ok && ticket.value.entries.at(-1)?.body).toBe(
-      'Modification non déclarée : api/users.js (auteur incertain)',
+      'Undeclared change: api/users.js (uncertain author)',
     );
   });
 

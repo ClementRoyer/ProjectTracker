@@ -143,7 +143,7 @@ export function finishExecution(
         entryType: 'situationChange',
         authorKind: 'launcher',
         role: 'backend',
-        body: `Modification non déclarée : ${input.undeclared.join(', ')}${input.uncertainAuthor ? ' (auteur incertain)' : ''}`,
+        body: `Undeclared change: ${input.undeclared.join(', ')}${input.uncertainAuthor ? ' (uncertain author)' : ''}`,
         createdAt: at,
       });
     }
@@ -175,7 +175,7 @@ function statusOf(input: FinishInput): 'done' | 'failed' | 'waiting' {
 
 function replyBody(input: FinishInput): string {
   if (input.reply) return input.reply.message;
-  return input.raw ?? `Échec du back-end : ${input.failure ?? 'raison inconnue'}`;
+  return input.raw ?? `Back-end failure: ${input.failure ?? 'unknown reason'}`;
 }
 
 /** The reply in the journal, word for word, and brought to the front assignee (ADR 0007). */

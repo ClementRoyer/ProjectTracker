@@ -5,6 +5,8 @@ import type { JiraComment, JiraIssue, JiraReader } from '../domain';
 export interface JiraConnection {
   baseUrl: string;
   project: string;
+  /** Only the children of these issues, when given (ADR 0052); checked as issue keys by the configuration. */
+  parents?: readonly string[];
   email: string;
   token: string;
 }
@@ -69,6 +71,10 @@ const BLOCKS = new Set(['paragraph', 'heading', 'listItem', 'codeBlock', 'blockq
 export function jiraReader(connection: JiraConnection, fetchFn: typeof fetch = fetch): JiraReader {
   const authorization = `Basic ${Buffer.from(`${connection.email}:${connection.token}`).toString('base64')}`;
   const base = connection.baseUrl.replace(/\/+$/, '');
+  const parentsClause =
+    connection.parents && connection.parents.length > 0
+      ? ` AND parent in (${connection.parents.join(', ')})`
+      : '';
   return async () => {
     const issues: JiraIssue[] = [];
     let nextPageToken: string | undefined;
@@ -76,7 +82,7 @@ export function jiraReader(connection: JiraConnection, fetchFn: typeof fetch = f
       const url = new URL(`${base}/rest/api/3/search/jql`);
       url.searchParams.set(
         'jql',
-        `project = "${connection.project}" AND assignee = currentUser() ORDER BY updated DESC`,
+        `project = "${connection.project}" AND assignee = currentUser()${parentsClause} ORDER BY updated DESC`,
       );
       url.searchParams.set('fields', 'summary,status,updated,description,priority,duedate,comment');
       url.searchParams.set('maxResults', '50');

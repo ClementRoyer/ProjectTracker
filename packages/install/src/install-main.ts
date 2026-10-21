@@ -10,13 +10,13 @@ import { rollBackToV1, switchOverToV2, type RunV1 } from './project/switch-over'
 
 // Usage: node dist/install.js --root <project> [--port <n>] [--from-v1 [--v1-project <id>]] [--rollback-v1]
 //        [--set-v1-aside]
-const USAGE = `Usage : node dist/install.js --root <projet> [options]
-  --port <n>            port du serveur, pour une nouvelle installation (par défaut 9620)
-  --from-v1             bascule un projet V1 : V1 mise de côté dans tools/tracker-v1, V2 installée et migrée
-  --v1-project <id>     le projet V1 à migrer, si le tracker V1 en suit plusieurs
-  --rollback-v1         remet la V1 en place ; la V2 est gardée à côté
-  --set-v1-aside        met la V1 de côté dans tools/tracker-legacy, sans migrer ses données, et installe la V2
-Relancée sur un projet déjà installé, la commande le met à jour, après une sauvegarde de la base.`;
+const USAGE = `Usage: node dist/install.js --root <project> [options]
+  --port <n>            server port, for a new installation (default 9620)
+  --from-v1             switch over a V1 project: V1 set aside in tools/tracker-v1, V2 installed and migrated
+  --v1-project <id>     the V1 project to migrate, if the V1 tracker follows several
+  --rollback-v1         put V1 back in place; V2 is kept beside it
+  --set-v1-aside        set V1 aside in tools/tracker-legacy, without migrating its data, and install V2
+Run again on an installed project, the command updates it, after a backup of the database.`;
 
 const artefactDir = dirname(fileURLToPath(import.meta.url));
 const legacyInstaller = resolve(artefactDir, '..', 'legacy', 'scripts', 'install.mjs');
@@ -24,13 +24,13 @@ const legacyInstaller = resolve(artefactDir, '..', 'legacy', 'scripts', 'install
 const runV1: RunV1 = (args) =>
   new Promise((done, failed) => {
     if (!existsSync(legacyInstaller)) {
-      failed(new Error(`Installeur V1 introuvable : ${legacyInstaller}`));
+      failed(new Error(`V1 installer not found: ${legacyInstaller}`));
       return;
     }
     const child = spawn('node', [legacyInstaller, ...args], { stdio: 'inherit' });
     child.on('exit', (code) => {
       if (code === 0) done();
-      else failed(new Error(`L’installeur V1 a échoué (code ${String(code)}).`));
+      else failed(new Error(`The V1 installer failed (code ${String(code)}).`));
     });
   });
 
@@ -67,7 +67,7 @@ main().then(
     process.stdout.write(`${report.join('\n')}\n`);
   },
   (error: unknown) => {
-    process.stderr.write(`install : ${error instanceof Error ? error.message : String(error)}\n`);
+    process.stderr.write(`install: ${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;
   },
 );

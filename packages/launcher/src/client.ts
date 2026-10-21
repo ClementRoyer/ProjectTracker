@@ -22,7 +22,7 @@ export function trackerClient(target: {
           async (response) => ({ status: response.status, text: await response.text() }),
         );
     if (answer.status !== 200) {
-      throw new Error(`${operation} : ${String(answer.status)} ${answer.text}`);
+      throw new Error(`${operation}: ${String(answer.status)} ${answer.text}`);
     }
     return JSON.parse(answer.text) as unknown;
   };

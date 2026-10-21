@@ -70,6 +70,14 @@ describe('Jira client (read-only, ADR 0026)', () => {
     );
   });
 
+  it('reads only the children of the parent tickets, when the project names some (ADR 0052)', async () => {
+    const seen: Seen[] = [];
+    await jiraReader({ ...connection, parents: ['DEMO-10', 'DEMO-20'] }, fakeJira(seen))();
+    expect(seen[0]?.url.searchParams.get('jql')).toBe(
+      'project = "DEMO" AND assignee = currentUser() AND parent in (DEMO-10, DEMO-20) ORDER BY updated DESC',
+    );
+  });
+
   it('only ever sends GET requests', async () => {
     const seen: Seen[] = [];
     await jiraReader(connection, fakeJira(seen))();

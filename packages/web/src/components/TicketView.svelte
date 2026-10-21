@@ -38,18 +38,18 @@
     if (answer.ok && answer.value.unread) await tracker.api.call(markTicketRead, { key });
   }
 
-  const SHORT = ['À faire', 'Analyse', 'Dév.', 'Test', 'Livr. qualité', 'Valid. qualité'];
+  const SHORT = ['To do', 'Analysis', 'Dev.', 'Test', 'QA delivery', 'QA valid.'];
 
   function assigneesText(ticket: TicketDetail): string {
-    if (ticket.assignees.length === 0) return 'aucun intervenant';
+    if (ticket.assignees.length === 0) return 'no assignee';
     return ticket.assignees
-      .map((a) => `${a.role === 'front' ? 'front' : 'back-end'} : ${a.name ?? 'toi'}`)
+      .map((a) => `${a.role === 'front' ? 'front' : 'back-end'}: ${a.name ?? 'you'}`)
       .join(' · ');
   }
 </script>
 
 {#if missing}
-  <p class="hint">Ce ticket n’existe pas.</p>
+  <p class="hint">This ticket does not exist.</p>
 {:else if detail}
   {@const ticket = detail}
   {@const phaseIndex = PHASES.indexOf(ticket.situation.phase)}

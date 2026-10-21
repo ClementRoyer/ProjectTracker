@@ -17,7 +17,7 @@ test('the page lists a ticket created through the API, and follows changes live'
 test('the theme button switches between light and dark', async ({ page }) => {
   await page.emulateMedia({ colorScheme: 'light' });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Passer au thème sombre' }).click();
+  await page.getByRole('button', { name: 'Switch to dark theme' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 });
 
@@ -32,7 +32,7 @@ test('the dark theme follows the system until the developer chooses', async ({ p
   await page.reload();
   expect(await background()).toBe('rgb(246, 245, 241)');
 
-  await page.getByRole('button', { name: 'Passer au thème sombre' }).click();
+  await page.getByRole('button', { name: 'Switch to dark theme' }).click();
   await page.reload();
   expect(await background()).toBe('rgb(18, 18, 20)');
 });

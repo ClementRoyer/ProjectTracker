@@ -57,9 +57,6 @@ project-tracker puts **the ticket at the centre**. Agents report their progress,
   </tr>
 </table>
 
-> [!NOTE]
-> The interface is in French for now; the code and the documentation are in English. Translating the interface is a welcome contribution.
-
 ## How it works
 
 ```
@@ -110,12 +107,14 @@ cd ~/code/my-project
 curl -fsSL https://github.com/ClementRoyer/ProjectTracker/releases/latest/download/install-front.sh | bash
 ```
 
-The installer downloads the latest release, checks its SHA-256 checksum, and asks only what it needs: the port, Jira (optional), and whether back-end agents run on another machine. Then it starts the server and prints the page's address; on this first start it asks for the missing secrets once and keeps them in `tools/tracker/secrets.env`, readable by you only and ignored by git. Later, start it again with `tools/tracker/app/start-front.sh`.
+The installer downloads the latest release, checks its SHA-256 checksum, and asks only what it needs: the port (a free one is proposed), Jira (optional, with parent tickets or epics to narrow it), and whether back-end agents run on another machine. On first start it asks for the missing secrets once and keeps them in `tools/tracker/secrets.env`, readable by you only and ignored by git. With Jira, it counts the tickets assigned to you and offers to load them. It ends with the dashboard URL; the server keeps running in the background.
+
+Stop it with `tools/tracker/app/stop-front.sh`, start it again with `tools/tracker/app/start-front.sh` (log in `tools/tracker/server.log`).
 
 That's it: open a Claude Code session in the project and it is tracked. Run the same command at any time to update; the database is backed up first.
 
 > [!TIP]
-> Every question has a variable, for scripted installs: `PROJECT_TRACKER_ROOT`, `PROJECT_TRACKER_PORT`, `PROJECT_TRACKER_JIRA_URL`, `PROJECT_TRACKER_JIRA_PROJECT`, `PROJECT_TRACKER_PRIVATE_ADDRESS`. `PROJECT_TRACKER_YES=1` takes the defaults, `PROJECT_TRACKER_VERSION=2.1.0` pins a version, `PROJECT_TRACKER_NO_START=1` installs without starting.
+> Every question has a variable, for scripted installs: `PROJECT_TRACKER_ROOT`, `PROJECT_TRACKER_PORT`, `PROJECT_TRACKER_JIRA_URL`, `PROJECT_TRACKER_JIRA_PROJECT`, `PROJECT_TRACKER_JIRA_PARENTS`, `PROJECT_TRACKER_PRIVATE_ADDRESS`. `PROJECT_TRACKER_YES=1` takes the defaults, `PROJECT_TRACKER_VERSION=2.1.0` pins a version, `PROJECT_TRACKER_NO_START=1` installs without starting.
 
 <details>
 <summary><b>What the installer adds to your project</b></summary>
@@ -196,7 +195,7 @@ For a back-end that lives on a separate server, reachable without SSH and withou
    curl -fsSL https://github.com/ClementRoyer/ProjectTracker/releases/latest/download/install-back.sh | bash
    ```
 
-   It asks where to install, the tool's address (`http://100.64.0.1:9620`), the mirror folder, the agent command (default `claude -p --output-format json --json-schema @SCHEMA@`), how many agents may run at once, an optional HTTP proxy (Tailscale in userspace mode), and on first start the launcher token, kept next to it. Later, start it again with `~/project-tracker-back/start-back.sh`.
+   It asks where to install, the tool's address (`http://100.64.0.1:9620`), the mirror folder, the agent command (default `claude -p --output-format json --json-schema @SCHEMA@`), how many agents may run at once, an optional HTTP proxy (Tailscale in userspace mode), and on first start the launcher token, kept next to it. The launcher then runs in the background (log in `launcher.log`); stop it with `~/project-tracker-back/stop-back.sh`, start it again with `start-back.sh`.
 
 The agent command reads the request on its standard input; `@SCHEMA@` becomes the JSON Schema of the expected reply. The launcher only ever runs its configured command and receives plain text, never commands. Two back-end agents never edit the same file at once: a held file blocks the request, which is retried as soon as the file is released.
 

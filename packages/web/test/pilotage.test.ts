@@ -113,27 +113,27 @@ describe('sorting the list', () => {
 describe('texts of a row', () => {
   it('says how long the developer has been waited for', () => {
     expect(waitText(ticket('F-1', { situation: waiting('developer', hoursAgo(50)) }), NOW)).toBe(
-      'Attend ta réponse depuis 2 j',
+      'Waiting for your answer for 2 d',
     );
   });
 
-  it('says « moins d’une minute » rather than « depuis maintenant »', () => {
+  it('says "less than a minute" rather than "for now"', () => {
     expect(waitText(ticket('F-4', { situation: waiting('backend', NOW) }), NOW)).toBe(
-      'Attend le back-end depuis moins d’une minute',
+      'Waiting for the back-end for less than a minute',
     );
   });
 
   it('names the agent at work', () => {
-    expect(waitText(ticket('F-2', { working: true }), NOW)).toBe('front-1 travaille');
+    expect(waitText(ticket('F-2', { working: true }), NOW)).toBe('front-1 is working');
   });
 
   it('says the progress in words', () => {
-    expect(progressText(ticket('F-3'))).toBe('En cours : form done');
+    expect(progressText(ticket('F-3'))).toBe('In progress: form done');
   });
 
   it('writes short durations', () => {
     expect([ago(hoursAgo(0), NOW), ago(hoursAgo(0.2), NOW), ago(hoursAgo(3), NOW)]).toEqual([
-      'maintenant',
+      'now',
       '12 min',
       '3 h',
     ]);

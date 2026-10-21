@@ -10,24 +10,22 @@ test('a QA delivery is noted from the tickets whose tests are done, then validat
   await developerCall(request, 'reportProgress', { key, progress: { state: 'done' } });
 
   await page.goto('/#/bilan');
-  const next = page.getByRole('region', { name: 'Prochaine livraison en qualité' });
+  const next = page.getByRole('region', { name: 'Next QA delivery' });
   await expect(next).toContainText(key);
   // Only this journey's ticket goes into the delivery.
   for (const box of await next.getByRole('checkbox').all()) {
     const label = await box.locator('..').innerText();
     if (!label.includes(key)) await box.uncheck();
   }
-  await next.getByLabel('Nom de la livraison').fill(`Livraison ${key}`);
-  await next.getByRole('button', { name: 'Noter comme livrée en qualité' }).click();
-  await expect(next.getByRole('status')).toContainText(
-    '1 tickets passent en « Livraison qualité »',
-  );
+  await next.getByLabel('Delivery name').fill(`Delivery ${key}`);
+  await next.getByRole('button', { name: 'Record as delivered to QA' }).click();
+  await expect(next.getByRole('status')).toContainText('1 tickets move to "QA delivery"');
 
-  const past = page.getByRole('region', { name: 'Livraisons passées' });
-  const batch = past.locator('.batch', { hasText: `Livraison ${key}` });
-  await expect(batch).toContainText('à valider');
-  await batch.getByRole('button', { name: 'Noter validée' }).click();
-  await expect(batch).toContainText('validée le');
+  const past = page.getByRole('region', { name: 'Past deliveries' });
+  const batch = past.locator('.batch', { hasText: `Delivery ${key}` });
+  await expect(batch).toContainText('to validate');
+  await batch.getByRole('button', { name: 'Record as validated' }).click();
+  await expect(batch).toContainText('validated on');
 });
 
 test('the AI usage is shown by period and by ticket', async ({ page, request }) => {
@@ -49,10 +47,10 @@ test('the AI usage is shown by period and by ticket', async ({ page, request }) 
   });
 
   await page.goto('/#/bilan');
-  const usage = page.getByRole('region', { name: 'Usage de l’IA' });
-  await expect(usage).toContainText('Semaine');
-  await usage.getByRole('button', { name: 'Jour' }).click();
-  await expect(usage).toContainText('Aujourd’hui');
+  const usage = page.getByRole('region', { name: 'AI usage' });
+  await expect(usage).toContainText('Week');
+  await usage.getByRole('button', { name: 'Day' }).click();
+  await expect(usage).toContainText('Today');
   await expect(usage.locator('.by-ticket', { hasText: key })).toContainText('5 k');
 });
 
@@ -64,13 +62,13 @@ test('the developer accepts the changelog line an agent proposed (F22)', async (
   const front = await agent(request, 'front-changelog');
   await front('proposeChangelog', { key, line: 'search by city' });
   await page.goto(`/#/ticket/${key}`);
-  const folder = page.getByRole('complementary', { name: 'Dossier du ticket' });
-  await expect(folder).toContainText('Proposée : search by city');
-  await folder.getByRole('button', { name: 'Relire et accepter' }).click();
-  await folder.getByLabel('Ligne de changelog', { exact: true }).fill('Search customers by city');
-  await folder.getByRole('button', { name: 'Accepter' }).click();
+  const folder = page.getByRole('complementary', { name: 'Ticket file' });
+  await expect(folder).toContainText('Proposed: search by city');
+  await folder.getByRole('button', { name: 'Review and accept' }).click();
+  await folder.getByLabel('Changelog line', { exact: true }).fill('Search customers by city');
+  await folder.getByRole('button', { name: 'Accept' }).click();
   await expect(folder).toContainText('Search customers by city');
-  await expect(folder).not.toContainText('Proposée');
+  await expect(folder).not.toContainText('Proposed');
 });
 
 test('the reference documents of the project can be read from the page (F31)', async ({ page }) => {
@@ -78,7 +76,7 @@ test('the reference documents of the project can be read from the page (F31)', a
   await page.getByRole('link', { name: 'Documents' }).click();
   await page.getByRole('button', { name: 'README.md' }).click();
   await expect(page.getByRole('article', { name: 'README.md' })).toContainText(
-    'Les règles du projet.',
+    'The project rules.',
   );
 });
 
@@ -96,15 +94,15 @@ test('a delivery with a working folder gives the command that merges its branche
   });
 
   await page.goto('/#/bilan');
-  const next = page.getByRole('region', { name: 'Prochaine livraison en qualité' });
+  const next = page.getByRole('region', { name: 'Next QA delivery' });
   await expect(next).toContainText(key);
   for (const box of await next.getByRole('checkbox').all()) {
     const label = await box.locator('..').innerText();
     if (!label.includes(key)) await box.uncheck();
   }
-  await next.getByLabel('Nom de la livraison').fill('Lot "12"');
-  await expect(next.getByRole('button', { name: 'Noter comme livrée en qualité' })).toHaveCount(0);
-  await expect(next.getByLabel('Commande de livraison')).toHaveText(
-    `node tools/tracker/app/tracker.js deliver "Lot \\"12\\"" ${key}`,
+  await next.getByLabel('Delivery name').fill('Batch "12"');
+  await expect(next.getByRole('button', { name: 'Record as delivered to QA' })).toHaveCount(0);
+  await expect(next.getByLabel('Delivery command')).toHaveText(
+    `node tools/tracker/app/tracker.js deliver "Batch \\"12\\"" ${key}`,
   );
 });

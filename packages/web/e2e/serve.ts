@@ -11,7 +11,7 @@ const jiraPort = port + 1;
 const root = mkdtempSync(join(tmpdir(), 'tracker-e2e-web-'));
 const folder = join(root, 'tools', 'tracker');
 mkdirSync(folder, { recursive: true });
-writeFileSync(join(root, 'README.md'), '# Projet de démonstration\n\nLes règles du projet.');
+writeFileSync(join(root, 'README.md'), '# Demo project\n\nThe project rules.');
 writeFileSync(
   join(folder, 'tracker.config.json'),
   JSON.stringify({

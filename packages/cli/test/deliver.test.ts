@@ -80,9 +80,9 @@ describe('delivery of a batch with its branches (ADR 0044)', () => {
   it('refuses while the main folder has changes, and delivers nothing', async () => {
     const key = await ticketWithCommits(root, 'Rename the list', []);
     writeFileSync(join(root, 'list.ts'), 'changed\n');
-    const { code, err } = await runCli(['deliver', 'Lot 0', key], {}, root);
+    const { code, err } = await runCli(['deliver', 'Batch 0', key], {}, root);
     expect(code).toBe(1);
-    expect(err).toMatch(/changements/);
+    expect(err).toMatch(/uncommitted changes/);
     git(root, 'checkout', '--', 'list.ts');
     expect(await batchCount(root)).toBe(0);
   });
@@ -95,7 +95,7 @@ describe('delivery of a batch with its branches (ADR 0044)', () => {
       { file: 'list.ts', text: 'sorted\n', message: '✨ Sort the list' },
     ]);
     const head = git(root, 'rev-parse', 'HEAD');
-    const { code, err } = await runCli(['deliver', 'Lot 1', first, second], {}, root);
+    const { code, err } = await runCli(['deliver', 'Batch 1', first, second], {}, root);
     expect(code).toBe(1);
     expect(err).toContain(second);
     expect(err).toContain('list.ts');
@@ -110,18 +110,18 @@ describe('delivery of a batch with its branches (ADR 0044)', () => {
       { file: 'city.ts', text: 'city\n', message: '✨ Add search by city' },
       { file: 'city.ts', text: 'city, fixed\n', message: '🐛 Fix search by city' },
     ]);
-    await runCli(['accept-changelog', key, '--line', 'Recherche par ville'], {}, root);
-    const { code, out } = await runCli(['deliver', 'Lot 1', 'LOC-2', key], {}, root);
+    await runCli(['accept-changelog', key, '--line', 'Search by city'], {}, root);
+    const { code, out } = await runCli(['deliver', 'Batch 1', 'LOC-2', key], {}, root);
     expect(code).toBe(0);
-    expect(out).toContain('Lot 1');
+    expect(out).toContain('Batch 1');
     expect(subjects(root, 3)).toEqual([
-      '📝 Update changelog for Lot 1',
+      '📝 Update changelog for Batch 1',
       '✨ Add search by city',
       '✨ Add search by name',
     ]);
     expect(git(root, 'log', '-1', '--skip=1', '--format=%an')).toBe('Developer');
     expect(readFileSync(join(root, 'city.ts'), 'utf8')).toBe('city, fixed\n');
-    expect(readFileSync(join(root, 'CHANGELOG.md'), 'utf8')).toContain('Recherche par ville');
+    expect(readFileSync(join(root, 'CHANGELOG.md'), 'utf8')).toContain('Search by city');
     expect(git(root, 'status', '--porcelain')).toBe('');
     expect(await phaseOf(key, root)).toBe('qaDelivery');
     expect(await batchCount(root)).toBe(1);
@@ -132,7 +132,7 @@ describe('delivery of a batch with its branches (ADR 0044)', () => {
       { file: 'export.ts', text: 'a\n', message: '✨ Add export' },
       { file: 'export.ts', text: 'b\n', message: '🐛 Fix export' },
     ]);
-    const { code } = await runCli(['deliver', 'Lot 2', key, '--keep', key], {}, root);
+    const { code } = await runCli(['deliver', 'Batch 2', key, '--keep', key], {}, root);
     expect(code).toBe(0);
     expect(git(root, 'log', '--format=%s', 'HEAD^..HEAD').split('\n')).toEqual([
       `🔀 Merge ticket/${key}`,
@@ -145,7 +145,7 @@ describe('delivery of a batch with its branches (ADR 0044)', () => {
     const created = await runCli(['create-ticket', '--title', 'Answer a question'], {}, root);
     const { key } = JSON.parse(created.out) as { key: string };
     const head = git(root, 'rev-parse', 'HEAD');
-    const { code } = await runCli(['deliver', 'Lot 3', key], {}, root);
+    const { code } = await runCli(['deliver', 'Batch 3', key], {}, root);
     expect(code).toBe(0);
     expect(git(root, 'rev-parse', 'HEAD')).toBe(head);
     expect(await phaseOf(key, root)).toBe('qaDelivery');
@@ -178,7 +178,7 @@ describe('delivery in a project with several repositories (ADR 0040, 0044)', () 
       { file: 'api/orders.ts', text: 'b\n', message: '✨ Show orders' },
     ]);
     const web = git(join(root, 'web'), 'rev-parse', 'HEAD');
-    const { code } = await runCli(['deliver', 'Lot 1', key], {}, root);
+    const { code } = await runCli(['deliver', 'Batch 1', key], {}, root);
     expect(code).toBe(0);
     expect(subjects(join(root, 'api'), 1)).toEqual(['✨ Show orders']);
     expect(git(join(root, 'web'), 'rev-parse', 'HEAD')).toBe(web);

@@ -37,7 +37,7 @@ export async function attachFile(target: Target, attach: Attach): Promise<string
   );
   const added = z.object({ id: z.string(), path: z.string() }).safeParse(await upload.json());
   if (!upload.ok || !added.success) {
-    throw new Error(`Pièce jointe refusée (${String(upload.status)}).`);
+    throw new Error(`Attachment refused (${String(upload.status)}).`);
   }
   const entry = await fetch(`${target.url}/api/recordEntry`, {
     method: 'POST',
@@ -45,14 +45,14 @@ export async function attachFile(target: Target, attach: Attach): Promise<string
     body: JSON.stringify({
       key: attach.key,
       entryType: 'exchange',
-      body: attach.message ?? `Pièce jointe : ${name}`,
+      body: attach.message ?? `Attachment: ${name}`,
       attachments: [added.data.id],
     }),
   });
   if (!entry.ok) {
-    throw new Error(`Pièce jointe gardée, mais pas notée au journal (${String(entry.status)}).`);
+    throw new Error(`Attachment kept, but not noted in the journal (${String(entry.status)}).`);
   }
-  return `${name} jointe à ${attach.key} : ${added.data.path}`;
+  return `${name} attached to ${attach.key}: ${added.data.path}`;
 }
 
 export function parseAttach(args: readonly string[]): Attach | string {
@@ -61,7 +61,7 @@ export function parseAttach(args: readonly string[]): Attach | string {
   const rest = index === -1 ? args : [...args.slice(0, index), ...args.slice(index + 2)];
   const [key, file] = rest;
   if (key === undefined || file === undefined) {
-    return 'Usage : tracker attach <ticket> <fichier> [--message "…"]';
+    return 'Usage: tracker attach <ticket> <file> [--message "..."]';
   }
   return { key, file, message };
 }

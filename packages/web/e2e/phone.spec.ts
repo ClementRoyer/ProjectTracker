@@ -17,7 +17,7 @@ test('on a phone, the list and a ticket each take the whole screen', async ({ pa
   await page.getByRole('link', { name: new RegExp(key) }).click();
   await expect(page.getByRole('complementary', { name: 'Tickets' })).toBeHidden();
   await page.getByRole('button', { name: /Yes/ }).click();
-  await expect(page.getByRole('group', { name: 'Question pour toi' })).toHaveCount(0);
+  await expect(page.getByRole('group', { name: 'Question for you' })).toHaveCount(0);
   expect(await hasNoSideScroll(page)).toBe(true);
 
   await page.getByRole('link', { name: '← Tickets' }).click();
@@ -26,6 +26,6 @@ test('on a phone, the list and a ticket each take the whole screen', async ({ pa
 
 test('on a phone, the board scrolls inside itself, not the page', async ({ page }) => {
   await page.goto('/#/tableau');
-  await expect(page.getByRole('region', { name: 'À FAIRE' })).toBeVisible();
+  await expect(page.getByRole('region', { name: 'TO DO' })).toBeVisible();
   expect(await hasNoSideScroll(page)).toBe(true);
 });

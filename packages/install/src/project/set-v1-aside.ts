@@ -27,9 +27,9 @@ const v1Config = z.object({ port: z.number().optional() }).loose();
 /** V1 moved to tools/tracker-legacy with its data, its session files removed, V2 installed as new (ADR 0049). */
 export async function setV1AsideAndInstall(request: SetV1AsideRequest): Promise<string[]> {
   const paths = projectPaths(request.root);
-  if (installedKind(paths) !== 'v1') throw new Error(`Pas de V1 dans ${paths.trackerDir}.`);
+  if (installedKind(paths) !== 'v1') throw new Error(`No V1 in ${paths.trackerDir}.`);
   const legacyDir = join(paths.root, 'tools', 'tracker-legacy');
-  if (existsSync(legacyDir)) throw new Error(`${legacyDir} existe déjà : rien n’a été modifié.`);
+  if (existsSync(legacyDir)) throw new Error(`${legacyDir} already exists: nothing was changed.`);
   const port =
     request.port ?? v1Config.parse(JSON.parse(readFileSync(paths.configFile, 'utf8'))).port;
 
@@ -50,8 +50,8 @@ export async function setV1AsideAndInstall(request: SetV1AsideRequest): Promise<
     ...(request.registryFile === undefined ? {} : { registryFile: request.registryFile }),
   });
   return [
-    `V1 mise de côté, avec ses données, sans migration : ${legacyDir}`,
-    ...removed.map((file) => `V1 retirée de ${file}`),
+    `V1 set aside, with its data, without migration: ${legacyDir}`,
+    ...removed.map((file) => `V1 removed from ${file}`),
     ...installed,
   ];
 }

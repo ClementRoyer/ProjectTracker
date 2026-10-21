@@ -47,7 +47,7 @@ describe('file holds in the mirror (ADR 0010)', () => {
 
   it('refuses a path that leaves the mirror', () => {
     expect(() => holdFile(folder(), '../outside.js', { key: 'LOC-1', executionId: 'e1' })).toThrow(
-      /miroir/,
+      /outside the mirror/i,
     );
   });
 });

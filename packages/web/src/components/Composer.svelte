@@ -14,8 +14,8 @@
   let picker: HTMLInputElement | undefined = $state();
 
   const recipients = [
-    { id: 'front', label: 'front · intervenant actuel' },
-    { id: 'backend', label: 'back-end · via le lanceur' },
+    { id: 'front', label: 'front · current assignee' },
+    { id: 'backend', label: 'back-end · via the launcher' },
   ] as const;
 
   /** Files picked, pasted or dropped on the ticket wait here until the message goes. */
@@ -35,7 +35,7 @@
     for (const file of pending) {
       const answer = await tracker.api.upload(ticketKey, file);
       if (!answer.ok) {
-        tracker.toast.show(`${file.name || 'capture'} : ${refusalText(answer.error)}`);
+        tracker.toast.show(`${file.name || 'screenshot'}: ${refusalText(answer.error)}`);
         return null;
       }
       ids.push(answer.value.id);
@@ -46,7 +46,7 @@
   async function send(event: SubmitEvent): Promise<void> {
     event.preventDefault();
     const names = pending.map((file) => file.name || 'capture.png');
-    const body = draft.trim() || (names.length > 0 ? `Pièce jointe : ${names.join(', ')}` : '');
+    const body = draft.trim() || (names.length > 0 ? `Attachment: ${names.join(', ')}` : '');
     if (body === '') return;
     const attachments = await uploadAll();
     if (attachments === null) return;
@@ -59,22 +59,22 @@
 </script>
 
 <form class="composer" onsubmit={send}>
-  <div class="to" role="group" aria-label="Destinataire">
-    <span class="label">À</span>
+  <div class="to" role="group" aria-label="Recipient">
+    <span class="label">To</span>
     {#each recipients as recipient (recipient.id)}
       <button type="button" aria-pressed={to === recipient.id} onclick={() => (to = recipient.id)}>
         {recipient.label}
       </button>
     {/each}
     <span class="spacer"></span>
-    <button type="button" class="attach" onclick={() => picker?.click()}>Joindre une capture</button
+    <button type="button" class="attach" onclick={() => picker?.click()}>Attach a screenshot</button
     >
     <input
       bind:this={picker}
       class="visually-hidden"
       type="file"
       multiple
-      aria-label="Fichiers à joindre"
+      aria-label="Files to attach"
       onchange={(event) => {
         addFiles(event.currentTarget.files ?? []);
         event.currentTarget.value = '';
@@ -82,13 +82,13 @@
     />
   </div>
   {#if pending.length > 0}
-    <ul class="pending" aria-label="Pièces à joindre">
+    <ul class="pending" aria-label="Files to attach">
       {#each pending as file, index (index)}
         <li>
           {file.name || 'capture.png'}
           <button
             type="button"
-            aria-label="Retirer {file.name || 'la capture'}"
+            aria-label="Remove {file.name || 'the screenshot'}"
             onclick={() => (pending = pending.filter((_, other) => other !== index))}>×</button
           >
         </li>
@@ -102,9 +102,9 @@
       rows="2"
       bind:value={draft}
       onpaste={paste}
-      placeholder="Une consigne, un retour reçu, une info… L’intervenant le reçoit sans que tu ouvres sa conversation."
+      placeholder="An instruction, some feedback, a piece of info… The assignee gets it without you opening their conversation."
     ></textarea>
-    <button type="submit" class="send">Envoyer</button>
+    <button type="submit" class="send">Send</button>
   </div>
 </form>
 

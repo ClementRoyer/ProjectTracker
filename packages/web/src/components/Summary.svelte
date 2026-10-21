@@ -6,7 +6,7 @@
   let { tracker }: { tracker: Tracker } = $props();
 </script>
 
-<main class="summary" aria-label="Bilan">
+<main class="summary" aria-label="Summary">
   <DeliveryPanel {tracker} />
   <UsagePanel {tracker} />
 </main>

@@ -48,7 +48,7 @@ export function deliverBatch(
       ...(batch.deliveredAt ? { deliveredAt: batch.deliveredAt } : {}),
     });
     for (const ticket of loaded) {
-      moveDone(ctx, ticket, 'qaDelivery', `Livré en qualité : ${input.name}`);
+      moveDone(ctx, ticket, 'qaDelivery', `Delivered to QA: ${input.name}`);
     }
   });
   return ok({
@@ -92,7 +92,7 @@ export function validateBatch(
     for (const ticket of tickets.filter((candidate) => batch.ticketIds.includes(candidate.id))) {
       const loaded = loadTicket(ctx, ticket.key);
       if (loaded.ok) {
-        moveDone(ctx, loaded.value, 'qaValidation', `Validé en qualité : ${batch.name}`);
+        moveDone(ctx, loaded.value, 'qaValidation', `Validated in QA: ${batch.name}`);
       }
     }
   });

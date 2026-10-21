@@ -36,9 +36,13 @@ for (const [outfile, entry] of Object.entries(ENTRIES)) {
 }
 writeFileSync('dist/VERSION', `${version}\n`);
 
-// The launch scripts go with the artefact: start-front.sh into each project, start-back.sh to the launcher (ADR 0046).
-for (const script of ['start-front.sh', 'start-back.sh'])
+// The launch scripts go with the artefact: the front ones into each project, the back ones to the launcher
+// (ADR 0046, 0052).
+for (const script of ['start-front.sh', 'stop-front.sh', 'start-back.sh', 'stop-back.sh']) {
   cpSync(`scripts/${script}`, `dist/${script}`);
+}
+// The bundles are ES modules: said once, so that Node warns about nothing at start (ADR 0052).
+writeFileSync('dist/package.json', `${JSON.stringify({ type: 'module' })}\n`);
 
 // The plugin form of the adapter, for trials with --plugin-dir; installs use the project settings (ADR 0030).
 cpSync('packages/adapter-claude/plugin', 'dist/claude-plugin', { recursive: true });

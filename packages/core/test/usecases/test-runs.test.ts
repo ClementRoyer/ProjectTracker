@@ -11,7 +11,7 @@ describe('test runs of a ticket (F17, ADR 0034)', () => {
     const last = ticket.ok ? ticket.value.entries.at(-1) : undefined;
     expect(last).toMatchObject({
       entryType: 'testRun',
-      body: 'Tests automatiques en échec : 14 of 16',
+      body: 'Automatic tests failed: 14 of 16',
       data: { kind: 'auto', passed: false },
     });
   });

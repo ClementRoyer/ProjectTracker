@@ -82,7 +82,7 @@ export function releaseResource(
     const at = ctx.now();
     leaveResourceQueue(ctx.db, input.resource, ticket.id);
     if (readResourceLock(ctx.db, input.resource)?.ticketId === ticket.id) {
-      note(ctx, ticket.id, `Ressource « ${input.resource} » rendue`, at);
+      note(ctx, ticket.id, `Resource "${input.resource}" released`, at);
       handOver(ctx, input.resource, at);
     }
     refreshWait(ctx, checked.value, at);
@@ -99,7 +99,7 @@ function check(ctx: UsecaseContext, input: Request): Result<LoadedTicket, Usecas
 function expire(ctx: UsecaseContext, resource: string, at: string): void {
   const lock = readResourceLock(ctx.db, resource);
   if (lock === null || lock.leaseUntil > at) return;
-  note(ctx, lock.ticketId, `Ressource « ${resource} » rendue : bail expiré, sans nouvelles`, at);
+  note(ctx, lock.ticketId, `Resource "${resource}" released: lease expired, no news`, at);
   handOver(ctx, resource, at);
 }
 
@@ -116,7 +116,7 @@ function handOver(ctx: UsecaseContext, resource: string, at: string): void {
 
 function give(ctx: UsecaseContext, resource: string, ticketId: string, at: string): string {
   leaveResourceQueue(ctx.db, resource, ticketId);
-  note(ctx, ticketId, `Ressource « ${resource} » prise`, at);
+  note(ctx, ticketId, `Resource "${resource}" taken`, at);
   return renew(ctx, resource, ticketId, at);
 }
 

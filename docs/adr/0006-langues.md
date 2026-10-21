@@ -1,6 +1,6 @@
 # 0006. Code in English, interface and documents in French
 
-- Status: Accepted; partly superseded by [ADR 0048](0048-documentation-en-anglais.md) (documents in English)
+- Status: Superseded by [ADR 0053](0053-tout-en-anglais.md)
 - Date: 2026-10-18
 - Decider: the user (answer "yes" to question 1 of the [glossary](../product/glossary.md))
 - Links: [tooling audit](../analysis/2026-10-16-audit-v1/tooling.md) §4, [glossary](../product/glossary.md)

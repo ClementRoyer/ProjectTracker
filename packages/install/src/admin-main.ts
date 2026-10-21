@@ -6,8 +6,8 @@ import { backupProject, restoreProject } from './project/admin';
 import { projectPaths } from './project/paths';
 
 // Usage, from the project root: node tools/tracker/app/admin.js backup | restore <file>
-const USAGE = `Usage : node tools/tracker/app/admin.js backup           copie la base et les pièces jointes dans tools/tracker/backups/ (serveur lancé ou non)
-        node tools/tracker/app/admin.js restore <dossier>  remet une sauvegarde en place (serveur arrêté)`;
+const USAGE = `Usage: node tools/tracker/app/admin.js backup          copy the database and the attachments into tools/tracker/backups/ (server running or not)
+       node tools/tracker/app/admin.js restore <folder>  put a backup back in place (server stopped)`;
 
 // admin.js sits in tools/tracker/app/: the project root is three levels up.
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
@@ -32,7 +32,7 @@ async function isServerUp(): Promise<boolean> {
 async function main(args: string[]): Promise<string[]> {
   const now = new Date().toISOString();
   const [command, file] = args;
-  if (command === 'backup') return [`Base sauvegardée : ${await backupProject(paths, now)}`];
+  if (command === 'backup') return [`Database backed up: ${await backupProject(paths, now)}`];
   if (command === 'restore' && file !== undefined) {
     return restoreProject(paths, resolve(file), now, isServerUp);
   }
@@ -44,7 +44,7 @@ main(process.argv.slice(2)).then(
     process.stdout.write(`${report.join('\n')}\n`);
   },
   (error: unknown) => {
-    process.stderr.write(`admin : ${error instanceof Error ? error.message : String(error)}\n`);
+    process.stderr.write(`admin: ${error instanceof Error ? error.message : String(error)}\n`);
     process.exitCode = 1;
   },
 );

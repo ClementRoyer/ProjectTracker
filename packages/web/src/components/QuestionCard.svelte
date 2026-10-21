@@ -31,13 +31,13 @@
   }
 
   const asker = $derived(
-    question.role === 'backend' ? 'du back-end' : `de ${question.author ?? 'l’agent'}`,
+    question.role === 'backend' ? 'from the back-end' : `from ${question.author ?? 'the agent'}`,
   );
 </script>
 
-<div role="group" aria-label="Question pour toi" class="card">
+<div role="group" aria-label="Question for you" class="card">
   <span class="head"
-    >{`Pour toi · question ${asker} · ${ago(question.askedAt, now)}`.toUpperCase()}</span
+    >{`For you · question ${asker} · ${ago(question.askedAt, now)}`.toUpperCase()}</span
   >
   <strong class="text">{question.text}</strong>
   {#if question.context}<span class="context">{question.context}</span>{/if}
@@ -47,12 +47,12 @@
         {@const recommended = option === question.recommendation}
         <button type="button" class:recommended onclick={() => answer(option)}>
           <b>{option}</b>
-          {#if recommended}<span class="detail">Recommandé</span>{/if}
+          {#if recommended}<span class="detail">Recommended</span>{/if}
         </button>
       {/each}
     </div>
   {:else if question.recommendation}
-    <span class="context">Recommandation : {question.recommendation}</span>
+    <span class="context">Recommendation: {question.recommendation}</span>
   {/if}
   <form
     class="other"
@@ -61,13 +61,13 @@
       void answer(other);
     }}
   >
-    <label class="visually-hidden" for="answer-{question.questionId}">Ta réponse</label>
+    <label class="visually-hidden" for="answer-{question.questionId}">Your answer</label>
     <input
       id="answer-{question.questionId}"
       bind:value={other}
-      placeholder={question.options.length > 0 ? 'Ou réponds autrement…' : 'Ta réponse…'}
+      placeholder={question.options.length > 0 ? 'Or answer differently…' : 'Your answer…'}
     />
-    <button type="submit">Répondre</button>
+    <button type="submit">Answer</button>
   </form>
 </div>
 

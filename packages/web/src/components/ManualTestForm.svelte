@@ -26,31 +26,31 @@
 </script>
 
 {#if open}
-  <form class="manual" aria-label="Noter un test manuel" onsubmit={save}>
+  <form class="manual" aria-label="Record a manual test" onsubmit={save}>
     <label>
       Test
       <select bind:value={kind}>
-        <option value="visual">visuel</option>
-        <option value="user">par l’utilisateur</option>
+        <option value="visual">visual</option>
+        <option value="user">by the end user</option>
       </select>
     </label>
-    <div class="result" role="radiogroup" aria-label="Résultat">
-      <label><input type="radio" bind:group={passed} value={true} /> réussi</label>
-      <label><input type="radio" bind:group={passed} value={false} /> en échec</label>
+    <div class="result" role="radiogroup" aria-label="Result">
+      <label><input type="radio" bind:group={passed} value={true} /> passed</label>
+      <label><input type="radio" bind:group={passed} value={false} /> failed</label>
     </div>
-    <label class="visually-hidden" for="manual-note-{ticketKey}">Retour</label>
+    <label class="visually-hidden" for="manual-note-{ticketKey}">Feedback</label>
     <textarea
       id="manual-note-{ticketKey}"
       rows="2"
       bind:value={note}
-      placeholder="Le retour, s’il y en a un"></textarea>
+      placeholder="The feedback, if there is any"></textarea>
     <div class="buttons">
-      <button type="submit" class="save">Noter</button>
-      <button type="button" class="quiet" onclick={() => (open = false)}>Annuler</button>
+      <button type="submit" class="save">Save</button>
+      <button type="button" class="quiet" onclick={() => (open = false)}>Cancel</button>
     </div>
   </form>
 {:else}
-  <button type="button" class="link" onclick={() => (open = true)}>Noter un test manuel</button>
+  <button type="button" class="link" onclick={() => (open = true)}>Record a manual test</button>
 {/if}
 
 <style>

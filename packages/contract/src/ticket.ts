@@ -35,20 +35,20 @@ export const situation = z.object({
 
 export const priority = z
   .enum(['urgent', 'high', 'normal', 'low'])
-  .describe('Priorité du ticket, réglée par le développeur : urgente, haute, normale, basse');
+  .describe('Ticket priority, set by the developer: urgent, high, normal, low');
 
 export const size = z
   .enum(['small', 'medium', 'large'])
-  .describe('Taille estimée du ticket : petite, moyenne, grande');
+  .describe('Estimated ticket size: small, medium, large');
 
-export const ticketKey = z.string().min(1).describe('Clé du ticket, par exemple PROJ-12 ou LOC-3');
+export const ticketKey = z.string().min(1).describe('Ticket key, for example PROJ-12 or LOC-3');
 
 export const role = z.enum(['front', 'backend']);
 
 export const assignee = z.object({
   role,
   kind: z.enum(['developer', 'agent']),
-  name: z.string().nullable().describe('Le nom de l’agent ; null pour le développeur'),
+  name: z.string().nullable().describe('The agent name; null for the developer'),
 });
 
 export const ticketSummary = z.object({
@@ -56,20 +56,18 @@ export const ticketSummary = z.object({
   title: z.string(),
   origin: z.enum(['jira', 'local']),
   priority,
-  dueDate: z.string().nullable().describe('Échéance, AAAA-MM-JJ'),
-  group: z.string().nullable().describe('Le groupe du ticket (une fonctionnalité, une épopée…)'),
+  dueDate: z.string().nullable().describe('Due date, YYYY-MM-DD'),
+  group: z.string().nullable().describe('The ticket group (a feature, an epic...)'),
   size: size.nullable(),
   jiraStatus: z.string().nullable(),
   situation,
   lastActivityAt: z.string(),
   stale: z.boolean(),
   unread: z.boolean(),
-  overlaps: z
-    .array(z.string())
-    .describe('Les autres tickets ouverts qui modifient les mêmes fichiers'),
+  overlaps: z.array(z.string()).describe('The other open tickets that change the same files'),
   assignees: z.array(assignee),
-  working: z.boolean().describe('Un agent travaille sur le ticket (signalé, sinon déduit)'),
-  readyToClose: z.boolean().describe('Validation en qualité faite : le développeur peut le clore'),
+  working: z.boolean().describe('An agent is working on the ticket (reported, otherwise inferred)'),
+  readyToClose: z.boolean().describe('QA validation done: the developer can close it'),
 });
 
 export const entry = z.object({
@@ -87,7 +85,7 @@ export const entry = z.object({
     'jiraImport',
   ]),
   authorKind: z.enum(['developer', 'agent', 'jira', 'launcher', 'system']),
-  author: z.string().nullable().describe('Nom de l’agent, quand un agent a écrit'),
+  author: z.string().nullable().describe('Agent name, when an agent wrote it'),
   role: role.nullable(),
   body: z.string(),
   data: z.unknown(),
@@ -95,7 +93,7 @@ export const entry = z.object({
   acknowledgedAt: z
     .string()
     .nullable()
-    .describe('Quand l’intervenant a pris en compte ce message du développeur'),
+    .describe('When the assignee took this developer message into account'),
   createdAt: z.string(),
 });
 
@@ -103,8 +101,8 @@ export const attachment = z.object({
   id: z.string(),
   name: z.string(),
   mime: z.string().nullable(),
-  path: z.string().describe('Chemin du fichier sur la machine du tracker'),
-  url: z.string().describe('Adresse pour le lire, avec un jeton (GET)'),
+  path: z.string().describe('File path on the tracker machine'),
+  url: z.string().describe('URL to read it, with a token (GET)'),
   createdAt: z.string(),
 });
 
@@ -132,42 +130,35 @@ export const ticketDetail = ticketSummary.extend({
   changelog: z
     .object({ proposed: z.string().nullable(), accepted: z.string().nullable() })
     .nullable()
-    .describe('La ligne de changelog du ticket ; null quand le projet n’a pas de changelog'),
+    .describe('The ticket changelog line; null when the project has no changelog'),
   worktree: z
     .object({ path: z.string(), branch: z.string() })
     .nullable()
-    .describe(
-      'Le dossier de travail du ticket, chemin depuis la racine du projet ; null sans dossier',
-    ),
+    .describe('The ticket working folder, path from the project root; null without a folder'),
   preview: z
     .object({
       state: z.enum(['included', 'conflict']),
-      files: z.array(z.string()).describe('Les fichiers en conflit'),
-      with: z.array(z.string()).describe('Les tickets déjà réunis qui les modifient'),
+      files: z.array(z.string()).describe('The conflicting files'),
+      with: z.array(z.string()).describe('The tickets already merged that change them'),
     })
     .nullable()
-    .describe('Le ticket dans la dernière reconstruction de l’aperçu ; null s’il n’y était pas'),
+    .describe('The ticket in the last preview rebuild; null if it was not in it'),
   changedFiles: z
     .array(
       z.object({
         path: z.string(),
-        repo: z.string().nullable().describe('Le dépôt du fichier, quand le projet en nomme'),
+        repo: z.string().nullable().describe('The file repository, when the project names some'),
         sharedWith: z.array(z.string()),
       }),
     )
-    .describe(
-      'Les fichiers que le ticket modifie, et les autres tickets ouverts qui les modifient aussi',
-    ),
+    .describe('The files the ticket changes, and the other open tickets that change them too'),
 });
 
 export const novelty = entry.extend({ key: z.string(), title: z.string() });
 
 export const waitingItem = z.object({
   kind: z.enum(['question', 'close']),
-  questionId: z
-    .string()
-    .nullable()
-    .describe('Pour une question : l’identifiant à donner à answerQuestion'),
+  questionId: z.string().nullable().describe('For a question: the id to give to answerQuestion'),
   key: z.string(),
   title: z.string(),
   since: z.string(),

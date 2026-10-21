@@ -4,7 +4,7 @@ import { attachment, role, ticketKey } from './ticket';
 
 /** The end-of-turn reply of a front agent (ADR 0020): a readable message and an optional question. */
 export const frontReply = z.object({
-  message: z.string().describe('Message lisible par le développeur'),
+  message: z.string().describe('Readable message for the developer'),
   question: z
     .object({
       context: z.string(),
@@ -19,7 +19,7 @@ export const inboxItem = z.object({
   key: z.string(),
   kind: z.enum(['answer', 'message']),
   body: z.string(),
-  question: z.string().nullable().describe('La question à laquelle répond une réponse'),
+  question: z.string().nullable().describe('The question an answer replies to'),
   attachments: z.array(attachment.pick({ name: true, path: true, url: true })),
   at: z.string(),
 });
@@ -27,7 +27,7 @@ export const inboxItem = z.object({
 export const introduce = defineOperation({
   name: 'introduce',
   description:
-    'Présente cette conversation au tracker sous un nom stable (par exemple front-1) ; rend le jeton à joindre à chaque appel.',
+    'Introduces this conversation to the tracker under a stable name (for example front-1); returns the token to send with every call.',
   callers: ['agent'],
   input: z.object({ name: z.string().min(1), tool: z.string().optional() }),
   output: z.object({ token: z.string(), agentName: z.string() }),
@@ -35,8 +35,7 @@ export const introduce = defineOperation({
 
 export const takeTicket = defineOperation({
   name: 'takeTicket',
-  description:
-    'Prend en charge le ticket dans un rôle (front ou back-end) ; un seul intervenant par rôle.',
+  description: 'Takes over the ticket in a role (front or back-end); only one assignee per role.',
   callers: ['developer', 'agent'],
   input: z.object({ key: ticketKey, role }),
   output: z.object({ key: z.string(), role }),
@@ -45,7 +44,7 @@ export const takeTicket = defineOperation({
 export const askQuestion = defineOperation({
   name: 'askQuestion',
   description:
-    'Pose une question au développeur, avec le contexte, les options et une recommandation. La réponse arrive plus tard.',
+    'Asks the developer a question, with context, options and a recommendation. The answer comes later.',
   callers: ['agent'],
   input: z.object({
     key: ticketKey,
@@ -59,7 +58,7 @@ export const askQuestion = defineOperation({
 
 export const answerQuestion = defineOperation({
   name: 'answerQuestion',
-  description: 'Répond à une question ; la réponse est acheminée à l’agent qui l’attend.',
+  description: 'Answers a question; the answer is routed to the agent waiting for it.',
   callers: ['developer'],
   input: z.object({ questionId: z.string(), answer: z.string().min(1) }),
   output: z.object({ entryId: z.string() }),
@@ -67,16 +66,13 @@ export const answerQuestion = defineOperation({
 
 export const sendMessage = defineOperation({
   name: 'sendMessage',
-  description: 'Écrit à l’intervenant d’un rôle du ticket, sans passer par sa conversation.',
+  description: 'Writes to the assignee of a ticket role, without going through their conversation.',
   callers: ['developer'],
   input: z.object({
     key: ticketKey,
     to: role,
     body: z.string().min(1),
-    attachments: z
-      .array(z.string())
-      .optional()
-      .describe('Identifiants de pièces jointes du ticket'),
+    attachments: z.array(z.string()).optional().describe('Ids of the ticket attachments'),
   }),
   output: z.object({ entryId: z.string() }),
 });
@@ -84,7 +80,7 @@ export const sendMessage = defineOperation({
 export const listInbox = defineOperation({
   name: 'listInbox',
   description:
-    'Les réponses et messages du développeur pas encore remis à cet agent ; chacun n’est remis qu’une fois.',
+    'The developer answers and messages not yet delivered to this agent; each one is delivered only once.',
   callers: ['agent'],
   input: z.object({}),
   output: z.object({ items: z.array(inboxItem) }),
@@ -92,7 +88,7 @@ export const listInbox = defineOperation({
 
 export const acknowledge = defineOperation({
   name: 'acknowledge',
-  description: 'Signale au développeur que sa réponse ou son message est pris en compte.',
+  description: 'Tells the developer that their answer or message was taken into account.',
   callers: ['agent'],
   input: z.object({ entryId: z.string() }),
   output: z.object({ acknowledgedAt: z.string() }),
@@ -101,7 +97,7 @@ export const acknowledge = defineOperation({
 export const submitReply = defineOperation({
   name: 'submitReply',
   description:
-    'Remet la réponse de fin de tour d’un agent front (lue par l’adaptateur) ; sans JSON valide, le texte brut est gardé.',
+    'Hands over the end-of-turn reply of a front agent (read by the adapter); without valid JSON, the raw text is kept.',
   callers: ['agent'],
   input: z.object({
     key: ticketKey.optional(),
@@ -114,7 +110,7 @@ export const submitReply = defineOperation({
 export const reportWorking = defineOperation({
   name: 'reportWorking',
   description:
-    'Signale que tu commences (working: true) ou que tu as fini (working: false) de travailler sur le ticket ; sans clé, sur les tickets de cette conversation.',
+    'Tells that you start (working: true) or finish (working: false) working on the ticket; without a key, applies to the tickets of this conversation.',
   callers: ['agent'],
   input: z.object({ key: ticketKey.optional(), working: z.boolean() }),
   output: z.object({ keys: z.array(z.string()) }),

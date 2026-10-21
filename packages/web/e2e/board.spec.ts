@@ -15,18 +15,18 @@ test('the board puts each ticket in the column of its phase', async ({ page, req
 
 test('a ticket created in one sentence opens at once, and stays local', async ({ page }) => {
   await page.goto('/');
-  await page.getByLabel('Nouveau ticket local').fill('Archive old quotes');
-  await page.getByRole('button', { name: 'Créer' }).click();
+  await page.getByLabel('New local ticket').fill('Archive old quotes');
+  await page.getByRole('button', { name: 'Create' }).click();
   await expect(page.getByRole('heading', { name: 'Archive old quotes' })).toBeVisible();
-  await expect(page.getByRole('status')).toContainText('rien n’est envoyé à Jira');
+  await expect(page.getByRole('status')).toContainText('nothing is sent to Jira');
 });
 
 test('loading Jira tells what came in, and that nothing was written there', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Charger Jira' }).click();
+  await page.getByRole('button', { name: 'Load Jira' }).click();
   const toast = page.getByRole('status');
-  await expect(toast).toContainText('Chargement Jira terminé');
-  await expect(toast).toContainText('Rien n’a été écrit dans Jira.');
+  await expect(toast).toContainText('Jira import done');
+  await expect(toast).toContainText('Nothing was written to Jira.');
   await expect(page.getByRole('complementary', { name: 'Tickets' })).toContainText('DEMO-1');
 });
 
@@ -41,5 +41,5 @@ test('the header shows the AI usage of the day', async ({ page, request }) => {
     usage: [{ ...line, cacheReadTokens: 0, cacheWriteTokens: 0 }],
   });
   await page.goto('/');
-  await expect(page.getByRole('banner')).toContainText('IA aujourd’hui : 1,2 M jetons');
+  await expect(page.getByRole('banner')).toContainText('AI today: 1.2 M tokens');
 });

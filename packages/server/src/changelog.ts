@@ -6,7 +6,7 @@ export function withSection(existing: string | null, section: ChangelogSection):
   const block = [
     `## ${section.name} (${section.at.slice(0, 10)})`,
     '',
-    ...section.lines.map(({ key, line }) => `- ${key} : ${line}`),
+    ...section.lines.map(({ key, line }) => `- ${key}: ${line}`),
     '',
   ].join('\n');
   if (existing === null) return `# Changelog\n\n${block}`;

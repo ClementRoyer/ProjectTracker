@@ -16,32 +16,32 @@ test('the triage goes through what waits for the developer, one at a time', asyn
   });
   const validated = await createTicket(request, 'Show the order date');
   const batch = (await developerCall(request, 'deliverBatch', {
-    name: 'Lot',
+    name: 'Batch',
     keys: [validated],
   })) as { id: string };
   await developerCall(request, 'validateBatch', { batchId: batch.id });
 
   await page.goto('/');
-  await page.getByRole('button', { name: /t’attend/ }).click();
+  await page.getByRole('button', { name: /waits? for you/ }).click();
   const triage = page.getByRole('dialog', { name: 'Triage' });
 
   // Older items from other journeys may come first: go through them until ours.
   for (let step = 0; step < 20; step += 1) {
     if (await triage.getByText('Keep the country code?').isVisible()) break;
-    await triage.getByRole('button', { name: 'Plus tard' }).click();
+    await triage.getByRole('button', { name: 'Later' }).click();
   }
   await triage.getByRole('button', { name: /Yes/ }).click();
   await expect(triage.getByText('Keep the country code?')).toHaveCount(0);
 
   for (let step = 0; step < 20; step += 1) {
     if (await triage.getByText(validated).isVisible()) break;
-    await triage.getByRole('button', { name: 'Plus tard' }).click();
+    await triage.getByRole('button', { name: 'Later' }).click();
   }
-  await triage.getByRole('button', { name: /Déclarer terminé/ }).click();
+  await triage.getByRole('button', { name: /Close ticket/ }).click();
   await expect(triage.getByText(validated)).toHaveCount(0);
 
   const inbox = (await front('listInbox', {})) as { items: { body: string }[] };
   expect(inbox.items.map((item) => item.body)).toEqual(['Yes']);
-  await triage.getByRole('button', { name: 'Fermer' }).click();
+  await triage.getByRole('button', { name: 'Close' }).click();
   await expect(triage).toBeHidden();
 });

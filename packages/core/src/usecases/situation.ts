@@ -54,7 +54,7 @@ export function changePhase(
   return change(ctx, input.key, (situation) => {
     const next = moveToPhase(situation, input.phase);
     if (!next.ok) return next;
-    const body = `Phase : ${PHASE_LABELS[situation.phase]} → ${PHASE_LABELS[input.phase]}`;
+    const body = `Phase: ${PHASE_LABELS[situation.phase]} → ${PHASE_LABELS[input.phase]}`;
     return ok({
       situation: next.value,
       entryType: 'situationChange',
@@ -72,7 +72,7 @@ export function closeTicket(
   return change(ctx, input.key, (situation) => {
     const next = closeSituation(situation, ctx.actor, at);
     return next.ok
-      ? ok({ situation: next.value, entryType: 'situationChange', body: 'Ticket déclaré terminé' })
+      ? ok({ situation: next.value, entryType: 'situationChange', body: 'Ticket declared closed' })
       : next;
   });
 }
@@ -84,7 +84,7 @@ export function declareWait(
 ): Result<SituationOutput, UsecaseError> {
   return change(ctx, input.key, (situation) => {
     if (situation.closedAt !== undefined) return fail('ticketClosed');
-    const body = input.wait === null ? 'Attente levée' : `Attente déclarée : ${input.wait.detail}`;
+    const body = input.wait === null ? 'Wait lifted' : `Wait declared: ${input.wait.detail}`;
     return ok({
       situation,
       entryType: 'situationChange',

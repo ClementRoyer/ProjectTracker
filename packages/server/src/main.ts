@@ -10,7 +10,7 @@ const webRoot = join(dirname(fileURLToPath(import.meta.url)), 'web');
 
 startServer(configFile, { webRoot }).then(
   (server) => {
-    console.log(`project-tracker prêt sur ${server.url}`);
+    console.log(`project-tracker ready on ${server.url}`);
   },
   (error: unknown) => {
     console.error(error instanceof Error ? error.message : String(error));

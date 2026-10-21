@@ -12,7 +12,7 @@ if (
   !env.TRACKER_EXECUTION
 ) {
   process.stderr.write(
-    'Usage : hold <fichier du miroir> (lancé par le lanceur, qui fournit son environnement)\n',
+    'Usage: hold <mirror file> (run by the launcher, which provides its environment)\n',
   );
   process.exit(2);
 }
@@ -22,10 +22,10 @@ const held = holdFile(env.TRACKER_LOCKS, path, {
   executionId: env.TRACKER_EXECUTION,
 });
 if (held.ok) {
-  process.stdout.write(`OK : ${path} est tenu par ${env.TRACKER_TICKET}. Tu peux le modifier.\n`);
+  process.stdout.write(`OK: ${path} is held by ${env.TRACKER_TICKET}. You can change it.\n`);
 } else {
   process.stdout.write(
-    `REFUSÉ : ${path} est tenu par le ticket ${held.heldBy}. Ne le modifie pas ; réponds avec le statut blocked.\n`,
+    `REFUSED: ${path} is held by ticket ${held.heldBy}. Do not change it; reply with the status blocked.\n`,
   );
   process.exitCode = 1;
 }

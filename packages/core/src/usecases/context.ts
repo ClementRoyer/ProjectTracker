@@ -19,7 +19,7 @@ export interface UsecaseContext {
   actor: Actor;
   now: () => Instant;
   newId: () => string;
-  /** A ticket in progress with no news for this long is « sans nouvelles » (F11). */
+  /** A ticket in progress with no news for this long is "stale" (F11). */
   staleAfterMs: number;
   /** After this silence, what an agent wrote no longer shows it at work (ADR 0028). */
   workingTimeoutMs: number;

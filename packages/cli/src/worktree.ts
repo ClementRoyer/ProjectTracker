@@ -21,7 +21,7 @@ export interface WorktreeCommand {
 }
 
 const USAGE =
-  'Usage : tracker worktree add <ticket> [--branch <branche>] [--base <branche>] | tracker worktree remove <ticket>';
+  'Usage: tracker worktree add <ticket> [--branch <branch>] [--base <branch>] | tracker worktree remove <ticket>';
 
 /** The tool's files git does not hold: the folder links them to the main project's (ADR 0041). */
 const ALWAYS_LINKED = ['tools/tracker/app', 'tools/tracker/developer.token'];
@@ -51,7 +51,7 @@ export async function addWorktree(
   const settings = readConfig(project);
   const relative = `${FOLDERS}/${command.key}`;
   const folder = join(project.root, relative);
-  if (existsSync(folder)) throw new Error(`Le dossier ${relative} existe déjà.`);
+  if (existsSync(folder)) throw new Error(`The folder ${relative} already exists.`);
   const branch = command.branch ?? settings.worktree.branch.replaceAll('{key}', command.key);
   const base = command.base ?? 'main';
   for (const repo of repoPaths(settings)) {
@@ -66,16 +66,16 @@ export async function addWorktree(
   const links = linkTool(project, folder);
   excludeFromGit(project.root, ['/.worktrees/', ...links.map((link) => `/${link}`)]);
   await call(target, 'setWorktree', { key: command.key, path: relative, branch });
-  const lines = [`Dossier de travail : ${relative} (branche ${branch})`];
+  const lines = [`Working folder: ${relative} (branch ${branch})`];
   if (settings.worktree.setup !== undefined) {
     if (!runSetup(settings.worktree.setup, folder)) {
       throw new Error(
-        `${lines.join('')} : créé, mais la préparation a échoué (${settings.worktree.setup})`,
+        `${lines.join('')}: created, but the setup failed (${settings.worktree.setup})`,
       );
     }
-    lines.push(`Préparé : ${settings.worktree.setup}`);
+    lines.push(`Set up: ${settings.worktree.setup}`);
   }
-  return [...lines, `Pour y travailler : cd ${relative}`].join('\n');
+  return [...lines, `To work there: cd ${relative}`].join('\n');
 }
 
 /** `tracker worktree remove`: git refuses a folder with uncommitted changes; the branch stays. */
@@ -93,14 +93,14 @@ export async function removeWorktree(
       run(join(project.root, repo), ['worktree', 'remove', into]);
     } catch {
       throw new Error(
-        `${relative} garde des changements non commités : commite-les ou annule-les, puis relance.`,
+        `${relative} has uncommitted changes: commit or discard them, then run again.`,
       );
     }
   }
   // Only the links are left; removing them leaves the main project's files alone.
   rmSync(folder, { recursive: true, force: true });
   await call(target, 'forgetWorktree', { key: command.key });
-  return `Dossier de travail ${relative} retiré ; la branche reste.`;
+  return `Working folder ${relative} removed; the branch stays.`;
 }
 
 function linkTool(project: Project, folder: string): string[] {

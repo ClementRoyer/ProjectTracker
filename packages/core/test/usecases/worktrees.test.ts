@@ -13,7 +13,7 @@ describe('the working folder of a ticket (ADR 0041)', () => {
       branch: 'ticket/LOC-1',
     });
     expect(ticket.ok && ticket.value.entries.at(-1)?.body).toBe(
-      'Dossier de travail : .worktrees/LOC-1 (branche ticket/LOC-1)',
+      'Working folder: .worktrees/LOC-1 (branch ticket/LOC-1)',
     );
   });
 
@@ -24,7 +24,7 @@ describe('the working folder of a ticket (ADR 0041)', () => {
     forgetWorktree(ctx, { key: 'LOC-1' });
     const ticket = getTicket(ctx, { key: 'LOC-1' });
     expect(ticket.ok && ticket.value.worktree).toBeNull();
-    expect(ticket.ok && ticket.value.entries.at(-1)?.body).toBe('Dossier de travail retiré');
+    expect(ticket.ok && ticket.value.entries.at(-1)?.body).toBe('Working folder removed');
   });
 
   it('has no folder by default: the ticket may be worked on in the main folder', () => {

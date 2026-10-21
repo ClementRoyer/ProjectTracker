@@ -24,6 +24,10 @@ const configSchema = z
       .object({
         baseUrl: z.url(),
         project: z.string().min(1),
+        parents: z
+          .array(z.string().regex(/^[A-Z][A-Z0-9_]*-\d+$/, 'a ticket key, for example PROJ-12'))
+          .optional()
+          .describe('Only the children of these tickets (ADR 0052)'),
         emailEnv: z.string().min(1),
         tokenEnv: z.string().min(1),
       })
@@ -36,7 +40,7 @@ const configSchema = z
     documents: z
       .array(z.string().min(1))
       .default([])
-      .describe('Motifs des documents de référence, depuis la racine du projet'),
+      .describe('Patterns of the reference documents, from the project root'),
     worktree: z
       .object({
         branch: z.string().min(1).default('ticket/{key}'),
@@ -44,27 +48,25 @@ const configSchema = z
       })
       .strict()
       .optional()
-      .describe(
-        'Dossier de travail par ticket (ADR 0041) : modèle de branche, commande de préparation',
-      ),
+      .describe('Working folder per ticket (ADR 0041): branch template, setup command'),
     preview: z
       .object({ setup: z.string().min(1).optional() })
       .strict()
       .optional()
-      .describe('Aperçu par branche d’intégration (ADR 0042) : commande de préparation'),
+      .describe('Preview per integration branch (ADR 0042): setup command'),
     commit: z
       .object({ gitmoji: z.boolean().default(true) })
       .strict()
       .optional()
-      .describe('Commande de commit (ADR 0043) : message en gitmoji exigé ou non'),
+      .describe('Commit command (ADR 0043): gitmoji message required or not'),
     changelog: z.boolean().default(false),
     changelogFile: z
       .string()
       .default('CHANGELOG.md')
-      .describe('Relatif à la racine du projet, deux dossiers au-dessus de la configuration'),
+      .describe('Relative to the project root, two folders above the configuration'),
     currency: z
       .string()
-      .regex(/^[A-Z]{3}$/, 'un code de devise ISO 4217, par exemple USD ou EUR')
+      .regex(/^[A-Z]{3}$/, 'an ISO 4217 currency code, for example USD or EUR')
       .optional(),
   })
   .strict();
@@ -76,14 +78,14 @@ export function parseConfig(raw: unknown): Result<Config, string> {
   if (!parsed.success) {
     return fail(
       parsed.error.issues
-        .map((issue) => `${issue.path.join('.') || '(racine)'} : ${issue.message}`)
+        .map((issue) => `${issue.path.join('.') || '(root)'}: ${issue.message}`)
         .join('\n'),
     );
   }
   const config = parsed.data;
   if (!isAllowedHost(config, config.host)) {
     return fail(
-      `host : ${config.host} n'est ni la boucle locale ni une adresse de privateAddresses ; l'outil n'écoute jamais ailleurs.`,
+      `host: ${config.host} is neither loopback nor an address of privateAddresses; the tool never listens anywhere else.`,
     );
   }
   return ok(config);

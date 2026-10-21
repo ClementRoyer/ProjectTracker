@@ -16,7 +16,7 @@ interface Repo {
 }
 
 const USAGE =
-  'Usage : tracker deliver "<nom de la livraison>" <ticket>… [--base <branche>] [--keep <ticket>]';
+  'Usage: tracker deliver "<delivery name>" <ticket>... [--base <branch>] [--keep <ticket>]';
 
 const detail = z.object({ worktree: z.object({ branch: z.string() }).nullable() });
 const delivered = z.object({
@@ -67,22 +67,20 @@ export async function deliver(
     throw error;
   }
   return [
-    `Livraison « ${command.name} » notée : ${command.keys.join(', ')} en livraison en qualité.`,
+    `Delivery "${command.name}" noted: ${command.keys.join(', ')} in QA delivery.`,
     ...lines,
     ...changelogLines(project, settings.changelogFile, command.name, batch.changelog),
-    'Rien n’est poussé : à toi de publier la branche quand tu le décides.',
+    'Nothing is pushed: publish the branch yourself when you decide to.',
   ].join('\n');
 }
 
 function checkReady({ repo, into }: Repo, base: string): void {
   const current = run(into, ['branch', '--show-current']);
   if (current !== base) {
-    throw new Error(`Le dossier principal doit être sur ${base} : ${repo} est sur ${current}.`);
+    throw new Error(`The main folder must be on ${base}: ${repo} is on ${current}.`);
   }
   if (run(into, ['status', '--porcelain', '--untracked-files=no']) !== '') {
-    throw new Error(
-      `${repo} a des changements non commités : commite-les ou annule-les, puis relance.`,
-    );
+    throw new Error(`${repo} has uncommitted changes: commit or discard them, then run again.`);
   }
 }
 
@@ -115,15 +113,15 @@ function merge(
     if (files !== null) {
       const paths = files.map((file) => (repo === '.' ? file : `${repo}/${file}`));
       throw new Error(
-        `Conflit : ${key} (${paths.join(', ')}). Rien n’a été livré : règle le conflit dans sa branche, puis relance.`,
+        `Conflict: ${key} (${paths.join(', ')}). Nothing was delivered: fix the conflict in its branch, then run again.`,
       );
     }
   }
-  if (merged.length === 0) return `${key} : rien à réunir`;
+  if (merged.length === 0) return `${key}: nothing to merge`;
   const where = merged.some(({ repo }) => repo !== '.')
     ? ` (${merged.map(({ repo }) => repo).join(', ')})`
     : '';
-  return `${key} réuni dans ${base}${where}${keep ? ', avec ses commits' : ', en un commit'}`;
+  return `${key} merged into ${base}${where}${keep ? ', with its commits' : ', as one commit'}`;
 }
 
 /** One commit with the message of the branch's first commit, the developer as author (ADR 0009). */
@@ -165,7 +163,7 @@ function changelogLines(
   if (changelog === null) return [];
   const missing =
     changelog.missing.length > 0
-      ? [`Sans ligne de changelog acceptée : ${changelog.missing.join(', ')}`]
+      ? [`No accepted changelog line: ${changelog.missing.join(', ')}`]
       : [];
   if (changelog.written === 0) return missing;
   const file = resolve(project.root, changelogFile);
@@ -173,9 +171,9 @@ function changelogLines(
   try {
     repo = run(dirname(file), ['rev-parse', '--show-toplevel']);
   } catch {
-    return [`Changelog : ${String(changelog.written)} lignes, hors dépôt`, ...missing];
+    return [`Changelog: ${String(changelog.written)} lines, outside any repository`, ...missing];
   }
   run(repo, ['add', file]);
   if (hasStaged(repo)) run(repo, ['commit', '-q', '-m', `📝 Update changelog for ${name}`]);
-  return [`Changelog commité : ${String(changelog.written)} lignes`, ...missing];
+  return [`Changelog committed: ${String(changelog.written)} lines`, ...missing];
 }

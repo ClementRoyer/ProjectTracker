@@ -90,11 +90,7 @@ export function answerQuestion(
     markQuestionAnswered(ctx.db, input.questionId, entryId);
     if (question.role === 'backend') {
       // The back-end agent that asked is gone: the answer starts a new execution.
-      addRequest(
-        ctx,
-        loaded.value,
-        `Réponse du développeur à « ${question.body} » : ${input.answer}`,
-      );
+      addRequest(ctx, loaded.value, `Developer's answer to "${question.body}": ${input.answer}`);
     } else {
       insertDelivery(ctx.db, {
         entryId,
@@ -121,7 +117,7 @@ export function sendMessage(
   if (input.to === 'backend') {
     // The back-end agent runs elsewhere: it reads the attachments by their address (ADR 0035).
     const refs = attachmentRefs(ctx, { attachments: attachments.value });
-    const text = [input.body, ...refs.map((ref) => `Pièce jointe : ${ref.name} (${ref.url})`)];
+    const text = [input.body, ...refs.map((ref) => `Attachment: ${ref.name} (${ref.url})`)];
     inTransaction(ctx.db, () => {
       addRequest(ctx, loaded.value, text.join('\n'), entryId);
     });

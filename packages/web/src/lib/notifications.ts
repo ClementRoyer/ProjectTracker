@@ -39,12 +39,12 @@ export function newNotices(
   return {
     notices: [
       ...questions.map((item) => ({
-        title: 'Question pour toi',
+        title: 'Question for you',
         body: `${item.key} · ${item.text}`,
         key: item.key,
       })),
       ...replies.map((novelty) => ({
-        title: 'Réponse du back-end',
+        title: 'Reply from the back-end',
         body: `${novelty.key} · ${novelty.body}`,
         key: novelty.key,
       })),

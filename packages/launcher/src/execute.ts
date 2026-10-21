@@ -78,10 +78,10 @@ export async function runExecution(
 
 function rules(holdCommand: string): string {
   return [
-    'Règles du serveur back-end :',
-    '- Tu travailles dans le dossier courant, un miroir sans git.',
-    `- AVANT de modifier un fichier, déclare-le : ${holdCommand} <chemin du fichier>`,
-    '- Si la commande répond REFUSÉ, ne modifie pas ce fichier et réponds avec le statut blocked.',
+    'Back-end server rules:',
+    '- You work in the current folder, a mirror without git.',
+    `- BEFORE changing a file, declare it: ${holdCommand} <file path>`,
+    '- If the command answers REFUSED, do not change that file and reply with the status blocked.',
   ].join('\n');
 }
 
@@ -94,7 +94,7 @@ function spawnAgent(
     part.replace('@SCHEMA@', settings.schema).replace('@PROMPT_FILE@', promptFile),
   );
   if (program === undefined) {
-    return Promise.resolve({ output: '', failure: 'commande d’agent vide' });
+    return Promise.resolve({ output: '', failure: 'empty agent command' });
   }
   return new Promise((resolve) => {
     const child = spawn(program, args, {
@@ -124,10 +124,10 @@ function spawnAgent(
       if (timedOut) {
         resolve({
           output,
-          failure: `agent arrêté après ${String(settings.maxSeconds)} s (durée maximale)`,
+          failure: `agent stopped after ${String(settings.maxSeconds)} s (maximum duration)`,
         });
       } else if (code !== 0) {
-        resolve({ output, failure: `agent terminé avec le code ${String(code)}` });
+        resolve({ output, failure: `agent ended with code ${String(code)}` });
       } else resolve({ output });
     });
   });

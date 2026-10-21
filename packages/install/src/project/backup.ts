@@ -12,7 +12,7 @@ export async function backupProjectData(
   label: string,
 ): Promise<string> {
   const folder = join(backupsDir, label);
-  if (existsSync(folder)) throw new Error(`La sauvegarde existe déjà : ${folder}`);
+  if (existsSync(folder)) throw new Error(`The backup already exists: ${folder}`);
   mkdirSync(folder, { recursive: true });
   const db = new DatabaseSync(database, { readOnly: true });
   try {

@@ -60,7 +60,7 @@ export function createTicket(
       ticketId: ticket.id,
       entryType: 'situationChange',
       ...authorOf(ctx.actor),
-      body: `Ticket créé : ${title}`,
+      body: `Ticket created: ${title}`,
       createdAt: at,
     });
   });
@@ -68,10 +68,10 @@ export function createTicket(
 }
 
 const PRIORITY_LABELS = {
-  urgent: 'urgente',
-  high: 'haute',
-  normal: 'normale',
-  low: 'basse',
+  urgent: 'urgent',
+  high: 'high',
+  normal: 'normal',
+  low: 'low',
 } as const;
 
 /** The developer sets the priority (ADR 0032); a real change is noted in the journal. */
@@ -90,7 +90,7 @@ export function setPriority(
       ticketId: ticket.id,
       entryType: 'situationChange',
       ...authorOf(ctx.actor),
-      body: `Priorité : ${PRIORITY_LABELS[ticket.priority]} → ${PRIORITY_LABELS[input.priority]}`,
+      body: `Priority: ${PRIORITY_LABELS[ticket.priority]} → ${PRIORITY_LABELS[input.priority]}`,
       data: { priority: { from: ticket.priority, to: input.priority } },
       createdAt: ctx.now(),
     });

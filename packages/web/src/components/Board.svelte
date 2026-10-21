@@ -15,13 +15,13 @@
       ),
     })),
     {
-      title: 'TERMINÉ',
+      title: 'CLOSED',
       tickets: tickets.filter((ticket) => ticket.situation.closedAt !== null),
     },
   ]);
 </script>
 
-<div class="board" aria-label="Tableau des tickets">
+<div class="board" aria-label="Ticket board">
   {#each columns as column (column.title)}
     <section aria-label={column.title}>
       <h2>{column.title} <span class="count">{column.tickets.length}</span></h2>

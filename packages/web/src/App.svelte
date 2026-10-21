@@ -69,7 +69,7 @@
       </aside>
       <div class="ticket">
         {#if route.key === null}
-          <p class="hint">Choisis un ticket dans la liste.</p>
+          <p class="hint">Pick a ticket in the list.</p>
         {:else}
           <TicketView {tracker} ticketKey={route.key} />
         {/if}

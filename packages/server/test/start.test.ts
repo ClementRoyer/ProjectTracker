@@ -64,7 +64,7 @@ describe('starting the server', () => {
     await call('acceptChangelog', { key: 'LOC-1', line: 'Search customers by name' });
     await call('deliverBatch', { name: 'Livraison 1', keys: ['LOC-1'] });
     expect(readFileSync(join(root, 'CHANGELOG.md'), 'utf8')).toContain(
-      '- LOC-1 : Search customers by name',
+      '- LOC-1: Search customers by name',
     );
   });
 

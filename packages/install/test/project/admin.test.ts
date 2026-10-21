@@ -60,7 +60,7 @@ describe('manual backup and restore (ADR 0013)', () => {
 
     const report = await restoreProject(paths, saved, '2026-10-20T11:00:00.000Z', serverDown);
     expect(visit(paths)).toBe('before');
-    expect(report.join('\n')).toContain('avant-restauration');
+    expect(report.join('\n')).toContain('before-restore');
   });
 
   it('refuses to restore while the server runs, since it holds the database open', async () => {
@@ -68,6 +68,6 @@ describe('manual backup and restore (ADR 0013)', () => {
     const saved = await backupProject(paths, '2026-10-20T10:00:00.000Z');
     await expect(
       restoreProject(paths, saved, '2026-10-20T11:00:00.000Z', () => Promise.resolve(true)),
-    ).rejects.toThrow(/serveur/);
+    ).rejects.toThrow(/server/);
   });
 });

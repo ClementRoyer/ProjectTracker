@@ -22,8 +22,8 @@ describe('what to take next (F21, ADR 0038)', () => {
       TODAY,
     );
     expect(suggestions).toEqual([
-      { key: 'A-2', reasons: ['échéance dépassée'] },
-      { key: 'A-1', reasons: ['priorité urgente'] },
+      { key: 'A-2', reasons: ['overdue'] },
+      { key: 'A-1', reasons: ['urgent priority'] },
     ]);
   });
 
@@ -32,7 +32,7 @@ describe('what to take next (F21, ADR 0038)', () => {
       [candidate('B-1', { phase: 'test', size: 'small', dueDate: '2026-10-22' })],
       TODAY,
     );
-    expect(first?.reasons).toEqual(['échéance dans 2 j', 'presque fini', 'gain rapide']);
+    expect(first?.reasons).toEqual(['due in 2 d', 'almost done', 'quick win']);
   });
 
   it('leaves out a ticket with no reason, and keeps three at most', () => {
@@ -48,7 +48,7 @@ describe('what to take next (F21, ADR 0038)', () => {
   it('counts a far due date only within a week', () => {
     expect(suggestNext([candidate('D-1', { dueDate: '2026-11-30' })], TODAY)).toEqual([]);
     expect(suggestNext([candidate('D-2', { dueDate: '2026-10-26' })], TODAY)[0]?.reasons).toEqual([
-      'échéance dans 6 j',
+      'due in 6 d',
     ]);
   });
 });

@@ -82,6 +82,6 @@ export function lastRefusal(locksDir: string, executionId: string): z.infer<type
 
 function mirrorPath(path: string): string {
   const clean = normalize(path).replaceAll('\\', '/');
-  if (isAbsolute(clean) || clean.startsWith('..')) throw new Error(`Hors du miroir : ${path}`);
+  if (isAbsolute(clean) || clean.startsWith('..')) throw new Error(`Outside the mirror: ${path}`);
   return clean;
 }

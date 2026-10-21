@@ -61,7 +61,7 @@ describe('novelties', () => {
     changePhase(ctx.as(agent), { key: 'LOC-1', phase: 'analysis' });
     const novelties = listNovelties(ctx, {});
     expect(novelties.ok && novelties.value.entries.map((e) => e.body)).toEqual([
-      'Phase : À faire → Analyse',
+      'Phase: To do → Analysis',
     ]);
   });
 });

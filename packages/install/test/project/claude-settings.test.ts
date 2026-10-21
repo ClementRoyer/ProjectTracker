@@ -40,7 +40,7 @@ describe('the project settings of Claude Code (ADR 0030)', () => {
     expect(withTrackerHooks(own, URL).attribution).toEqual(own.attribution);
   });
 
-  it('declares the MCP server in HTTP, beside the project’s other servers', () => {
+  it("declares the MCP server in HTTP, beside the project's other servers", () => {
     const mcp = withTrackerMcp({ mcpServers: { other: { command: 'x' } } }, URL);
     expect(mcp.mcpServers).toEqual({
       other: { command: 'x' },
@@ -52,7 +52,7 @@ describe('the project settings of Claude Code (ADR 0030)', () => {
     });
   });
 
-  it('takes its hooks and address back out, and leaves the project’s own and the attribution', () => {
+  it("takes its hooks and address back out, and leaves the project's own and the attribution", () => {
     const own = { hooks: { Stop: [{ hooks: [{ type: 'command', command: 'echo done' }] }] } };
     const removed = withoutTracker(withTrackerHooks(own, URL));
     expect(removed).toEqual({ ...own, attribution: { commit: '', pr: '' } });

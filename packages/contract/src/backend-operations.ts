@@ -5,7 +5,7 @@ import { ticketKey } from './ticket';
 /** The end-of-turn reply of a back-end agent (ADR 0017, 0020): the launcher sets the ticket itself. */
 export const backendReply = z.object({
   status: z.enum(['done', 'inProgress', 'blocked', 'question']),
-  message: z.string().describe('Message lisible, pour le front et le développeur'),
+  message: z.string().describe('Readable message, for the front agent and the developer'),
   question: z
     .object({ context: z.string(), options: z.array(z.string()), recommendation: z.string() })
     .nullable(),
@@ -31,7 +31,7 @@ export const backendJob = z.object({
 export const requestBackend = defineOperation({
   name: 'requestBackend',
   description:
-    'Adresse une demande au back-end du ticket ; le lanceur la relève et démarre un agent sur le serveur back-end.',
+    'Sends a request to the ticket back-end; the launcher picks it up and starts an agent on the back-end server.',
   callers: ['developer', 'agent'],
   input: z.object({ key: ticketKey, text: z.string().min(1) }),
   output: z.object({ requestId: z.string() }),
@@ -39,7 +39,7 @@ export const requestBackend = defineOperation({
 
 export const launcherHeartbeat = defineOperation({
   name: 'launcherHeartbeat',
-  description: 'Signe de vie du lanceur : exécutions en cours et fichiers tenus dans le miroir.',
+  description: 'Launcher sign of life: running executions and files held in the mirror.',
   callers: ['launcher'],
   input: z.object({
     name: z.string().min(1),
@@ -52,7 +52,7 @@ export const launcherHeartbeat = defineOperation({
 export const takeBackendRequest = defineOperation({
   name: 'takeBackendRequest',
   description:
-    'Le lanceur prend la plus ancienne demande prête ; au plus une exécution à la fois par ticket.',
+    'The launcher takes the oldest ready request; at most one execution at a time per ticket.',
   callers: ['launcher'],
   longPoll: true,
   input: z.object({
@@ -65,7 +65,7 @@ export const takeBackendRequest = defineOperation({
 export const finishExecution = defineOperation({
   name: 'finishExecution',
   description:
-    'Le lanceur rend le résultat d’une exécution : réponse de l’agent, fichiers modifiés mesurés, usage, ou échec.',
+    'The launcher returns the result of an execution: the agent reply, measured changed files, usage, or failure.',
   callers: ['launcher'],
   input: z.object({
     executionId: z.string(),
@@ -85,7 +85,7 @@ export const finishExecution = defineOperation({
 export const recordUsage = defineOperation({
   name: 'recordUsage',
   description:
-    'Enregistre l’usage d’IA mesuré (par l’adaptateur) ou déclaré (par l’agent), rattaché au ticket que tient la conversation.',
+    'Records AI usage, measured (by the adapter) or declared (by the agent), attached to the ticket the conversation holds.',
   callers: ['agent'],
   input: z.object({
     key: ticketKey.optional(),
@@ -98,16 +98,13 @@ export const recordUsage = defineOperation({
 export const usageSummary = defineOperation({
   name: 'usageSummary',
   description:
-    'Usage d’IA par jour, semaine ou mois (dans le fuseau du développeur), et par ticket : jetons et coût estimé.',
+    'AI usage per day, week or month (in the developer time zone), and per ticket: tokens and estimated cost.',
   callers: ['developer'],
   readOnly: true,
   input: z.object({ period: z.enum(['day', 'week', 'month']) }),
   output: z.object({
-    current: z.string().describe('La période en cours : aujourd’hui, cette semaine ou ce mois'),
-    currency: z
-      .string()
-      .nullable()
-      .describe('La devise de la table de prix, si elle est configurée'),
+    current: z.string().describe('The current period: today, this week or this month'),
+    currency: z.string().nullable().describe('The currency of the price table, if configured'),
     periods: z.array(
       z.object({
         period: z.string(),

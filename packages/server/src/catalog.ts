@@ -59,6 +59,7 @@ export const CATALOG: readonly Binding[] = [
   bind(contract.acceptChangelog, usecases.acceptChangelog),
   bind(contract.reportChangedFiles, usecases.reportChangedFiles),
   bind(contract.loadFromJira, usecases.loadFromJira),
+  bind(contract.previewJiraLoad, usecases.previewJiraLoad),
   bind(contract.listDocuments, usecases.listDocuments),
   bind(contract.readDocument, usecases.readDocument),
   bind(contract.introduce, usecases.introduce),

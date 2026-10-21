@@ -42,7 +42,7 @@ export class Tracker {
   /** The last build of the preview (ADR 0042), or null before the first one. */
   preview: { builtAt: string; included: string[]; conflicts: { key: string }[] } | null =
     $state(null);
-  /** Durations (« depuis 3 h ») move on even when nothing changes. */
+  /** Durations ("for 3 h") move on even when nothing changes. */
   now: string = $state(currentInstant());
   /** Bumped at each change, so that open views reload what they show. */
   version = $state(0);

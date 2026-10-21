@@ -34,7 +34,7 @@ export function createApi(token: string): Api {
       });
       const body: unknown = await response.json();
       if (response.status === 409) return { ok: false, error: refusalCode(body) };
-      if (!response.ok) throw new Error(`${operation.name} : réponse ${String(response.status)}`);
+      if (!response.ok) throw new Error(`${operation.name}: response ${String(response.status)}`);
       return { ok: true, value: operation.output.parse(body) };
     },
     upload: async (key, file) => {
@@ -74,7 +74,7 @@ export function createApi(token: string): Api {
 export function pageToken(): string {
   const token = document.querySelector('meta[name="tracker-token"]')?.getAttribute('content');
   if (!token || token.startsWith('%')) {
-    throw new Error('Jeton absent : ouvre la page servie par le serveur.');
+    throw new Error('Token missing: open the page served by the server.');
   }
   return token;
 }

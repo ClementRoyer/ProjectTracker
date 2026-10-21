@@ -56,7 +56,7 @@ async function readContent(c: Context): Promise<Uint8Array | null> {
 function store(c: Context, options: AppOptions, caller: Caller, content: Uint8Array): Response {
   const key = c.req.query('key') ?? '';
   const id = randomUUID();
-  const name = safeName(c.req.query('name') ?? 'fichier');
+  const name = safeName(c.req.query('name') ?? 'file');
   const path = posix.join('attachments', safeName(key), `${id}-${name}`);
   const mime = c.req.header('content-type')?.split(';')[0]?.trim() || null;
   const added = addAttachment(usecaseContext(options, caller.actor), { key, id, path, mime });
@@ -74,5 +74,5 @@ function safeName(name: string): string {
     .replace(/[^\w.-]/g, '_')
     .replace(/^\.+/, '')
     .slice(0, 100);
-  return cleaned === '' ? 'fichier' : cleaned;
+  return cleaned === '' ? 'file' : cleaned;
 }

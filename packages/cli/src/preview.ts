@@ -76,13 +76,13 @@ export async function buildPreview(
   const prepared = settings.preview.setup === undefined || runSetup(settings.preview.setup, folder);
   await call(target, 'recordPreview', { included, conflicts });
   return [
-    `Aperçu reconstruit dans ${relative} sur ${base} : ${included.length > 0 ? included.join(', ') : 'aucun ticket'}`,
+    `Preview rebuilt in ${relative} on ${base}: ${included.length > 0 ? included.join(', ') : 'no ticket'}`,
     ...conflicts.map(
       (c) =>
-        `Laissé de côté, conflit : ${c.key} (${c.files.join(', ')}${c.with.length > 0 ? ` ; avec ${c.with.join(', ')}` : ''})`,
+        `Left out, conflict: ${c.key} (${c.files.join(', ')}${c.with.length > 0 ? `; with ${c.with.join(', ')}` : ''})`,
     ),
-    ...(prepared ? [] : [`La préparation a échoué : ${settings.preview.setup ?? ''}`]),
-    `Serveur de développement : lance-le une fois dans ${relative}, il suit les reconstructions.`,
+    ...(prepared ? [] : [`The setup failed: ${settings.preview.setup ?? ''}`]),
+    `Development server: start it once in ${relative}, it follows the rebuilds.`,
   ].join('\n');
 }
 

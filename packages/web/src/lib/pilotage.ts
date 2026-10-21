@@ -5,23 +5,23 @@ import { shortDate, since } from './format';
 export type GroupId = 'me' | 'agent' | 'other' | 'stale' | 'none' | 'done';
 
 export const GROUP_TITLES: Readonly<Record<GroupId, string>> = {
-  me: 'À TOI',
-  agent: 'LES AGENTS AVANCENT',
-  other: 'ATTEND QUELQU’UN D’AUTRE',
-  stale: 'SANS NOUVELLES',
-  none: 'PAS COMMENCÉS',
-  done: 'TERMINÉS',
+  me: 'YOURS',
+  agent: 'AGENTS ARE MOVING',
+  other: 'WAITING FOR SOMEONE ELSE',
+  stale: 'STALE',
+  none: 'NOT STARTED',
+  done: 'CLOSED',
 };
 
 const GROUP_ORDER: readonly GroupId[] = ['me', 'agent', 'other', 'stale', 'none', 'done'];
 
 export const PHASE_LABELS = {
-  todo: 'À faire',
-  analysis: 'Analyse',
-  development: 'Développement',
+  todo: 'To do',
+  analysis: 'Analysis',
+  development: 'Development',
   test: 'Test',
-  qaDelivery: 'Livraison qualité',
-  qaValidation: 'Validation qualité',
+  qaDelivery: 'QA delivery',
+  qaValidation: 'QA validation',
 } as const;
 
 export const PHASES = Object.keys(PHASE_LABELS) as (keyof typeof PHASE_LABELS)[];
@@ -30,10 +30,10 @@ export type SortOrder = 'wait' | 'activity' | 'phase' | 'priority' | 'key';
 
 /** Most urgent first (ADR 0032). */
 export const PRIORITY_LABELS = {
-  urgent: 'Urgente',
-  high: 'Haute',
-  normal: 'Normale',
-  low: 'Basse',
+  urgent: 'Urgent',
+  high: 'High',
+  normal: 'Normal',
+  low: 'Low',
 } as const;
 
 const PRIORITY_ORDER = ['urgent', 'high', 'normal', 'low'] as const;
@@ -72,7 +72,7 @@ export function groupTickets(tickets: readonly TicketSummary[]): TicketGroup[] {
   })).filter((group) => group.tickets.length > 0);
 }
 
-const byKey = new Intl.Collator('fr', { numeric: true });
+const byKey = new Intl.Collator('en', { numeric: true });
 
 const COMPARE: Readonly<Record<SortOrder, (a: TicketSummary, b: TicketSummary) => number>> = {
   // Without a wait, a ticket goes after those that wait.
@@ -88,46 +88,46 @@ export function sortTickets(tickets: readonly TicketSummary[], order: SortOrder)
 }
 
 export function progressText(ticket: TicketSummary): string {
-  if (ticket.situation.closedAt !== null) return 'Terminé';
+  if (ticket.situation.closedAt !== null) return 'Closed';
   const { progress } = ticket.situation;
   switch (progress.state) {
     case 'notStarted':
-      return 'Pas démarré';
+      return 'Not started';
     case 'inProgress':
-      return `En cours : ${progress.note}`;
+      return `In progress: ${progress.note}`;
     case 'done':
-      return 'Fait';
+      return 'Done';
   }
 }
 
 /** The pill of a row: who or what the ticket waits for, and since when. */
 export function waitText(ticket: TicketSummary, now: string): string {
   const { wait, closedAt } = ticket.situation;
-  if (closedAt !== null) return `Clos le ${shortDate(closedAt)}`;
+  if (closedAt !== null) return `Closed on ${shortDate(closedAt)}`;
   if (wait !== null) {
     const waited = since(wait.since, now);
     switch (wait.kind) {
       case 'developer':
-        return `Attend ta réponse ${waited}`;
+        return `Waiting for your answer ${waited}`;
       case 'backend':
-        return `Attend le back-end ${waited}`;
+        return `Waiting for the back-end ${waited}`;
       case 'resource':
-        return `Attend la ressource « ${wait.detail} » ${waited}`;
+        return `Waiting for resource "${wait.detail}" ${waited}`;
       case 'fileHold':
-        return `Attend un fichier tenu : ${wait.detail}`;
+        return `Waiting for a held file: ${wait.detail}`;
       case 'endUser':
       case 'partner':
-        return `Attend « ${wait.detail} » ${waited}`;
+        return `Waiting for "${wait.detail}" ${waited}`;
     }
   }
   return idleText(ticket, now);
 }
 
 function idleText(ticket: TicketSummary, now: string): string {
-  if (ticket.readyToClose) return 'À déclarer terminé';
-  if (ticket.stale) return `Sans nouvelles ${since(ticket.lastActivityAt, now)}`;
+  if (ticket.readyToClose) return 'Ready to close';
+  if (ticket.stale) return `Stale ${since(ticket.lastActivityAt, now)}`;
   const agentName = ticket.assignees.find((assignee) => assignee.kind === 'agent')?.name;
-  if (ticket.working) return `${agentName ?? 'Un agent'} travaille`;
-  if (agentName !== undefined && agentName !== null) return `Pris par ${agentName}`;
-  return ticket.assignees.length > 0 ? 'Pris par toi' : 'Personne ne l’a pris';
+  if (ticket.working) return `${agentName ?? 'An agent'} is working`;
+  if (agentName !== undefined && agentName !== null) return `Taken by ${agentName}`;
+  return ticket.assignees.length > 0 ? 'Taken by you' : 'Nobody has taken it';
 }

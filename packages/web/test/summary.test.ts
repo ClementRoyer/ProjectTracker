@@ -55,7 +55,7 @@ describe('the summary screen (validated mockup)', () => {
       periodLabel('day', '2026-10-20'),
       periodLabel('week', '2026-W43'),
       periodLabel('month', '2026-10'),
-    ]).toEqual(['Aujourd’hui', 'Semaine 43', 'Octobre 2026']);
+    ]).toEqual(['Today', 'Week 43', 'October 2026']);
   });
 
   it('gives the seven days up to today, with zero for a day without usage', () => {

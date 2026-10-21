@@ -1,6 +1,6 @@
 <script lang="ts"></script>
 
-<span class="agent-running" role="img" aria-label="Un agent travaille sur ce ticket"></span>
+<span class="agent-running" role="img" aria-label="An agent is working on this ticket"></span>
 
 <style>
   @keyframes agent-spin {

@@ -16,7 +16,7 @@ export function toTicket(item: V1Item, project: V1Project): Ticket {
   return ticket;
 }
 
-/** ADR 0024: an unfinished ticket starts again in « À faire »; a finished one is closed at its end date. */
+/** ADR 0024: an unfinished ticket starts again in "To do"; a finished one is closed at its end date. */
 export function toSituation(item: V1Item, project: V1Project): SituationRecord {
   if (isFinished(item, project)) {
     return {

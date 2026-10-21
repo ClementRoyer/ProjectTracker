@@ -11,9 +11,9 @@
   let daily = $state<UsageSummaryView | null>(null);
 
   const PERIODS = [
-    { id: 'day', label: 'Jour' },
-    { id: 'week', label: 'Semaine' },
-    { id: 'month', label: 'Mois' },
+    { id: 'day', label: 'Day' },
+    { id: 'week', label: 'Week' },
+    { id: 'month', label: 'Month' },
   ] as const;
 
   const current = $derived(usage?.periods.find((p) => p.period === usage?.current) ?? null);
@@ -50,10 +50,10 @@
   }
 </script>
 
-<section class="panel usage" aria-label="Usage de l’IA">
+<section class="panel usage" aria-label="AI usage">
   <div class="title-row">
-    <h1>Usage de l’IA</h1>
-    <div role="group" aria-label="Période" class="periods">
+    <h1>AI usage</h1>
+    <div role="group" aria-label="Period" class="periods">
       {#each PERIODS as choice (choice.id)}
         <button
           type="button"
@@ -68,30 +68,30 @@
   <div class="stats">
     <div>
       <span class="muted">{usage ? periodLabel(period, usage.current) : ''}</span>
-      <strong>{tokensText(tokens)}</strong><span class="muted">jetons</span>
+      <strong>{tokensText(tokens)}</strong><span class="muted">tokens</span>
     </div>
     <div>
-      <span class="muted">Coût estimé</span>
+      <span class="muted">Estimated cost</span>
       <strong>{costText(current?.estimatedCost ?? 0, usage?.currency ?? null)}</strong>
       <span class="muted"
-        >dont {tokensText(current?.unpricedTokens ?? 0)} jetons sans prix connu</span
+        >of which {tokensText(current?.unpricedTokens ?? 0)} tokens without a known price</span
       >
     </div>
     <div>
-      <span class="muted">Provenance</span>
-      <strong>{measuredShare === null ? '—' : `${String(measuredShare)} %`}</strong>
+      <span class="muted">Source</span>
+      <strong>{measuredShare === null ? '—' : `${String(measuredShare)}%`}</strong>
       <span class="muted">
         {measuredShare === null
-          ? 'rien de compté'
-          : `mesuré · ${String(100 - measuredShare)} % déclaré`}
+          ? 'nothing counted'
+          : `measured · ${String(100 - measuredShare)}% declared`}
       </span>
     </div>
   </div>
-  <h2>7 derniers jours</h2>
+  <h2>Last 7 days</h2>
   <div
     class="chart"
     role="img"
-    aria-label={`Jetons par jour : ${chart.map((day) => `${day.label} ${tokensText(day.tokens)}`).join(', ')}`}
+    aria-label={`Tokens per day: ${chart.map((day) => `${day.label} ${tokensText(day.tokens)}`).join(', ')}`}
   >
     {#each chart as day (day.key)}
       <div class="bar-cell">
@@ -102,10 +102,10 @@
       </div>
     {/each}
   </div>
-  <h2>Par ticket, depuis le début</h2>
+  <h2>Per ticket, since the beginning</h2>
   {#each usage?.byTicket ?? [] as row (row.key ?? '')}
     <div class="by-ticket">
-      <span class="key">{row.key ?? 'Sans ticket'}</span>
+      <span class="key">{row.key ?? 'No ticket'}</span>
       <span class="track">
         <span
           class="fill"
@@ -117,10 +117,10 @@
       <span class="muted">{costText(row.estimatedCost, usage?.currency ?? null)}</span>
     </div>
   {:else}
-    <span class="muted">Aucun usage enregistré.</span>
+    <span class="muted">No usage recorded.</span>
   {/each}
   <span class="muted note">
-    Jours, semaines et mois comptés dans ton fuseau horaire ; la semaine va du lundi au dimanche.
+    Days, weeks and months are counted in your time zone; the week runs from Monday to Sunday.
   </span>
 </section>
 

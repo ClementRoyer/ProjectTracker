@@ -74,15 +74,15 @@ describe('the preview of the open tickets (ADR 0042)', () => {
     const notes = (): string[] => {
       const ticket = getTicket(ctx, { key: 'LOC-2' });
       return ticket.ok
-        ? ticket.value.entries.map((entry) => entry.body).filter((body) => body.includes('aperçu'))
+        ? ticket.value.entries.map((entry) => entry.body).filter((body) => body.includes('preview'))
         : [];
     };
     recordPreview(ctx, { included: ['LOC-1'], conflicts: [conflictOf2] });
     recordPreview(ctx, { included: ['LOC-1'], conflicts: [conflictOf2] });
     recordPreview(ctx, { included: ['LOC-1', 'LOC-2'], conflicts: [] });
     expect(notes()).toEqual([
-      'Conflit avec l’aperçu : src/search.ts (déjà réunis : LOC-1)',
-      'Plus de conflit avec l’aperçu',
+      'Conflict with the preview: src/search.ts (already merged: LOC-1)',
+      'No more conflict with the preview',
     ]);
   });
 });

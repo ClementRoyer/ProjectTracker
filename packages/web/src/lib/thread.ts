@@ -25,7 +25,7 @@ const MARKS: ReadonlySet<EntryView['entryType']> = new Set([
 export function threadOf(entries: readonly EntryView[]): ThreadItem[] {
   return entries.map((entry) => {
     if (entry.entryType === 'decision') {
-      return mark(entry, `Décision · ${entry.body}`, true);
+      return mark(entry, `Decision · ${entry.body}`, true);
     }
     if (MARKS.has(entry.entryType) || entry.authorKind === 'system') {
       return mark(entry, entry.body, false);
@@ -34,7 +34,7 @@ export function threadOf(entries: readonly EntryView[]): ThreadItem[] {
   });
 }
 
-/** « F1 » for front-1, « BE » for back-end: one letter per word, then the number. */
+/** "F1" for front-1, "BE" for back-end: one letter per word, then the number. */
 export function initials(name: string): string {
   const words = name.split(/[-_\s]+/).filter((word) => word !== '');
   const letters = words
@@ -55,13 +55,12 @@ function mine(entry: EntryView): ThreadItem {
     id: entry.id,
     side: 'mine',
     tone: 'developer',
-    author: 'Toi',
-    initials: 'MOI',
+    author: 'You',
+    initials: 'ME',
     to: recipient(entry),
     body: entry.body,
     at: entry.createdAt,
-    receipt:
-      entry.acknowledgedAt === null ? 'Envoyée · pas encore prise en compte' : 'Prise en compte',
+    receipt: entry.acknowledgedAt === null ? 'Sent · not acknowledged yet' : 'Acknowledged',
   };
 }
 
@@ -75,7 +74,7 @@ function theirs(entry: EntryView): ThreadItem {
     tone: fromBackend ? 'backend' : 'agent',
     author,
     initials: initials(author),
-    to: entry.entryType === 'question' ? '→ toi' : '',
+    to: entry.entryType === 'question' ? '→ you' : '',
     body: entry.body,
     at: entry.createdAt,
     receipt: null,

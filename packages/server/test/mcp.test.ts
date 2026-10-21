@@ -50,7 +50,7 @@ const text = (result: Awaited<ReturnType<Client['callTool']>>): string =>
     .map((part) => part.text)
     .join('\n');
 
-const tokenIn = (reply: string): string => /Jeton : (\S+)/.exec(reply)?.[1] ?? '';
+const tokenIn = (reply: string): string => /Token: (\S+)/.exec(reply)?.[1] ?? '';
 
 const developerCall = async (app: App, operation: string, body: unknown): Promise<unknown> => {
   const response = await app.request(`/api/${operation}`, {

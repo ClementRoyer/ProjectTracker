@@ -202,6 +202,6 @@ describe('hooks', () => {
       { session_id: 's1', cwd: '/work/shop', source: 'startup' },
       { call, stateDir: folder(), env: {} },
     );
-    expect(output.hookSpecificOutput.additionalContext).toMatch(/injoignable/);
+    expect(output.hookSpecificOutput.additionalContext).toMatch(/cannot be reached/);
   });
 });

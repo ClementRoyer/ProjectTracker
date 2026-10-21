@@ -75,7 +75,7 @@ describe('CLI (ADR 0011, 0026)', () => {
     expect((await cli(['take-ticket', 'LOC-1', '--role', 'front'], env)).code).toBe(0);
     const refused = await cli(['close-ticket', 'LOC-1'], env);
     expect(refused.code).toBe(1);
-    expect(refused.err).toMatch(/développeur/);
+    expect(refused.err).toMatch(/the developer/);
   });
 
   it('repeats an option to give a list', async () => {
@@ -105,7 +105,7 @@ describe('CLI (ADR 0011, 0026)', () => {
       TRACKER_TOKEN: 'x',
     });
     expect(code).toBe(1);
-    expect(err).toMatch(/ne répond pas/);
+    expect(err).toMatch(/does not answer/);
   });
 
   it('reports the files the ticket changes in its git folder, and the tickets that touch them too', async () => {
@@ -174,7 +174,7 @@ describe('CLI (ADR 0011, 0026)', () => {
   it('explains how to call resource run when the command is missing', async () => {
     const { code, err } = await cli(['resource', 'run', 'e2e', '--key', 'LOC-1']);
     expect(code).toBe(1);
-    expect(err).toMatch(/tracker resource run <ressource>/);
+    expect(err).toMatch(/tracker resource run <resource>/);
   });
 
   it('attaches a file to a ticket and notes it in the journal (ADR 0035)', async () => {
@@ -188,7 +188,7 @@ describe('CLI (ADR 0011, 0026)', () => {
       'The cut button',
     ]);
     expect(code).toBe(0);
-    expect(out).toMatch(/capture\.png jointe à LOC-1/);
+    expect(out).toMatch(/capture\.png attached to LOC-1/);
     const ticket = JSON.parse((await cli(['get-ticket', 'LOC-1'])).out) as {
       attachments: { name: string }[];
       entries: { body: string }[];

@@ -35,7 +35,9 @@ const artefact = (version: string): string => {
   writeFileSync(join(dist, 'VERSION'), version);
   writeFileSync(join(dist, 'launcher.js'), '');
   writeFileSync(join(dist, 'start-front.sh'), '');
+  writeFileSync(join(dist, 'stop-front.sh'), '');
   writeFileSync(join(dist, 'start-back.sh'), '');
+  writeFileSync(join(dist, 'package.json'), '{"type":"module"}');
   return dist;
 };
 
@@ -51,8 +53,10 @@ describe('installing the tool in a project (ADR 0030)', () => {
       'VERSION',
       'admin.js',
       'claude',
+      'package.json',
       'server.js',
       'start-front.sh',
+      'stop-front.sh',
       'tracker.js',
       'web',
     ]);
@@ -63,7 +67,15 @@ describe('installing the tool in a project (ADR 0030)', () => {
     await installProject({ root, artefactDir: artefact('2.0.0'), port: 9640, now: NOW });
     expect(read(join(root, 'tools', 'tracker', 'tracker.config.json'))).toEqual({ port: 9640 });
     const ignored = readFileSync(join(root, 'tools', 'tracker', '.gitignore'), 'utf8');
-    for (const entry of ['app/', '*.db', 'backups/', 'developer.token', 'secrets.env']) {
+    for (const entry of [
+      'app/',
+      '*.db',
+      'backups/',
+      'developer.token',
+      'secrets.env',
+      'server.log',
+      'server.pid',
+    ]) {
       expect(ignored).toContain(entry);
     }
   });

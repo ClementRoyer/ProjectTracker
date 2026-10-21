@@ -20,12 +20,12 @@ test('the header and each ticket show the last build of the preview, and its con
   });
 
   await page.goto(`/#/ticket/${merged}`);
-  const pill = page.getByRole('status', { name: 'Aperçu' });
-  await expect(pill).toHaveText(/^Aperçu : 1 ticket.* · 1 conflit$/);
-  await expect(pill).toHaveAttribute('title', /Reconstruit à l’instant/);
-  const folder = page.getByRole('complementary', { name: 'Dossier du ticket' });
-  await expect(folder).toContainText('Dans l’aperçu');
+  const pill = page.getByRole('status', { name: 'Preview' });
+  await expect(pill).toHaveText(/^Preview: 1 ticket.* · 1 conflict$/);
+  await expect(pill).toHaveAttribute('title', /Rebuilt just now/);
+  const folder = page.getByRole('complementary', { name: 'Ticket file' });
+  await expect(folder).toContainText('In the preview');
 
   await page.goto(`/#/ticket/${left}`);
-  await expect(folder).toContainText(`Conflit avec l’aperçu : src/search.ts · avec ${merged}`);
+  await expect(folder).toContainText(`Conflict with the preview: src/search.ts · with ${merged}`);
 });

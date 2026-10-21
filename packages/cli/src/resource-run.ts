@@ -33,7 +33,7 @@ export async function runWithResource(
     if (answer.granted) break;
     if (!announced) {
       log(
-        `En attente de « ${run.resource} », tenue par ${answer.heldBy ?? '?'} (place ${String(answer.position)})…`,
+        `Waiting for "${run.resource}", held by ${answer.heldBy ?? '?'} (place ${String(answer.position)})...`,
       );
       announced = true;
     }
@@ -75,7 +75,7 @@ async function call(target: Target, operation: string, input: object): Promise<u
   if (!response.ok) {
     const error = z.object({ error: z.string() }).safeParse(body);
     throw new Error(
-      `${operation} refusé : ${error.success ? error.data.error : String(response.status)}`,
+      `${operation} refused: ${error.success ? error.data.error : String(response.status)}`,
     );
   }
   return body;
@@ -90,7 +90,7 @@ export function parseResourceRun(args: readonly string[]): ResourceRun | string 
   const key = keyIndex === -1 ? undefined : before[keyIndex + 1];
   const resource = before.find((arg, index) => !arg.startsWith('--') && index !== keyIndex + 1);
   if (resource === undefined || key === undefined || command.length === 0) {
-    return 'Usage : tracker resource run <ressource> --key <ticket> -- <commande …>';
+    return 'Usage: tracker resource run <resource> --key <ticket> -- <command ...>';
   }
   return { resource, key, command };
 }

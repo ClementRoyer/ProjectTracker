@@ -56,6 +56,25 @@ export async function loadFromJira(
   return ok(summary);
 }
 
+/** What a load would bring, without writing anything (ADR 0052): for the installer's pre-fetch. */
+export async function previewJiraLoad(
+  ctx: UsecaseContext,
+  _input: InputOf<typeof op.previewJiraLoad>,
+): Promise<Result<OutputOf<typeof op.previewJiraLoad>, UsecaseError>> {
+  if (!ctx.jira) return fail('jiraNotConfigured');
+  let issues: JiraIssue[];
+  try {
+    issues = await ctx.jira();
+  } catch {
+    return fail('jiraUnreachable');
+  }
+  const known = new Set(allTickets(ctx.db).map((ticket) => ticket.key));
+  return ok({
+    read: issues.length,
+    created: issues.map((issue) => issue.key).filter((key) => !known.has(key)),
+  });
+}
+
 function create(ctx: UsecaseContext, issue: JiraIssue): void {
   const at = ctx.now();
   const ticket: Ticket = {
@@ -77,7 +96,7 @@ function create(ctx: UsecaseContext, issue: JiraIssue): void {
     wait: null,
     updatedAt: at,
   });
-  journal(ctx, ticket.id, `Chargé de Jira : ${issue.title}`, { status: issue.status });
+  journal(ctx, ticket.id, `Imported from Jira: ${issue.title}`, { status: issue.status });
   for (const comment of issue.comments) addComment(ctx, ticket.id, comment);
 }
 
@@ -85,16 +104,16 @@ function create(ctx: UsecaseContext, issue: JiraIssue): void {
 function followDueDate(ctx: UsecaseContext, ticket: Ticket, issue: JiraIssue): string[] {
   if ((ticket.dueDate ?? null) === (issue.dueDate ?? null)) return [];
   saveDueDate(ctx.db, ticket.id, issue.dueDate ?? null);
-  return [`Échéance Jira : ${issue.dueDate ?? 'aucune'}`];
+  return [`Jira due date: ${issue.dueDate ?? 'none'}`];
 }
 
 /** Returns whether anything changed; each change is an entry of the journal. */
 function update(ctx: UsecaseContext, ticket: Ticket, issue: JiraIssue): boolean {
   const changes: string[] = [];
   if (ticket.jiraStatus !== issue.status) {
-    changes.push(`Statut Jira : ${ticket.jiraStatus ?? '—'} → ${issue.status}`);
+    changes.push(`Jira status: ${ticket.jiraStatus ?? '—'} → ${issue.status}`);
   }
-  if (ticket.title !== issue.title) changes.push(`Titre Jira : ${issue.title}`);
+  if (ticket.title !== issue.title) changes.push(`Jira title: ${issue.title}`);
   if ((ticket.initialRequest ?? '') !== issue.description) {
     changes.push(`Description Jira :\n${issue.description}`);
   }
@@ -119,7 +138,7 @@ function addComment(
   ticketId: string,
   comment: JiraIssue['comments'][number],
 ): void {
-  journal(ctx, ticketId, `${comment.author} : ${comment.body}`, {
+  journal(ctx, ticketId, `${comment.author}: ${comment.body}`, {
     commentId: comment.id,
     author: comment.author,
     at: comment.createdAt,

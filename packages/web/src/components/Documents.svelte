@@ -16,7 +16,7 @@
 </script>
 
 <main class="documents" aria-label="Documents">
-  <nav aria-label="Documents du projet" class="list">
+  <nav aria-label="Project documents" class="list">
     <h1>Documents</h1>
     {#each tracker.documents as path (path)}
       <button
@@ -28,9 +28,9 @@
       </button>
     {/each}
   </nav>
-  <article class="panel content" aria-label={chosen ?? 'Aucun document'}>
+  <article class="panel content" aria-label={chosen ?? 'No document'}>
     {#if chosen === null}
-      <span class="muted">Choisis un document.</span>
+      <span class="muted">Pick a document.</span>
     {:else}
       <h2>{chosen}</h2>
       <pre>{content ?? '…'}</pre>

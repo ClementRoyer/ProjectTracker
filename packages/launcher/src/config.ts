@@ -22,11 +22,11 @@ export type LauncherConfig = z.infer<typeof launcherConfig>;
 
 /** Reads the file; relative folders are taken from the file's folder. */
 export function readLauncherConfig(file: string): LauncherConfig {
-  if (!existsSync(file)) throw new Error(`Configuration du lanceur introuvable : ${file}`);
+  if (!existsSync(file)) throw new Error(`Launcher configuration not found: ${file}`);
   const parsed = launcherConfig.safeParse(JSON.parse(readFileSync(file, 'utf8')));
   if (!parsed.success) {
     throw new Error(
-      parsed.error.issues.map((issue) => `${issue.path.join('.')} : ${issue.message}`).join('\n'),
+      parsed.error.issues.map((issue) => `${issue.path.join('.')}: ${issue.message}`).join('\n'),
     );
   }
   const folder = dirname(file);

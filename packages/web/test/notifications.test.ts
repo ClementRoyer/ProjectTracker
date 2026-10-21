@@ -37,8 +37,8 @@ describe('notifications (F26, ADR 0036)', () => {
     const seen = firstSeen([], []);
     const first = newNotices(seen, [question('q2')], [reply('r2')]);
     expect(first.notices.map((notice) => [notice.title, notice.key])).toEqual([
-      ['Question pour toi', 'LOC-1'],
-      ['Réponse du back-end', 'LOC-2'],
+      ['Question for you', 'LOC-1'],
+      ['Reply from the back-end', 'LOC-2'],
     ]);
     expect(newNotices(first.seen, [question('q2')], [reply('r2')]).notices).toEqual([]);
   });

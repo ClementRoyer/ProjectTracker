@@ -29,13 +29,13 @@
   }
 </script>
 
-<main class="novelties" aria-label="Nouveautés">
+<main class="novelties" aria-label="Novelties">
   <div class="title-row">
-    <h1>Nouveautés</h1>
+    <h1>Novelties</h1>
     <span class="muted">
       {since === null
-        ? 'Depuis le début'
-        : `Depuis ta dernière visite, le ${shortDate(since, true)}`}
+        ? 'Since the beginning'
+        : `Since your last visit, on ${shortDate(since, true)}`}
     </span>
     <button
       type="button"
@@ -43,7 +43,7 @@
       disabled={novelties.length === 0}
       onclick={() => tracker.act(markVisited, {})}
     >
-      Tout marquer vu
+      Mark all as seen
     </button>
   </div>
   {#each groups as group (group.key)}
@@ -60,7 +60,7 @@
       {/each}
     </section>
   {:else}
-    <p class="muted">Rien de neuf depuis ta dernière visite.</p>
+    <p class="muted">Nothing new since your last visit.</p>
   {/each}
 </main>
 

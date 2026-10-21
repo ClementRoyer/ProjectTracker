@@ -45,22 +45,22 @@ function reasonsOf(
   return [
     dueReason(candidate.dueDate, today),
     priorityReason(candidate.priority),
-    ALMOST_DONE.includes(candidate.phase) ? { text: 'presque fini', points: 20 } : null,
-    candidate.size === 'small' ? { text: 'gain rapide', points: 15 } : null,
+    ALMOST_DONE.includes(candidate.phase) ? { text: 'almost done', points: 20 } : null,
+    candidate.size === 'small' ? { text: 'quick win', points: 15 } : null,
   ].filter((reason) => reason !== null);
 }
 
 function dueReason(dueDate: string | null, today: string): { text: string; points: number } | null {
   if (dueDate === null) return null;
   const days = Math.round((Date.parse(dueDate) - Date.parse(today)) / DAY_MS);
-  if (days < 0) return { text: 'échéance dépassée', points: 50 };
-  if (days <= 2) return { text: `échéance dans ${String(days)} j`, points: 30 };
-  if (days <= 7) return { text: `échéance dans ${String(days)} j`, points: 15 };
+  if (days < 0) return { text: 'overdue', points: 50 };
+  if (days <= 2) return { text: `due in ${String(days)} d`, points: 30 };
+  if (days <= 7) return { text: `due in ${String(days)} d`, points: 15 };
   return null;
 }
 
 function priorityReason(priority: Priority): { text: string; points: number } | null {
-  if (priority === 'urgent') return { text: 'priorité urgente', points: 40 };
-  if (priority === 'high') return { text: 'priorité haute', points: 20 };
+  if (priority === 'urgent') return { text: 'urgent priority', points: 40 };
+  if (priority === 'high') return { text: 'high priority', points: 20 };
   return null;
 }

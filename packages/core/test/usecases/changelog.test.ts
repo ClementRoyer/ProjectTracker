@@ -40,8 +40,8 @@ describe('delivery changelog (F22, ADR 0037)', () => {
       accepted: 'Search customers by their name',
     });
     expect(ticket.ok && ticket.value.entries.slice(-2).map((entry) => entry.body)).toEqual([
-      'Ligne de changelog proposée : search customers by name',
-      'Ligne de changelog acceptée : Search customers by their name',
+      'Changelog line proposed: search customers by name',
+      'Changelog line accepted: Search customers by their name',
     ]);
   });
 

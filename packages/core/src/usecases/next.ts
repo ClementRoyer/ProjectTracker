@@ -20,7 +20,7 @@ import {
 } from './context';
 import { toSummary } from './views';
 
-const SIZE_LABELS = { small: 'petite', medium: 'moyenne', large: 'grande' } as const;
+const SIZE_LABELS = { small: 'small', medium: 'medium', large: 'large' } as const;
 
 /** The developer sets the due date of a local ticket; a Jira ticket's follows Jira (ADR 0038). */
 export function setDueDate(
@@ -32,7 +32,7 @@ export function setDueDate(
   if (loaded.value.ticket.origin === 'jira') return fail('jiraOwnsDueDate');
   inTransaction(ctx.db, () => {
     saveDueDate(ctx.db, loaded.value.ticket.id, input.dueDate);
-    note(ctx, loaded.value.ticket.id, `Échéance : ${input.dueDate ?? 'aucune'}`);
+    note(ctx, loaded.value.ticket.id, `Due date: ${input.dueDate ?? 'none'}`);
   });
   return ok({ dueDate: input.dueDate });
 }
@@ -49,7 +49,7 @@ export function setSize(
     note(
       ctx,
       loaded.value.ticket.id,
-      `Taille : ${input.size === null ? 'non estimée' : SIZE_LABELS[input.size]}`,
+      `Size: ${input.size === null ? 'not estimated' : SIZE_LABELS[input.size]}`,
     );
   });
   return ok({ size: input.size });
@@ -66,7 +66,7 @@ export function setGroup(
   inTransaction(ctx.db, () => {
     const groupId = name === null ? null : findOrCreateGroup(ctx.db, name, ctx.newId());
     saveGroup(ctx.db, loaded.value.ticket.id, groupId);
-    note(ctx, loaded.value.ticket.id, `Groupe : ${name ?? 'aucun'}`);
+    note(ctx, loaded.value.ticket.id, `Group: ${name ?? 'none'}`);
   });
   return ok({ group: name });
 }

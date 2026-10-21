@@ -31,7 +31,7 @@ describe('what to take next, with due dates and sizes (F21, ADR 0038)', () => {
     setSize(ctx, { key: 'LOC-2', size: 'small' });
     const suggested = suggestNext(ctx, {});
     expect(suggested.ok && suggested.value.suggestions).toEqual([
-      { key: 'LOC-2', title: 'Export orders', reasons: ['priorité urgente', 'gain rapide'] },
+      { key: 'LOC-2', title: 'Export orders', reasons: ['urgent priority', 'quick win'] },
     ]);
   });
 

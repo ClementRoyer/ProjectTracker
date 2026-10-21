@@ -25,7 +25,7 @@ export function findTarget(
   const url = env.TRACKER_URL ?? (folder ? urlOf(folder) : undefined);
   const token = env.TRACKER_TOKEN ?? (folder ? developerToken(folder) : undefined);
   if (url === undefined || token === undefined) {
-    return 'Projet introuvable : lance la commande dans le projet (dossier tools/tracker/), ou donne TRACKER_URL et TRACKER_TOKEN.';
+    return 'Project not found: run the command inside the project (folder tools/tracker/), or set TRACKER_URL and TRACKER_TOKEN.';
   }
   return { url, token };
 }

@@ -18,11 +18,11 @@ export function recentlyClosed(tickets: readonly TicketSummary[]): TicketSummary
 
 export type Period = 'day' | 'week' | 'month';
 
-/** « Aujourd’hui », « Semaine 43 », « Octobre 2026 », from the keys the server gives. */
+/** "Today", "Week 43", "October 2026", from the keys the server gives. */
 export function periodLabel(period: Period, key: string): string {
-  if (period === 'day') return 'Aujourd’hui';
-  if (period === 'week') return `Semaine ${String(Number(key.slice(-2)))}`;
-  const month = new Intl.DateTimeFormat('fr-FR', {
+  if (period === 'day') return 'Today';
+  if (period === 'week') return `Week ${String(Number(key.slice(-2)))}`;
+  const month = new Intl.DateTimeFormat('en-GB', {
     month: 'long',
     year: 'numeric',
     timeZone: 'UTC',
@@ -41,7 +41,7 @@ export function lastDays(
   return Array.from({ length: 7 }, (_, index) => {
     const date = new Date(end - (6 - index) * DAY_MS);
     const key = date.toISOString().slice(0, 10);
-    const label = new Intl.DateTimeFormat('fr-FR', { weekday: 'short', timeZone: 'UTC' }).format(
+    const label = new Intl.DateTimeFormat('en-GB', { weekday: 'short', timeZone: 'UTC' }).format(
       date,
     );
     return { key, label, tokens: days.find((day) => day.period === key)?.tokens ?? 0 };

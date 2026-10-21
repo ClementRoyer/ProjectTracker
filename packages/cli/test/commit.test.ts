@@ -60,9 +60,9 @@ describe('commit message (ADR 0043)', () => {
   });
 
   it('refuses more than one line, more than 72 characters, or nothing', () => {
-    expect(() => commitMessage('✨ Add search\n\nWith a body', true)).toThrow(/une ligne/);
+    expect(() => commitMessage('✨ Add search\n\nWith a body', true)).toThrow(/one line/);
     expect(() => commitMessage(`✨ ${'a'.repeat(71)}`, true)).toThrow(/72/);
-    expect(() => commitMessage('  ', true)).toThrow(/vide/);
+    expect(() => commitMessage('  ', true)).toThrow(/empty/);
   });
 });
 
@@ -94,7 +94,7 @@ describe('commit from a ticket folder or the main folder (ADR 0043)', () => {
     expect(out).toContain(sha);
     expect(git(folder, 'log', '-1', '--format=%an|%B')).toBe('Developer|✨ Add search by name');
     expect(git(folder, 'status', '--porcelain')).toBe('');
-    expect(await journal('LOC-1', root)).toContain(`Commit ${sha} : ✨ Add search by name`);
+    expect(await journal('LOC-1', root)).toContain(`Commit ${sha}: ✨ Add search by name`);
   });
 
   it('commits only what is staged in the main folder, for the ticket given', async () => {
@@ -110,14 +110,14 @@ describe('commit from a ticket folder or the main folder (ADR 0043)', () => {
     expect(git(root, 'show', '--name-only', '--format=', 'HEAD')).toBe('city.ts');
     expect(git(root, 'status', '--porcelain')).toBe('?? other.ts');
     const sha = git(root, 'rev-parse', '--short', 'HEAD');
-    expect(await journal('LOC-2', root)).toContain(`Commit ${sha} : ✨ Add search by city`);
+    expect(await journal('LOC-2', root)).toContain(`Commit ${sha}: ✨ Add search by city`);
   });
 
   it('refuses when there is nothing to commit, or a bad message, and commits nothing', async () => {
     const head = git(root, 'rev-parse', 'HEAD');
     const nothing = await runCli(['commit', '✨ Add nothing'], {}, root);
     expect(nothing.code).toBe(1);
-    expect(nothing.err).toMatch(/Rien à commiter/);
+    expect(nothing.err).toMatch(/Nothing to commit/);
     const bad = await runCli(['commit', 'Add other'], {}, root);
     expect(bad.code).toBe(1);
     expect(git(root, 'rev-parse', 'HEAD')).toBe(head);
@@ -166,7 +166,7 @@ describe('commit in a project with several repositories (ADR 0040, 0043)', () =>
     const api = git(join(folder, 'api'), 'rev-parse', '--short', 'HEAD');
     expect(git(join(folder, 'api'), 'log', '-1', '--format=%s')).toBe('✨ Show orders in the list');
     expect(await journal('LOC-1', root)).toContain(
-      `Commit ${web} (web), ${api} (api) : ✨ Show orders in the list`,
+      `Commit ${web} (web), ${api} (api): ✨ Show orders in the list`,
     );
   });
 
@@ -177,6 +177,6 @@ describe('commit in a project with several repositories (ADR 0040, 0043)', () =>
     expect((await runCli(['commit', '🐛 Fix the order total'], {}, folder)).code).toBe(0);
     expect(git(join(folder, 'web'), 'rev-parse', 'HEAD')).toBe(web);
     const api = git(join(folder, 'api'), 'rev-parse', '--short', 'HEAD');
-    expect(await journal('LOC-1', root)).toContain(`Commit ${api} (api) : 🐛 Fix the order total`);
+    expect(await journal('LOC-1', root)).toContain(`Commit ${api} (api): 🐛 Fix the order total`);
   });
 });

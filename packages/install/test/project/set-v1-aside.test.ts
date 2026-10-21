@@ -17,7 +17,14 @@ const folder = (): string => {
 /** A built dist/, with dummy files. */
 const artefact = (): string => {
   const dist = folder();
-  for (const file of ['server.js', 'tracker.js', 'admin.js', 'start-front.sh']) {
+  for (const file of [
+    'server.js',
+    'tracker.js',
+    'admin.js',
+    'start-front.sh',
+    'stop-front.sh',
+    'package.json',
+  ]) {
     writeFileSync(join(dist, file), '');
   }
   for (const dir of ['web', 'claude']) mkdirSync(join(dist, dir));
@@ -32,7 +39,7 @@ const V1_HOOK = (args: string): { type: string; command: string } => ({
 });
 const OWN_HOOK = { type: 'command', command: 'echo done' };
 
-/** A project with V1 installed: its folder, hooks, slash commands and blocks, beside the project's own. */
+/** A project with V1 installed: its folder, hooks, slash commands and blocks, beside the project\'s own. */
 function projectWithV1(): string {
   const root = folder();
   const write = (path: string, text: string): void => {
@@ -58,7 +65,7 @@ function projectWithV1(): string {
     JSON.stringify({ hooks: { SessionEnd: [{ hooks: [V1_HOOK('usage record --hook')] }] } }),
   );
   write('.claude/commands/tracker.md', '<!-- project-tracker command -->\nV1 command\n');
-  write('.claude/commands/review.md', 'The project’s own command\n');
+  write('.claude/commands/review.md', "The project's own command\n");
   write(
     '.gitignore',
     'node_modules/\n# project-tracker:start\n/.claude/commands/tracker.md\n# project-tracker:end\ndist/\n',
@@ -84,7 +91,7 @@ describe('setting V1 aside without migration (ADR 0049)', () => {
     expect(report.join('\n')).toContain('tools/tracker-legacy');
   });
 
-  it('takes the V1 hooks, commands and blocks out, and keeps the project’s own', async () => {
+  it("takes the V1 hooks, commands and blocks out, and keeps the project's own", async () => {
     const root = projectWithV1();
     await setV1AsideAndInstall({ root, artefactDir: artefact(), now: NOW });
     const settings = readFileSync(join(root, '.claude/settings.json'), 'utf8');
@@ -112,7 +119,7 @@ describe('setting V1 aside without migration (ADR 0049)', () => {
   it('refuses a project without V1', async () => {
     const root = folder();
     await expect(setV1AsideAndInstall({ root, artefactDir: artefact(), now: NOW })).rejects.toThrow(
-      /Pas de V1/,
+      /No V1/,
     );
   });
 });

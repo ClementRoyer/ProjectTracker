@@ -10,7 +10,7 @@ import {
   type UsecaseError,
 } from './context';
 
-const KIND_LABELS = { auto: 'automatiques', visual: 'visuels', user: 'par l’utilisateur' } as const;
+const KIND_LABELS = { auto: 'Automatic', visual: 'Visual', user: 'User' } as const;
 
 /** A test run of the ticket (F17): kept as a run, and told in the journal. */
 export function recordTestRun(
@@ -22,7 +22,7 @@ export function recordTestRun(
   const entryId = ctx.newId();
   const at = ctx.now();
   const note = input.note?.trim();
-  const verdict = `Tests ${KIND_LABELS[input.kind]} ${input.passed ? 'réussis' : 'en échec'}`;
+  const verdict = `${KIND_LABELS[input.kind]} tests ${input.passed ? 'passed' : 'failed'}`;
   inTransaction(ctx.db, () => {
     insertTestRun(ctx.db, {
       id: ctx.newId(),
@@ -37,7 +37,7 @@ export function recordTestRun(
       ticketId: loaded.value.ticket.id,
       entryType: 'testRun',
       ...authorOf(ctx.actor),
-      body: note ? `${verdict} : ${note}` : verdict,
+      body: note ? `${verdict}: ${note}` : verdict,
       data: { kind: input.kind, passed: input.passed },
       createdAt: at,
     });

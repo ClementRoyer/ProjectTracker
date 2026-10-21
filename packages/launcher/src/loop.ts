@@ -77,7 +77,7 @@ async function takeRequests(state: LauncherState): Promise<void> {
     } catch (error) {
       if (state.abort.signal.aborted) return;
       state.deps.log(
-        `tracker injoignable, nouvel essai dans ${String(pause / 1000)} s : ${String(error)}`,
+        `tracker unreachable, trying again in ${String(pause / 1000)} s: ${String(error)}`,
       );
       await new Promise((resolve) => setTimeout(resolve, pause));
       pause = Math.min(pause * 2, 60_000);
@@ -89,7 +89,7 @@ function execute(state: LauncherState, job: z.infer<typeof backendJob>): void {
   for (const other of state.running.values()) other.overlapped = true;
   const running: Running = { overlapped: state.running.size > 0, done: Promise.resolve() };
   state.running.set(job.executionId, running);
-  state.deps.log(`${job.executionId} : ${job.key}, agent démarré`);
+  state.deps.log(`${job.executionId}: ${job.key}, agent started`);
   const { config } = state;
   const settings = {
     mirror: config.mirror,
@@ -124,11 +124,11 @@ async function handBack(state: LauncherState, result: FinishInput): Promise<void
   for (;;) {
     try {
       await state.deps.call('finishExecution', result);
-      state.deps.log(`${result.executionId} : terminé en ${String(result.seconds)} s`);
+      state.deps.log(`${result.executionId}: finished in ${String(result.seconds)} s`);
       return;
     } catch (error) {
       if (state.stopped && pause > 8000) {
-        state.deps.log(`${result.executionId} : résultat non remis (${String(error)})`);
+        state.deps.log(`${result.executionId}: result not handed back (${String(error)})`);
         return;
       }
       await new Promise((resolve) => setTimeout(resolve, pause));

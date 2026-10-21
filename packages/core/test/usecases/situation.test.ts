@@ -45,10 +45,10 @@ describe('situation', () => {
     expect(situationOf(ctx)).toMatchObject({
       progress: { state: 'inProgress', note: 'form done' },
     });
-    expect(lastEntry(ctx)).toBe('Avancement : en cours, form done');
+    expect(lastEntry(ctx)).toBe('Progress: in progress, form done');
   });
 
-  it('refuses « in progress » without saying where things stand', () => {
+  it('refuses "in progress" without saying where things stand', () => {
     const ctx = withTicket();
     expect(
       reportProgress(ctx, { key: 'LOC-1', progress: { state: 'inProgress', note: ' ' } }),
@@ -66,7 +66,7 @@ describe('situation', () => {
       phase: 'development',
       progress: { state: 'notStarted' },
     });
-    expect(lastEntry(ctx)).toBe('Phase : À faire → Développement');
+    expect(lastEntry(ctx)).toBe('Phase: To do → Development');
   });
 
   it('lets only the developer close a ticket', () => {

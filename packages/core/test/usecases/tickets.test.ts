@@ -16,7 +16,7 @@ const created = (ctx: ReturnType<typeof testContext>, title: string): string => 
 };
 
 describe('tickets', () => {
-  it('gives a new local ticket the next LOC key, not started in « À faire »', () => {
+  it('gives a new local ticket the next LOC key, not started in "To do"', () => {
     const ctx = testContext();
     expect(created(ctx, 'Clean the test logs')).toBe('LOC-1');
     expect(created(ctx, 'Rename a column')).toBe('LOC-2');
@@ -127,7 +127,7 @@ describe('tickets', () => {
       value: { priority: 'urgent' },
     });
     const ticket = getTicket(ctx, { key });
-    expect(ticket.ok && ticket.value.entries.at(-1)?.body).toBe('Priorité : normale → urgente');
+    expect(ticket.ok && ticket.value.entries.at(-1)?.body).toBe('Priority: normal → urgent');
   });
 
   it('writes nothing when the priority does not change', () => {

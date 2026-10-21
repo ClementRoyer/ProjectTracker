@@ -22,8 +22,8 @@ const sessionState = z.object({
 type SessionState = z.infer<typeof sessionState>;
 
 const REPLY_FORMAT =
-  'À la fin de chaque tour, termine ta réponse par un bloc ```json {"message": "ce que tu as fait ou trouvé, en une ou deux phrases", "question": null} ``` ; ' +
-  'si tu as besoin d’une décision du développeur, mets "question": {"context": "…", "options": ["…", "…"], "recommendation": "…"}.';
+  'At the end of every turn, finish your reply with a block ```json {"message": "what you did or found, in one or two sentences", "question": null} ```; ' +
+  'if you need a decision from the developer, set "question": {"context": "...", "options": ["...", "..."], "recommendation": "..."}.';
 
 /** SessionStart (ADR 0011): the adapter introduces the conversation, and keeps it when Claude Code resumes it. */
 export async function onSessionStart(
@@ -46,18 +46,18 @@ export async function onSessionStart(
       writeState(ctx.stateDir, input.session_id, state);
     } catch {
       return context(
-        'Le tracker de tickets est injoignable : rien n’est suivi pour cette conversation. Le développeur peut le lancer avec « npm start » dans le projet.',
+        'The ticket tracker cannot be reached: nothing is tracked for this conversation. The developer can start it with "npm start" in the project.',
       );
     }
   }
   const documents = await referenceDocuments(ctx, state.token);
   return context(
     [
-      `Tu es suivi par le tracker de tickets sous le nom ${state.agentName}.`,
-      `Ta conversation est déjà présentée : n’appelle pas introduce. Ton jeton de conversation : ${state.token} ; passe-le dans l’argument token de ton premier appel aux outils MCP « tracker », ensuite la session le connaît.`,
-      'Prends ton ticket avec takeTicket (rôle front) avant de travailler dessus, et rapporte ton avancement avec reportProgress.',
-      'Après chaque passage de tests, enregistre-le avec recordTestRun. Pour une ressource partagée (par exemple les tests e2e), lance la commande avec « node tools/tracker/app/tracker.js resource run <ressource> --key <ticket> -- <commande> » : elle attend son tour et garde la ressource pendant la commande.',
-      'Pour commiter, utilise « node tools/tracker/app/tracker.js commit "<gitmoji> <phrase simple en anglais>" [--ticket <ticket>] » : une ligne de 72 caractères au plus, sans co-auteur ; dans le dossier d’un ticket, tout ce qui a changé est commité, dans le dossier principal seulement ce qui est indexé.',
+      `You are tracked by the ticket tracker as ${state.agentName}.`,
+      `Your conversation is already introduced: do not call introduce. Your conversation token: ${state.token}; pass it in the token argument of your first call to the "tracker" MCP tools, after that the session knows it.`,
+      'Take your ticket with takeTicket (role front) before working on it, and report your progress with reportProgress.',
+      'After every test run, record it with recordTestRun. For a shared resource (for example the e2e tests), run the command with "node tools/tracker/app/tracker.js resource run <resource> --key <ticket> -- <command>": it waits its turn and keeps the resource during the command.',
+      'To commit, use "node tools/tracker/app/tracker.js commit "<gitmoji> <simple English sentence>" [--ticket <ticket>]": one line of 72 characters at most, no co-author; in a ticket working folder, everything that changed is committed, in the main folder only what is staged.',
       ...documents,
       REPLY_FORMAT,
     ].join('\n'),
@@ -73,7 +73,7 @@ async function referenceDocuments(ctx: HookContext, token: string): Promise<stri
     if (listed.documents.length === 0) return [];
     const paths = listed.documents.map((document) => document.path).join(', ');
     return [
-      `Documents de référence du projet : ${paths}. Lis ceux qui concernent ton ticket (outil readDocument, ou directement depuis la racine du projet).`,
+      `Reference documents of the project: ${paths}. Read those that concern your ticket (readDocument tool, or directly from the project root).`,
     ];
   } catch {
     return [];

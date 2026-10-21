@@ -32,24 +32,29 @@ describe('the discussion of a ticket (validated mockup)', () => {
     const [item] = threadOf([
       entry({ entryType: 'exchange', authorKind: 'developer', author: null, role: 'backend' }),
     ]);
-    expect(item).toMatchObject({ kind: 'message', side: 'mine', author: 'Toi', to: '→ back-end' });
+    expect(item).toMatchObject({ kind: 'message', side: 'mine', author: 'You', to: '→ back-end' });
   });
 
   it('says whether the assignee took the developer’s message into account', () => {
     const sent = entry({ entryType: 'answer', authorKind: 'developer', author: null });
     const taken = { ...sent, acknowledgedAt: '2026-10-20T09:05:00.000Z' };
-    expect(threadOf([sent])[0]).toMatchObject({ receipt: 'Envoyée · pas encore prise en compte' });
-    expect(threadOf([taken])[0]).toMatchObject({ receipt: 'Prise en compte' });
+    expect(threadOf([sent])[0]).toMatchObject({ receipt: 'Sent · not acknowledged yet' });
+    expect(threadOf([taken])[0]).toMatchObject({ receipt: 'Acknowledged' });
   });
 
   it('marks a question as meant for the developer', () => {
-    expect(threadOf([entry({ entryType: 'question' })])[0]).toMatchObject({ to: '→ toi' });
+    expect(threadOf([entry({ entryType: 'question' })])[0]).toMatchObject({ to: '→ you' });
   });
 
   it('shows changes of situation and Jira loads as marks between messages', () => {
     const items = threadOf([
       entry({ entryType: 'situationChange', authorKind: 'developer', body: 'Phase : Test' }),
-      entry({ entryType: 'jiraImport', authorKind: 'jira', author: null, body: 'Chargé de Jira' }),
+      entry({
+        entryType: 'jiraImport',
+        authorKind: 'jira',
+        author: null,
+        body: 'Loaded from Jira',
+      }),
     ]);
     expect(items.map((item) => item.kind)).toEqual(['mark', 'mark']);
   });
@@ -59,7 +64,7 @@ describe('the discussion of a ticket (validated mockup)', () => {
       expect.objectContaining({
         kind: 'mark',
         strong: true,
-        body: 'Décision · Start after 3 letters',
+        body: 'Decision · Start after 3 letters',
       }),
     );
   });

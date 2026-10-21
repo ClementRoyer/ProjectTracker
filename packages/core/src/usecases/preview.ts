@@ -73,8 +73,8 @@ function conflictNote(
   before: PreviewConflict | undefined,
   after: PreviewConflict | undefined,
 ): string | null {
-  if (after === undefined) return before === undefined ? null : 'Plus de conflit avec l’aperçu';
+  if (after === undefined) return before === undefined ? null : 'No more conflict with the preview';
   if (before !== undefined && before.files.join('\n') === after.files.join('\n')) return null;
-  const merged = after.with.length > 0 ? ` (déjà réunis : ${after.with.join(', ')})` : '';
-  return `Conflit avec l’aperçu : ${after.files.join(', ')}${merged}`;
+  const merged = after.with.length > 0 ? ` (already merged: ${after.with.join(', ')})` : '';
+  return `Conflict with the preview: ${after.files.join(', ')}${merged}`;
 }

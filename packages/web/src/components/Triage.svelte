@@ -40,14 +40,14 @@
 <dialog bind:this={dialog} aria-label="Triage" onclose={onClose}>
   <div class="top">
     <span class="progress">
-      {current ? `${String(handled + 1)} sur ${String(total)}` : 'Tout est traité'}
+      {current ? `${String(handled + 1)} of ${String(total)}` : 'All done'}
       <span class="dots" aria-hidden="true">
         {#each { length: total } as _, index (index)}
           <span class="dot" class:past={index < handled} class:now={index === handled}></span>
         {/each}
       </span>
     </span>
-    <button type="button" class="quiet" onclick={() => dialog?.close()}>Fermer</button>
+    <button type="button" class="quiet" onclick={() => dialog?.close()}>Close</button>
   </div>
 
   {#if current}
@@ -56,7 +56,7 @@
       <span class="where">
         <span class="key">{item.key}</span> · {item.title} ·
         <b
-          >{item.kind === 'question' ? 'Question' : 'Action pour toi'} · {ago(
+          >{item.kind === 'question' ? 'Question' : 'Action for you'} · {ago(
             item.since,
             tracker.now,
           )}</b
@@ -84,7 +84,7 @@
         <h2>{item.text}</h2>
         <div class="choices">
           <button type="button" class="recommended" onclick={() => close(item)}>
-            <b>Déclarer terminé</b><span>Le ticket est clos ; il reste dans le bilan.</span>
+            <b>Close ticket</b><span>The ticket is closed; it stays in the summary.</span>
           </button>
           <button
             type="button"
@@ -92,7 +92,7 @@
               putOff(item);
             }}
           >
-            <b>Pas encore</b><span>Il reste en validation en qualité.</span>
+            <b>Not yet</b><span>It stays in QA validation.</span>
           </button>
         </div>
       {/if}
@@ -102,21 +102,21 @@
           class="quiet"
           onclick={() => {
             putOff(item);
-          }}>Plus tard</button
+          }}>Later</button
         >
         <button
           type="button"
           class="link"
           onclick={() => {
             open(item);
-          }}>Ouvrir la discussion</button
+          }}>Open the discussion</button
         >
       </div>
     </div>
   {:else}
     <div class="done">
-      <h2>Rien ne t’attend.</h2>
-      <span>Les agents reprennent avec tes réponses.</span>
+      <h2>Nothing is waiting for you.</h2>
+      <span>The agents carry on with your answers.</span>
     </div>
   {/if}
 </dialog>

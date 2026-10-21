@@ -113,11 +113,11 @@ describe('publishing a stable version (ADR 0047)', () => {
     publish(repo);
     const again = publish(repo);
     expect(again.code).not.toBe(0);
-    expect(again.out).toMatch(/v2\.0\.0 existe déjà/);
+    expect(again.out).toMatch(/v2\.0\.0 already exists/);
 
     writeFileSync(join(repo, 'README.md'), 'changed\n');
     const dirty = publish(repo);
     expect(dirty.code).not.toBe(0);
-    expect(dirty.out).toMatch(/non commités/);
+    expect(dirty.out).toMatch(/uncommitted changes/);
   });
 });

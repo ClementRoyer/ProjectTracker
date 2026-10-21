@@ -16,17 +16,17 @@ createServer((request, response) => {
         {
           key: 'DEMO-1',
           fields: {
-            summary: 'Afficher la date de commande au format local',
+            summary: 'Show the order date in the local format',
             status: { name: 'To Do' },
             updated: '2026-10-19T08:00:00.000Z',
             description:
-              'Sur la liste des commandes, la date doit suivre le format local (jour/mois/année).',
+              'On the order list, the date must follow the local format (day/month/year).',
             comment: {
               comments: [
                 {
                   id: '1',
-                  author: { displayName: 'Responsable produit' },
-                  body: 'Garder la colonne triable.',
+                  author: { displayName: 'Product owner' },
+                  body: 'Keep the column sortable.',
                   created: '2026-10-18T10:00:00.000Z',
                 },
               ],

@@ -93,7 +93,7 @@ describe.skipIf(!existsSync(FIXTURE))('V1 migration', () => {
     ).toEqual(['high', 'normal']);
   });
 
-  it('puts every unfinished ticket in « À faire », not started', () => {
+  it('puts every unfinished ticket in "To do", not started', () => {
     const { db } = migrateDemo();
     expect(readSituation(db, 'DEMO-2')?.situation).toEqual({
       phase: 'todo',
@@ -136,7 +136,7 @@ describe.skipIf(!existsSync(FIXTURE))('V1 migration', () => {
     const { db } = migrateDemo();
     const answers = listEntries(db, 'DEMO-1').filter((entry) => entry.entryType === 'answer');
     expect(answers.map((answer) => [answer.replyTo, answer.body])).toEqual([
-      ['DEMO-1/Q1', 'Oui'],
+      ['DEMO-1/Q1', 'Yes'],
       ['DEMO-1/Q2', 'Start of each word\n\nKeep it simple for the first version.'],
     ]);
     expect(column(db, "SELECT status FROM question WHERE ticketId = 'DEMO-1'")).toEqual([

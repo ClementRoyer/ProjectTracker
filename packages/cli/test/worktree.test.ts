@@ -101,7 +101,7 @@ describe('working folder of a ticket in a single repository (ADR 0041)', () => {
   it('refuses to remove a folder with uncommitted changes', async () => {
     const { code, err } = await runCli(['worktree', 'remove', 'LOC-1'], {}, root);
     expect(code).toBe(1);
-    expect(err).toMatch(/non commités/);
+    expect(err).toMatch(/uncommitted changes/);
     expect(existsSync(join(root, '.worktrees/LOC-1'))).toBe(true);
   });
 

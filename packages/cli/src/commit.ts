@@ -7,7 +7,7 @@ export interface CommitCommand {
   ticket: string | undefined;
 }
 
-const USAGE = 'Usage : tracker commit "<gitmoji> <phrase>" [--ticket <ticket>]';
+const USAGE = 'Usage: tracker commit "<gitmoji> <sentence>" [--ticket <ticket>]';
 const MAX_LENGTH = 72;
 // What agent tools add on their own: the author is the developer (ADR 0009).
 const ATTRIBUTION = /^(co-authored-by:|.*generated with)/i;
@@ -27,13 +27,13 @@ export function commitMessage(raw: string, gitmoji: boolean): string {
     .map((line) => line.trim())
     .filter((line) => line !== '' && !ATTRIBUTION.test(line));
   const [message] = lines;
-  if (message === undefined) throw new Error('Le message de commit est vide.');
-  if (lines.length > 1) throw new Error('Le message de commit tient sur une ligne, sans corps.');
+  if (message === undefined) throw new Error('The commit message is empty.');
+  if (lines.length > 1) throw new Error('The commit message is one line, with no body.');
   if ([...new Intl.Segmenter().segment(message)].length > MAX_LENGTH) {
-    throw new Error(`Le message de commit dépasse ${String(MAX_LENGTH)} caractères.`);
+    throw new Error(`The commit message is longer than ${String(MAX_LENGTH)} characters.`);
   }
   if (gitmoji && !GITMOJI.test(message)) {
-    throw new Error('Le message de commit commence par un gitmoji puis une espace : « ✨ Add … ».');
+    throw new Error('The commit message starts with a gitmoji and a space: "✨ Add ...".');
   }
   return message;
 }
@@ -60,8 +60,8 @@ export async function commit(
   if (staged.length === 0) {
     throw new Error(
       inFolder
-        ? 'Rien à commiter dans le dossier du ticket.'
-        : 'Rien à commiter : dans le dossier principal, seul ce qui est indexé (git add) est commité.',
+        ? 'Nothing to commit in the ticket folder.'
+        : 'Nothing to commit: in the main folder, only what is staged (git add) is committed.',
     );
   }
   const shas = staged.map(({ repo, into }) => {
@@ -69,10 +69,10 @@ export async function commit(
     const sha = run(into, ['rev-parse', '--short', 'HEAD']);
     return repo === '.' ? sha : `${sha} (${repo})`;
   });
-  const done = `Commit ${shas.join(', ')} : ${message}`;
+  const done = `Commit ${shas.join(', ')}: ${message}`;
   if (key === undefined) return done;
   await call(target, 'recordEntry', { key, entryType: 'progress', body: done });
-  return `${done}\nNoté sur ${key}.`;
+  return `${done}\nNoted on ${key}.`;
 }
 
 /** Where the command runs: the main folder, or a ticket's folder in `.worktrees`. */
@@ -80,7 +80,7 @@ function workingFolder(project: Project, trackerDir: string): { here: string; in
   const here = dirname(dirname(trackerDir));
   const inFolder = resolve(here) !== resolve(project.root);
   if (inFolder && basename(here) === 'preview') {
-    throw new Error(`${FOLDERS}/preview est reconstruit par l’outil : on n’y commite pas.`);
+    throw new Error(`${FOLDERS}/preview is rebuilt by the tool: do not commit there.`);
   }
   return { here, inFolder };
 }

@@ -11,7 +11,7 @@ import { testContext } from './context';
 // The test clock moves one minute at each reading: the lease is set long enough to measure.
 const MINUTE = 60_000;
 
-/** A project declaring the « e2e » resource, with two tickets. */
+/** A project declaring the "e2e" resource, with two tickets. */
 const setUp = (): ReturnType<typeof testContext> => {
   const ctx = testContext();
   ctx.resources = ['e2e'];
@@ -91,8 +91,8 @@ describe('shared resources (ADR 0008, 0034)', () => {
     releaseResource(ctx, { key: 'LOC-1', resource: 'e2e' });
     const ticket = getTicket(ctx, { key: 'LOC-1' });
     expect(ticket.ok && ticket.value.entries.slice(-2).map((entry) => entry.body)).toEqual([
-      'Ressource « e2e » prise',
-      'Ressource « e2e » rendue',
+      'Resource "e2e" taken',
+      'Resource "e2e" released',
     ]);
   });
 

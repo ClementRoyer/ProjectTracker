@@ -26,8 +26,9 @@ type ToolResult = { content: { type: 'text'; text: string }[]; isError?: boolean
 const TOKEN_ARGUMENT = z
   .string()
   .optional()
-  .describe('Jeton de conversation, si cette session MCP ne s’est pas présentée');
-const INTRODUCE_FIRST = 'Présente-toi d’abord avec introduce (un nom stable, par exemple front-1).';
+  .describe('Conversation token, if this MCP session did not introduce itself');
+const INTRODUCE_FIRST =
+  'Introduce yourself first with introduce (a stable name, for example front-1).';
 
 /** MCP over HTTP (ADR 0011): the catalogue operations open to agents, one MCP server per session. */
 export function mountMcp(app: Hono, options: AppOptions, changes: Changes): void {
@@ -78,7 +79,7 @@ function buildServer(options: AppOptions, changes: Changes, state: SessionState)
     'waitForInbox',
     {
       description:
-        'Attend une réponse ou un message du développeur, au plus timeoutSeconds ; à rappeler si rien n’arrive.',
+        'Waits for an answer or a message from the developer, at most timeoutSeconds; call it again if nothing arrives.',
       inputSchema: {
         timeoutSeconds: z.number().int().min(1).max(600).default(120),
         token: TOKEN_ARGUMENT,
@@ -94,7 +95,7 @@ function buildServer(options: AppOptions, changes: Changes, state: SessionState)
       const items = await waitForItems(options, changes, actor, timeoutSeconds * 1000);
       return reply(
         items.length === 0
-          ? 'Rien pour l’instant ; rappelle waitForInbox ou continue autre chose.'
+          ? 'Nothing for now; call waitForInbox again or carry on with something else.'
           : describeInbox(items),
       );
     },
@@ -129,7 +130,7 @@ function registerOperation(server: McpServer, binding: Binding, env: ToolEnviron
           );
       if (!actor) return refused(INTRODUCE_FIRST);
       const result = await binding.run(usecaseContext(env.options, actor), input);
-      if (!result.ok) return refused(`Refusé : ${result.error}`);
+      if (!result.ok) return refused(`Refused: ${result.error}`);
       if (operation.readOnly !== true) env.changes.notify();
       if (introducing) return introduced(env, result.value);
       return reply(JSON.stringify(result.value) + inboxSuffix(env.options, actor));
@@ -141,7 +142,7 @@ function introduced(env: ToolEnvironment, value: unknown): ToolResult {
   const token = z.object({ token: z.string() }).parse(value).token;
   env.state.actor = identify(usecaseContext(env.options, ANONYMOUS), token);
   return reply(
-    `Présentation faite. Jeton : ${token}\nGarde-le : si une autre session MCP s’ouvre (conversation reprise), passe-le dans l’argument token.`,
+    `Introduction done. Token: ${token}\nKeep it: if another MCP session opens (resumed conversation), pass it in the token argument.`,
   );
 }
 
@@ -173,10 +174,10 @@ function inboxSuffix(options: AppOptions, actor: Actor): string {
 function describeInbox(items: readonly InboxItemView[]): string {
   const lines = items.map((item) =>
     item.kind === 'answer'
-      ? `- [${item.key}] Réponse à « ${item.question ?? ''} » : ${item.body} (entryId ${item.entryId})`
-      : `- [${item.key}] Message : ${item.body} (entryId ${item.entryId})`,
+      ? `- [${item.key}] Answer to "${item.question ?? ''}": ${item.body} (entryId ${item.entryId})`
+      : `- [${item.key}] Message: ${item.body} (entryId ${item.entryId})`,
   );
-  return `Du développeur, pour toi (confirme la prise en compte avec acknowledge) :\n${lines.join('\n')}`;
+  return `From the developer, for you (confirm with acknowledge):\n${lines.join('\n')}`;
 }
 
 function waitForItems(

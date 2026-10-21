@@ -24,9 +24,9 @@
 
   const SIZES = [
     { value: '', label: '—' },
-    { value: 'small', label: 'Petite' },
-    { value: 'medium', label: 'Moyenne' },
-    { value: 'large', label: 'Grande' },
+    { value: 'small', label: 'Small' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'large', label: 'Large' },
   ] as const;
 
   function toSize(value: string): 'small' | 'medium' | 'large' | null {
@@ -43,20 +43,20 @@
     const sent = await tracker.act(sendMessage, {
       key: ticket.key,
       to: 'front',
-      body: 'Où en es-tu ?',
+      body: 'Where do things stand?',
     });
-    if (sent) tracker.toast.show('Demande envoyée à l’intervenant front.');
+    if (sent) tracker.toast.show('Request sent to the front assignee.');
   }
 </script>
 
 <div class="actions">
   <label class="priority">
-    Groupe
+    Group
     <input
       class="group"
       list="groups-{ticket.key}"
       value={ticket.group ?? ''}
-      placeholder="aucun"
+      placeholder="none"
       disabled={closed}
       onchange={(event) => {
         chooseGroup(event.currentTarget.value);
@@ -69,7 +69,7 @@
     </datalist>
   </label>
   <label class="priority">
-    Taille
+    Size
     <select
       value={ticket.size ?? ''}
       disabled={closed}
@@ -83,12 +83,12 @@
     </select>
   </label>
   <label class="priority">
-    Échéance
+    Due date
     <input
       type="date"
       value={ticket.dueDate ?? ''}
       disabled={closed || ticket.origin === 'jira'}
-      title={ticket.origin === 'jira' ? 'L’échéance d’un ticket Jira vient de Jira' : undefined}
+      title={ticket.origin === 'jira' ? 'The due date of a Jira ticket comes from Jira' : undefined}
       onchange={(event) => {
         const value = event.currentTarget.value;
         void tracker.act(setDueDate, { key: ticket.key, dueDate: value === '' ? null : value });
@@ -96,7 +96,7 @@
     />
   </label>
   <label class="priority">
-    Priorité
+    Priority
     <select
       value={ticket.priority}
       disabled={closed}
@@ -116,20 +116,20 @@
     onclick={() => (phaseMenuOpen = !phaseMenuOpen)}
     disabled={closed}
   >
-    Changer de phase
+    Change phase
   </button>
-  <button type="button" onclick={askForNews} disabled={closed}>Demander un point</button>
+  <button type="button" onclick={askForNews} disabled={closed}>Ask for an update</button>
   <button
     type="button"
     class="close"
     class:ready={ticket.readyToClose}
     disabled={!ticket.readyToClose}
     title={ticket.readyToClose
-      ? 'Déclarer le ticket terminé'
-      : 'Possible après une validation en qualité faite'}
+      ? 'Declare the ticket closed'
+      : 'Possible after a QA validation is done'}
     onclick={() => tracker.act(closeTicket, { key: ticket.key })}
   >
-    Déclarer terminé
+    Close ticket
   </button>
   {#if phaseMenuOpen}
     <div role="menu" aria-label="Phases" class="menu">
@@ -143,7 +143,7 @@
           {phase === ticket.situation.phase ? '● ' : ''}{PHASE_LABELS[phase]}
         </button>
       {/each}
-      <span class="note">Changer de phase remet l’avancement à « pas démarré ».</span>
+      <span class="note">Changing phase resets progress to "not started".</span>
     </div>
   {/if}
 </div>

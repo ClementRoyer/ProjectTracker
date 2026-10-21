@@ -14,6 +14,9 @@ const APP_ENTRIES = [
   'web',
   'claude',
   'start-front.sh',
+  'stop-front.sh',
+  // Declares the bundles as ES modules: no warning from Node at start (ADR 0052).
+  'package.json',
   'VERSION',
 ] as const;
 
@@ -25,6 +28,8 @@ const GITIGNORE = [
   'attachments/',
   'developer.token',
   'secrets.env',
+  'server.log',
+  'server.pid',
   '',
 ].join('\n');
 
@@ -44,7 +49,7 @@ export async function installProject(request: InstallRequest): Promise<string[]>
   const kind = installedKind(paths);
   if (kind === 'v1' || kind === 'other') {
     throw new Error(
-      `${paths.trackerDir} contient ${kind === 'v1' ? 'une V1 : utilise la bascule (--from-v1)' : 'autre chose qu’une V2'} ; rien n’a été modifié.`,
+      `${paths.trackerDir} holds ${kind === 'v1' ? 'a V1: use the switch-over (--from-v1)' : 'something other than a V2'}; nothing was changed.`,
     );
   }
   const previous = installedVersion(paths);
@@ -53,9 +58,9 @@ export async function installProject(request: InstallRequest): Promise<string[]>
   const config = ensureConfig(paths, request.port);
   const report: string[] = [];
   if (existsSync(config.database)) {
-    const label = `${stamp(request.now)}-avant-${version}`;
+    const label = `${stamp(request.now)}-before-${version}`;
     report.push(
-      `Base sauvegardée : ${await backupProjectData(config.database, paths.backupsDir, label)}`,
+      `Database backed up: ${await backupProjectData(config.database, paths.backupsDir, label)}`,
     );
   }
   copyApp(request.artefactDir, paths);
@@ -65,8 +70,8 @@ export async function installProject(request: InstallRequest): Promise<string[]>
   if (request.registryFile !== undefined) registerProject(request.registryFile, paths.root, url);
   return [
     previous === null
-      ? `project-tracker ${version} installé dans ${paths.trackerDir}`
-      : `project-tracker mis à jour : ${previous} → ${version}`,
+      ? `project-tracker ${version} installed in ${paths.trackerDir}`
+      : `project-tracker updated: ${previous} → ${version}`,
     ...report,
     ...portLine(config, request.port),
     ...howToUse(url, previous !== null),
@@ -95,14 +100,14 @@ export function updateJson(file: string, change: (raw: unknown) => unknown): voi
 
 function portLine(config: { port: number; created: boolean }, asked: number | undefined): string[] {
   if (config.created || asked === undefined || asked === config.port) return [];
-  return [`Port gardé : ${String(config.port)} (la configuration existante n’est pas modifiée)`];
+  return [`Port kept: ${String(config.port)} (the existing configuration is not changed)`];
 }
 
 function howToUse(url: string, updated: boolean): string[] {
   return [
-    `${updated ? 'Redémarre' : 'Démarre'} le serveur : tools/tracker/app/start-front.sh`,
-    `Page : ${url}`,
-    'Claude Code : hooks et MCP ajoutés à .claude/settings.json et .mcp.json',
-    `Autres agents : MCP en HTTP sur ${url}/mcp ; CLI : node tools/tracker/app/tracker.js`,
+    `${updated ? 'Restart' : 'Start'} the server: tools/tracker/app/start-front.sh`,
+    `Page: ${url}`,
+    'Claude Code: hooks and MCP added to .claude/settings.json and .mcp.json',
+    `Other agents: MCP over HTTP at ${url}/mcp; CLI: node tools/tracker/app/tracker.js`,
   ];
 }

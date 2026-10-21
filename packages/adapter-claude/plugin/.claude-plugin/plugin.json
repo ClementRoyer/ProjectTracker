@@ -1,5 +1,5 @@
 {
   "name": "project-tracker",
-  "description": "Relie les conversations Claude Code au tracker de tickets local : présentation, réponse de fin de tour, usage mesuré, réponses du développeur.",
+  "description": "Connects Claude Code conversations to the local ticket tracker: introduction, end-of-turn reply, measured usage, developer answers.",
   "version": "2.0.0"
 }

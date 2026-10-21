@@ -41,6 +41,21 @@ describe('configuration (ADR 0026)', () => {
     expect(config.ok).toBe(true);
   });
 
+  it('takes parent tickets as issue keys only, so that nothing else reaches the Jira query (ADR 0052)', () => {
+    const jira = (parents: string[]): boolean =>
+      parseConfig({
+        jira: {
+          baseUrl: 'https://jira.example.test',
+          project: 'DEMO',
+          emailEnv: 'JIRA_EMAIL',
+          tokenEnv: 'JIRA_API_TOKEN',
+          parents,
+        },
+      }).ok;
+    expect(jira(['DEMO-10', 'DEMO-20'])).toBe(true);
+    expect(jira(['DEMO-10) OR project = OTHER'])).toBe(false);
+  });
+
   it('never listens on every interface', () => {
     const config = parseConfig({ host: '0.0.0.0' });
     expect(config.ok ? '' : config.error).toMatch(/0\.0\.0\.0/);

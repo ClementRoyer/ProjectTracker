@@ -30,9 +30,9 @@ for (const viewport of [
 
     await page.setViewportSize(viewport);
     await page.goto(`/#/ticket/${key}`);
-    await expect(page.getByRole('group', { name: 'Question pour toi' })).toBeInViewport();
+    await expect(page.getByRole('group', { name: 'Question for you' })).toBeInViewport();
     expect(await pageFitsTheScreen(page)).toBe(true);
-    await expect(page.getByRole('button', { name: 'Envoyer' })).toBeInViewport();
+    await expect(page.getByRole('button', { name: 'Send' })).toBeInViewport();
 
     for (const hash of ['#/', '#/tableau', '#/bilan']) {
       await page.goto(`/${hash}`);

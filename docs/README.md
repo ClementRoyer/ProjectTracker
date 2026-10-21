@@ -26,6 +26,6 @@ The rules for agents that write code are in [`../AGENTS.md`](../AGENTS.md) and [
 
 ## Conventions
 
-- Language: code, commit messages and documents in English; the interface in French ([ADR 0006](adr/0006-langues.md), [ADR 0048](adr/0048-documentation-en-anglais.md)).
+- Language: everything in English: code, commit messages, documents and the interface ([ADR 0053](adr/0053-tout-en-anglais.md), which supersedes [ADR 0006](adr/0006-langues.md)).
 - Dates in the format `YYYY-MM-DD`.
 - Every decision made with the user becomes an ADR, written, if possible, with the user's own words.

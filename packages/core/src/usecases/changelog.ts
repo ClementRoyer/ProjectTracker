@@ -15,7 +15,7 @@ export function proposeChangelog(
   ctx: UsecaseContext,
   input: InputOf<typeof op.proposeChangelog>,
 ): Result<OutputOf<typeof op.proposeChangelog>, UsecaseError> {
-  return saveLine(ctx, input, 'proposed', 'Ligne de changelog proposée');
+  return saveLine(ctx, input, 'proposed', 'Changelog line proposed');
 }
 
 /** The developer accepts the line, possibly reworded: only an accepted line is delivered. */
@@ -23,7 +23,7 @@ export function acceptChangelog(
   ctx: UsecaseContext,
   input: InputOf<typeof op.acceptChangelog>,
 ): Result<OutputOf<typeof op.acceptChangelog>, UsecaseError> {
-  return saveLine(ctx, input, 'accepted', 'Ligne de changelog acceptée');
+  return saveLine(ctx, input, 'accepted', 'Changelog line accepted');
 }
 
 /** The ticket's line for its folder: a proposal shows until the developer reviews it; null without a changelog. */
@@ -58,7 +58,7 @@ function saveLine(
       ticketId: loaded.value.ticket.id,
       entryType: 'decision',
       ...authorOf(ctx.actor),
-      body: `${label} : ${line}`,
+      body: `${label}: ${line}`,
       data: { changelog: which },
       createdAt: at,
     });

@@ -8,10 +8,10 @@
 </script>
 
 {#if suggestions.length > 0}
-  <section class="next" aria-label="À prendre ensuite">
+  <section class="next" aria-label="Up next">
     <h2>
       <button type="button" aria-expanded={open} onclick={() => (open = !open)}>
-        À PRENDRE ENSUITE <span class="count">{suggestions.length}</span>
+        UP NEXT <span class="count">{suggestions.length}</span>
       </button>
     </h2>
     {#if open}

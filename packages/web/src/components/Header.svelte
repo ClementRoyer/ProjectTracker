@@ -19,8 +19,8 @@
   let loading = $state(false);
   let askToNotify = $state(mayAskToNotify());
   const SCREEN_NAMES = {
-    summary: 'Bilan',
-    novelties: 'Nouveautés',
+    summary: 'Summary',
+    novelties: 'Novelties',
     documents: 'Documents',
   } as const;
   let projects: { name: string; url: string; current: boolean }[] = $state([]);
@@ -43,7 +43,7 @@
     const created = await tracker.act(createTicket, { title });
     if (!created) return;
     newTitle = '';
-    tracker.toast.show(`${created.key} créé, en local : rien n’est envoyé à Jira.`);
+    tracker.toast.show(`${created.key} created, locally: nothing is sent to Jira.`);
     location.hash = routeHash({ view: 'list', key: created.key });
   }
 
@@ -55,12 +55,12 @@
     const list = (keys: string[]): string => (keys.length > 0 ? ` : ${keys.join(', ')}` : '');
     tracker.toast.show(
       [
-        `Chargement Jira terminé · ${String(loaded.read)} tickets lus`,
-        `${String(loaded.created.length)} nouveaux${list(loaded.created)} · ${String(loaded.changed.length)} changés${list(loaded.changed)}`,
+        `Jira import done · ${String(loaded.read)} tickets read`,
+        `${String(loaded.created.length)} new${list(loaded.created)} · ${String(loaded.changed.length)} changed${list(loaded.changed)}`,
         ...(loaded.notAssigned.length > 0
-          ? [`Plus assignés à toi${list(loaded.notAssigned)}`]
+          ? [`No longer assigned to you${list(loaded.notAssigned)}`]
           : []),
-        'Rien n’a été écrit dans Jira.',
+        'Nothing was written to Jira.',
       ].join('\n'),
     );
   }
@@ -73,15 +73,15 @@
     const elapsed = ago(preview.builtAt, now);
     const conflicts = preview.conflicts.length;
     return {
-      count: `Aperçu : ${String(count)} ticket${count > 1 ? 's' : ''}`,
-      when: elapsed === 'maintenant' ? 'à l’instant' : `il y a ${elapsed}`,
-      conflicts: conflicts > 0 ? `${String(conflicts)} conflit${conflicts > 1 ? 's' : ''}` : '',
+      count: `Preview: ${String(count)} ticket${count > 1 ? 's' : ''}`,
+      when: elapsed === 'now' ? 'just now' : `${elapsed} ago`,
+      conflicts: conflicts > 0 ? `${String(conflicts)} conflict${conflicts > 1 ? 's' : ''}` : '',
     };
   }
 
   const modes = [
-    { label: 'Liste', route: { view: 'list', key: null } },
-    { label: 'Tableau', route: { view: 'board' } },
+    { label: 'List', route: { view: 'list', key: null } },
+    { label: 'Board', route: { view: 'board' } },
   ] as const;
 </script>
 
@@ -90,7 +90,7 @@
   {#if projects.length > 1}
     <label class="project">
       <select
-        aria-label="Projet"
+        aria-label="Project"
         value={projects.find((project) => project.current)?.url ?? ''}
         onchange={(event) => {
           location.href = event.currentTarget.value;
@@ -103,10 +103,10 @@
     </label>
   {/if}
   {#if route.view === 'summary' || route.view === 'novelties' || route.view === 'documents'}
-    <a class="link" href={routeHash({ view: 'list', key: null })}>← Pilotage</a>
+    <a class="link" href={routeHash({ view: 'list', key: null })}>← Cockpit</a>
     <span class="current">{SCREEN_NAMES[route.view]}</span>
   {:else}
-    <nav aria-label="Affichage" class="modes">
+    <nav aria-label="View" class="modes">
       {#each modes as mode (mode.label)}
         <a
           href={routeHash(mode.route)}
@@ -114,18 +114,18 @@
         >
       {/each}
     </nav>
-    <a class="link" href={routeHash({ view: 'summary' })}>Bilan</a>
+    <a class="link" href={routeHash({ view: 'summary' })}>Summary</a>
     {#if tracker.groups.length > 0}
       <label class="project">
         <select
-          aria-label="Groupe"
+          aria-label="Group"
           value={tracker.groupFilter ?? ''}
           onchange={(event) => {
             tracker.groupFilter =
               event.currentTarget.value === '' ? null : event.currentTarget.value;
           }}
         >
-          <option value="">Tous les groupes</option>
+          <option value="">All groups</option>
           {#each tracker.groups as group (group)}
             <option value={group}>{group}</option>
           {/each}
@@ -138,12 +138,12 @@
   {/if}
   {#if route.view !== 'novelties'}
     <a class="link" href={routeHash({ view: 'novelties' })}>
-      Nouveautés{tracker.novelties.length > 0 ? ` (${String(tracker.novelties.length)})` : ''}
+      Novelties{tracker.novelties.length > 0 ? ` (${String(tracker.novelties.length)})` : ''}
     </a>
   {/if}
   {#if route.view === 'list' || route.view === 'board'}
     <form class="create" onsubmit={create}>
-      <label for="newTicket" class="visually-hidden">Nouveau ticket local</label>
+      <label for="newTicket" class="visually-hidden">New local ticket</label>
       <svg
         width="16"
         height="16"
@@ -155,35 +155,33 @@
       >
         <path d="M3 8h10M8 3v10"></path>
       </svg>
-      <input id="newTicket" bind:value={newTitle} placeholder="Nouveau ticket en une phrase" />
-      <button type="submit">Créer</button>
+      <input id="newTicket" bind:value={newTitle} placeholder="New ticket in one sentence" />
+      <button type="submit">Create</button>
     </form>
     <button type="button" class="jira" onclick={loadJira} disabled={loading}>
-      {loading ? 'Chargement…' : 'Charger Jira'}
+      {loading ? 'Loading…' : 'Load Jira'}
     </button>
   {:else}
     <span class="spacer"></span>
   {/if}
   {#if askToNotify}
-    <button type="button" class="jira" onclick={enableNotifications}
-      >Activer les notifications</button
-    >
+    <button type="button" class="jira" onclick={enableNotifications}>Enable notifications</button>
   {/if}
   {#if tracker.preview}
     {@const parts = previewParts(tracker.preview, tracker.now)}
     <span
       role="status"
-      aria-label="Aperçu"
+      aria-label="Preview"
       class="preview"
       class:conflict={parts.conflicts !== ''}
-      title="Reconstruit {parts.when} par « tracker preview build », servi depuis .worktrees/preview"
+      title="Rebuilt {parts.when} by 'tracker preview build', served from .worktrees/preview"
       >{parts.count}<span class="when">{` · ${parts.when}`}</span>{parts.conflicts === ''
         ? ''
         : ` · ${parts.conflicts}`}</span
     >
   {/if}
   <span class="usage">
-    IA aujourd’hui : {tokensText(tracker.usageToday.tokens)} jetons · coût estimé {costText(
+    AI today: {tokensText(tracker.usageToday.tokens)} tokens · estimated cost {costText(
       tracker.usageToday.cost,
       tracker.usageToday.currency,
     )}
@@ -191,7 +189,7 @@
   <button
     type="button"
     class="theme"
-    aria-label={theme === 'dark' ? 'Passer au thème clair' : 'Passer au thème sombre'}
+    aria-label={theme === 'dark' ? 'Switch to light theme' : 'Switch to dark theme'}
     onclick={onToggleTheme}
   >
     <svg

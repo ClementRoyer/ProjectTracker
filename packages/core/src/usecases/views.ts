@@ -29,22 +29,22 @@ import type { UsecaseContext } from './context';
 import { overlappingKeys } from './overlaps';
 
 export const PHASE_LABELS: Readonly<Record<Phase, string>> = {
-  todo: 'À faire',
-  analysis: 'Analyse',
-  development: 'Développement',
+  todo: 'To do',
+  analysis: 'Analysis',
+  development: 'Development',
   test: 'Test',
-  qaDelivery: 'Livraison en qualité',
-  qaValidation: 'Validation en qualité',
+  qaDelivery: 'QA delivery',
+  qaValidation: 'QA validation',
 };
 
 export function describeProgress(progress: Progress): string {
   switch (progress.state) {
     case 'notStarted':
-      return 'Avancement : pas démarré';
+      return 'Progress: not started';
     case 'inProgress':
-      return `Avancement : en cours, ${progress.note}`;
+      return `Progress: in progress, ${progress.note}`;
     case 'done':
-      return 'Avancement : fait';
+      return 'Progress: done';
   }
 }
 
@@ -81,7 +81,7 @@ export function toEntryView(entry: Entry, context: EntryContext): EntryView {
 /** A signalled start is forgotten after this silence: the agent may have stopped without saying (ADR 0028). */
 const SIGNALLED_WORK_TIMEOUT_MS = 3_600_000;
 
-/** A ticket as the list shows it: situation, last activity, « sans nouvelles », unread, who acts. */
+/** A ticket as the list shows it: situation, last activity, "stale", unread, who acts. */
 export function toSummary(
   ctx: UsecaseContext,
   ticket: Ticket,

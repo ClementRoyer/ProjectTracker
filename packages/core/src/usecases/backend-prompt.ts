@@ -17,17 +17,17 @@ export function backendPrompt(
       `- ${entry.createdAt.slice(0, 16).replace('T', ' ')} · ${entry.authorKind}${entry.role ? ` (${entry.role})` : ''} · ${entry.body}`,
   );
   return [
-    `Tu es l'intervenant back-end du ticket ${ticket.key} : ${ticket.title}.`,
+    `You are the back-end assignee of ticket ${ticket.key}: ${ticket.title}.`,
     '',
-    `Demande initiale : ${ticket.initialRequest ?? '(aucune)'}`,
-    `Situation : ${PHASE_LABELS[record.situation.phase]}, ${describeProgress(record.situation.progress).toLowerCase()}.`,
+    `Initial request: ${ticket.initialRequest ?? '(none)'}`,
+    `Situation: ${PHASE_LABELS[record.situation.phase]}, ${describeProgress(record.situation.progress).toLowerCase()}.`,
     '',
-    'Journal du ticket, du plus ancien au plus récent :',
+    'Ticket journal, oldest to newest:',
     ...lines,
     '',
-    'Demande à traiter maintenant :',
+    'Request to handle now:',
     request,
     '',
-    'Termine par la réponse structurée demandée : statut, message lisible pour le front, question éventuelle au développeur (contexte, options, recommandation), avancement, fichiers modifiés.',
+    'End with the structured reply asked for: status, message the front can read, possible question to the developer (context, options, recommendation), progress, changed files.',
   ].join('\n');
 }

@@ -26,16 +26,16 @@ export async function restoreProject(
 ): Promise<string[]> {
   const database = databaseOf(paths);
   const savedDatabase = join(saved, basename(database));
-  if (!existsSync(savedDatabase)) throw new Error(`Sauvegarde introuvable : ${savedDatabase}`);
+  if (!existsSync(savedDatabase)) throw new Error(`Backup not found: ${savedDatabase}`);
   if (await isServerUp()) {
     throw new Error(
-      'Le serveur tourne et tient la base ouverte : arrête-le, puis relance la restauration.',
+      'The server is running and holds the database open: stop it, then run the restore again.',
     );
   }
   const current = await backupProjectData(
     database,
     paths.backupsDir,
-    `${stamp(now)}-avant-restauration`,
+    `${stamp(now)}-before-restore`,
   );
   for (const suffix of ['-wal', '-shm']) rmSync(`${database}${suffix}`, { force: true });
   copyFileSync(savedDatabase, database);
@@ -44,5 +44,5 @@ export async function restoreProject(
   if (existsSync(join(saved, 'attachments'))) {
     cpSync(join(saved, 'attachments'), attachments, { recursive: true });
   }
-  return [`Base restaurée depuis ${saved}`, `L’ancienne base est gardée : ${current}`];
+  return [`Database restored from ${saved}`, `The previous database is kept: ${current}`];
 }

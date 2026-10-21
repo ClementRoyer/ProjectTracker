@@ -25,9 +25,9 @@ export interface CliResult {
 }
 
 const CALLER_NAMES: Readonly<Record<string, string>> = {
-  developer: 'au développeur',
-  agent: 'aux agents',
-  launcher: 'au lanceur',
+  developer: 'the developer',
+  agent: 'the agents',
+  launcher: 'the launcher',
 };
 
 const OPERATIONS: readonly Operation<z.ZodType, z.ZodType>[] = [
@@ -48,7 +48,7 @@ export async function runCli(
   const special = specialCommand(command, rest);
   if (special) return special.run(special.args, env, cwd);
   const operation = OPERATIONS.find((candidate) => commandName(candidate.name) === command);
-  if (!operation) return failed(`Commande inconnue : ${command}. Voir « tracker help ».`);
+  if (!operation) return failed(`Unknown command: ${command}. See "tracker help".`);
   if (rest.includes('--help')) return done(usage(operation));
   const input = buildInput(operation, rest, cwd, env);
   if (typeof input === 'string') return failed(input);
@@ -100,7 +100,7 @@ async function worktree(
   const trackerDir = findTrackerFolder(cwd);
   const target = findTarget(env, cwd);
   if (typeof target === 'string' || trackerDir === undefined) {
-    return failed(typeof target === 'string' ? target : 'Lance la commande dans le projet.');
+    return failed(typeof target === 'string' ? target : 'Run the command inside the project.');
   }
   const project = mainProject(trackerDir);
   try {
@@ -125,7 +125,7 @@ async function commitCommand(
   const trackerDir = findTrackerFolder(cwd);
   const target = findTarget(env, cwd);
   if (typeof target === 'string' || trackerDir === undefined) {
-    return failed(typeof target === 'string' ? target : 'Lance la commande dans le projet.');
+    return failed(typeof target === 'string' ? target : 'Run the command inside the project.');
   }
   try {
     return done(await commit(target, mainProject(trackerDir), trackerDir, command));
@@ -144,7 +144,7 @@ async function deliverCommand(
   const trackerDir = findTrackerFolder(cwd);
   const target = findTarget(env, cwd);
   if (typeof target === 'string' || trackerDir === undefined) {
-    return failed(typeof target === 'string' ? target : 'Lance la commande dans le projet.');
+    return failed(typeof target === 'string' ? target : 'Run the command inside the project.');
   }
   const base = command.base ?? env.TRACKER_BASE ?? 'main';
   try {
@@ -162,7 +162,7 @@ async function preview(
   const trackerDir = findTrackerFolder(cwd);
   const target = findTarget(env, cwd);
   if (typeof target === 'string' || trackerDir === undefined) {
-    return failed(typeof target === 'string' ? target : 'Lance la commande dans le projet.');
+    return failed(typeof target === 'string' ? target : 'Run the command inside the project.');
   }
   const base = takeOption(args, '--base').value ?? env.TRACKER_BASE ?? 'main';
   try {
@@ -213,7 +213,7 @@ function buildInput(
     const parsed = operation.input.safeParse(raw);
     if (parsed.success) return parsed.data;
     return parsed.error.issues
-      .map((issue) => `--${issue.path.join('.')} : ${issue.message}`)
+      .map((issue) => `--${issue.path.join('.')}: ${issue.message}`)
       .join('\n');
   } catch (error) {
     return error instanceof Error ? error.message : String(error);
@@ -234,7 +234,7 @@ async function send(
     });
   } catch {
     return failed(
-      `Le serveur project-tracker ne répond pas sur ${target.url}. Lance-le dans le projet : npm start (ou node dist/server.js tools/tracker/tracker.config.json).`,
+      `The project-tracker server does not answer on ${target.url}. Start it in the project: npm start (or node dist/server.js tools/tracker/tracker.config.json).`,
     );
   }
   const body: unknown = await response.json().catch(() => null);
@@ -249,12 +249,12 @@ function explain(
 ): string {
   const error = z.object({ error: z.string() }).safeParse(body);
   if (status === 401) {
-    return 'Jeton refusé : relance « introduce », ou redémarre le serveur pour un nouveau jeton développeur.';
+    return 'Token refused: run "introduce" again, or restart the server to get a new developer token.';
   }
   if (status === 403) {
-    return `Commande réservée : ${operation.callers.map((caller) => CALLER_NAMES[caller]).join(', ')}.`;
+    return `Command reserved for: ${operation.callers.map((caller) => CALLER_NAMES[caller]).join(', ')}.`;
   }
-  return `Refusé : ${error.success ? error.data.error : `erreur ${String(status)}`}`;
+  return `Refused: ${error.success ? error.data.error : `error ${String(status)}`}`;
 }
 
 function help(): string {
@@ -262,15 +262,15 @@ function help(): string {
     (operation) => `  ${commandName(operation.name).padEnd(22)} ${operation.description}`,
   );
   const resourceRun =
-    '  resource run           Lance une commande en tenant une ressource partagée : tracker resource run e2e --key LOC-1 -- npm run e2e\n  attach                 Joint un fichier au ticket : tracker attach LOC-1 capture.png [--message "…"]\n  worktree add           Crée le dossier de travail du ticket : tracker worktree add LOC-1 [--branch b] [--base main]\n  worktree remove        Retire le dossier de travail du ticket (la branche reste) : tracker worktree remove LOC-1\n  preview build          Reconstruit l’aperçu : la base plus les branches des tickets ouverts, dans .worktrees/preview [--base main]\n  commit                 Commite selon la convention, sans co-auteur, et le note sur le ticket : tracker commit "✨ Add search" [--ticket LOC-1]\n  deliver                Réunit les branches du lot dans la base, un commit par ticket, et note la livraison : tracker deliver "Lot 12" LOC-1 LOC-2 [--base main] [--keep LOC-2]';
-  return `Usage : tracker <commande> [CLÉ] [--champ valeur …]\n\n${lines.join('\n')}\n${resourceRun}\n\nDétail d'une commande : tracker <commande> --help`;
+    '  resource run           Runs a command while holding a shared resource: tracker resource run e2e --key LOC-1 -- npm run e2e\n  attach                 Attaches a file to the ticket: tracker attach LOC-1 capture.png [--message "..."]\n  worktree add           Creates the working folder of the ticket: tracker worktree add LOC-1 [--branch b] [--base main]\n  worktree remove        Removes the working folder of the ticket (the branch stays): tracker worktree remove LOC-1\n  preview build          Rebuilds the preview: the base plus the branches of the open tickets, in .worktrees/preview [--base main]\n  commit                 Commits following the convention, without co-author, and notes it on the ticket: tracker commit "✨ Add search" [--ticket LOC-1]\n  deliver                Merges the branches of the batch into the base, one commit per ticket, and notes the delivery: tracker deliver "Batch 12" LOC-1 LOC-2 [--base main] [--keep LOC-2]';
+  return `Usage: tracker <command> [KEY] [--field value ...]\n\n${lines.join('\n')}\n${resourceRun}\n\nDetails of a command: tracker <command> --help`;
 }
 
 function usage(operation: Operation<z.ZodType, z.ZodType>): string {
   const fields = fieldsOf(operation.input).map(
-    (field) => `  --${field.path.join('.')}${field.kind === 'list' ? ' (répétable)' : ''}`,
+    (field) => `  --${field.path.join('.')}${field.kind === 'list' ? ' (repeatable)' : ''}`,
   );
-  return `${commandName(operation.name)} : ${operation.description}\n\n${fields.join('\n')}`;
+  return `${commandName(operation.name)}: ${operation.description}\n\n${fields.join('\n')}`;
 }
 
 function takeOption(

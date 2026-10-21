@@ -20,7 +20,7 @@ export function setWorktree(
   const ticketId = loaded.value.ticket.id;
   inTransaction(ctx.db, () => {
     saveWorktree(ctx.db, ticketId, { path: input.path, branch: input.branch });
-    note(ctx, ticketId, `Dossier de travail : ${input.path} (branche ${input.branch})`);
+    note(ctx, ticketId, `Working folder: ${input.path} (branch ${input.branch})`);
   });
   return ok({ path: input.path, branch: input.branch });
 }
@@ -35,7 +35,7 @@ export function forgetWorktree(
   const ticketId = loaded.value.ticket.id;
   inTransaction(ctx.db, () => {
     deleteWorktree(ctx.db, ticketId);
-    note(ctx, ticketId, 'Dossier de travail retiré');
+    note(ctx, ticketId, 'Working folder removed');
   });
   return ok({});
 }

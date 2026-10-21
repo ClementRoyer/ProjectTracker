@@ -9,7 +9,7 @@
     <span class="text">{toast.text}</span>
     <button
       type="button"
-      aria-label="Fermer le message"
+      aria-label="Close the message"
       onclick={() => {
         toast.close();
       }}>×</button

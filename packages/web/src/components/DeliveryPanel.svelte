@@ -14,7 +14,7 @@
 
   let batches: DeliveryBatchView[] = $state([]);
   let unchecked: string[] = $state([]);
-  let batchName = $state(`Livraison du ${shortDate(currentInstant())}`);
+  let batchName = $state(`Delivery of ${shortDate(currentInstant())}`);
   let delivered: string | null = $state(null);
   /** The tickets with a working folder: their branches are merged by the CLI, not the page (ADR 0044). */
   let withFolder: string[] = $state([]);
@@ -24,7 +24,7 @@
   const closed = $derived(recentlyClosed(tracker.tickets).slice(0, 10));
   const hasBranches = $derived(chosen.some((ticket) => withFolder.includes(ticket.key)));
   const command = $derived(
-    `node tools/tracker/app/tracker.js deliver "${(batchName.trim() || 'Livraison').replaceAll('"', '\\"')}" ${chosen.map((ticket) => ticket.key).join(' ')}`,
+    `node tools/tracker/app/tracker.js deliver "${(batchName.trim() || 'Delivery').replaceAll('"', '\\"')}" ${chosen.map((ticket) => ticket.key).join(' ')}`,
   );
 
   $effect(() => {
@@ -47,14 +47,14 @@
 
   async function deliver(): Promise<void> {
     const batch = await tracker.act(deliverBatch, {
-      name: batchName.trim() || 'Livraison',
+      name: batchName.trim() || 'Delivery',
       keys: chosen.map((ticket) => ticket.key),
     });
     if (batch) {
       const changelog = batch.changelog
-        ? ` Changelog : ${String(batch.changelog.written)} lignes ajoutées${batch.changelog.missing.length > 0 ? ` ; sans ligne acceptée : ${batch.changelog.missing.join(', ')}` : ''}.`
+        ? ` Changelog: ${String(batch.changelog.written)} lines added${batch.changelog.missing.length > 0 ? `; without an accepted line: ${batch.changelog.missing.join(', ')}` : ''}.`
         : '';
-      delivered = `Livraison notée : ${String(batch.keys.length)} tickets passent en « Livraison qualité ». Tu la valideras quand l’utilisateur final aura testé.${changelog}`;
+      delivered = `Delivery recorded: ${String(batch.keys.length)} tickets move to "QA delivery". You will validate it once the end user has tested.${changelog}`;
     }
   }
 
@@ -64,10 +64,10 @@
 </script>
 
 <div class="column">
-  <section class="panel" aria-label="Prochaine livraison en qualité">
+  <section class="panel" aria-label="Next QA delivery">
     <div class="title-row">
-      <h1>Prochaine livraison en qualité</h1>
-      <span class="muted">{chosen.length} prêts : tests faits</span>
+      <h1>Next QA delivery</h1>
+      <span class="muted">{chosen.length} ready: tests done</span>
     </div>
     {#each candidates as ticket (ticket.key)}
       <label class="ready">
@@ -82,56 +82,56 @@
         <span class="grow">{ticket.title}</span>
       </label>
     {:else}
-      <span class="muted">Aucun ticket en test avec ses tests faits.</span>
+      <span class="muted">No ticket in test with its tests done.</span>
     {/each}
     <div class="deliver">
-      <label for="batch" class="muted">Nom de la livraison</label>
+      <label for="batch" class="muted">Delivery name</label>
       <input id="batch" bind:value={batchName} />
       {#if !hasBranches}
         <button type="button" class="primary" disabled={chosen.length === 0} onclick={deliver}>
-          Noter comme livrée en qualité
+          Record as delivered to QA
         </button>
       {/if}
     </div>
     {#if hasBranches}
       <span class="muted"
-        >Des tickets ont une branche à réunir. Lance dans le projet : leurs branches entrent dans la
-        base, un commit par ticket, puis la livraison est notée. Rien n’est poussé.</span
+        >Some tickets have a branch to merge. Run this in the project: their branches go into the
+        base, one commit per ticket, then the delivery is recorded. Nothing is pushed.</span
       >
-      <code aria-label="Commande de livraison">{command}</code>
+      <code aria-label="Delivery command">{command}</code>
     {/if}
     {#if delivered}<span role="status" class="muted">{delivered}</span>{/if}
   </section>
 
-  <section class="panel" aria-label="Livraisons passées">
-    <h2>Livraisons passées</h2>
+  <section class="panel" aria-label="Past deliveries">
+    <h2>Past deliveries</h2>
     {#each batches as batch (batch.id)}
       <div class="batch">
         <b>{batch.name}</b>
         <span class="keys">{batch.keys.join(' · ')}</span>
         {#if batch.validatedAt}
-          <span>validée le {shortDate(batch.validatedAt)}</span>
+          <span>validated on {shortDate(batch.validatedAt)}</span>
         {:else}
-          <span class="to-validate">à valider</span>
+          <span class="to-validate">to validate</span>
           <button type="button" class="quiet" onclick={() => validate(batch.id)}>
-            Noter validée
+            Record as validated
           </button>
         {/if}
       </div>
     {:else}
-      <span class="muted">Aucune livraison pour l’instant.</span>
+      <span class="muted">No delivery yet.</span>
     {/each}
   </section>
 
-  <section class="panel" aria-label="Terminés récemment">
-    <h2>Terminés récemment</h2>
+  <section class="panel" aria-label="Recently closed">
+    <h2>Recently closed</h2>
     {#each closed as ticket (ticket.key)}
       <span>
         <span class="key">{ticket.key}</span>
-        {ticket.title} · clos le {shortDate(ticket.situation.closedAt ?? '')}
+        {ticket.title} · closed on {shortDate(ticket.situation.closedAt ?? '')}
       </span>
     {:else}
-      <span class="muted">Aucun ticket clos.</span>
+      <span class="muted">No closed ticket.</span>
     {/each}
   </section>
 </div>

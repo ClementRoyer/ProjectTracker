@@ -99,13 +99,13 @@ export async function call(target: Target, operation: string, input: unknown): P
       body: JSON.stringify(input),
     });
   } catch {
-    throw new Error(`Le serveur project-tracker ne répond pas sur ${target.url}.`);
+    throw new Error(`The project-tracker server does not answer on ${target.url}.`);
   }
   const body: unknown = await response.json().catch(() => null);
   if (!response.ok) {
     const error = z.object({ error: z.string() }).safeParse(body);
     throw new Error(
-      `Refusé : ${error.success ? error.data.error : `erreur ${String(response.status)}`}`,
+      `Refused: ${error.success ? error.data.error : `error ${String(response.status)}`}`,
     );
   }
   return body;

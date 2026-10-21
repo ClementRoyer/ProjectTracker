@@ -116,7 +116,7 @@ export function listWaitingForMe(
         key: ticket.key,
         title: ticket.title,
         since: record.updatedAt,
-        text: 'Validation en qualité faite : à déclarer terminé',
+        text: 'QA validation done: to be declared closed',
         question: null,
       },
     ];

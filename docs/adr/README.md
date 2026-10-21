@@ -11,7 +11,7 @@ An ADR (*Architecture Decision Record*) records **one** decision: the context, t
 | [0003](0003-build-a-la-release.md) | Dependencies and build in the repository, standalone artifact shipped | Accepted | 2026-10-16 |
 | [0004](0004-stockage-sqlite.md) | Storage in native SQLite (`node:sqlite`) | Accepted | 2026-10-16 |
 | [0005](0005-frontend-svelte.md) | Web page in Svelte + Vite + TypeScript | Accepted | 2026-10-16 |
-| [0006](0006-langues.md) | Code in English, interface and documents in French | Accepted | 2026-10-18 |
+| [0006](0006-langues.md) | Code in English, interface and documents in French | Superseded by 0053 | 2026-10-18 |
 | [0007](0007-acheminement-des-reponses.md) | Routing of the developer's answer to the agent | Accepted | 2026-10-18 |
 | [0008](0008-eviter-les-conflits-entre-tickets.md) | Avoid conflicts between tickets worked on in parallel | Accepted | 2026-10-19 |
 | [0009](0009-apercu-et-commits-des-dossiers-de-travail.md) | Preview and commits of the working folders | Accepted | 2026-10-19 |
@@ -57,6 +57,9 @@ An ADR (*Architecture Decision Record*) records **one** decision: the context, t
 | [0049](0049-v1-mise-de-cote-sans-migration.md) | V1 set aside without migration | Accepted | 2026-10-21 |
 | [0050](0050-installer-et-lancer-en-une-commande.md) | Install and start in one command | Accepted | 2026-10-21 |
 | [0051](0051-changelog-des-versions.md) | A changelog for each published version | Accepted | 2026-10-21 |
+| [0052](0052-installation-retours-du-premier-deploiement.md) | Installation: feedback from the first real deployment | Accepted | 2026-10-21 |
+| [0053](0053-tout-en-anglais.md) | Everything in English | Accepted | 2026-10-21 |
+| [0054](0054-detection-des-depots.md) | The installer finds the project's repositories | Accepted | 2026-10-21 |
 
 ## Rules
 

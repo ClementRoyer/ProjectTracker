@@ -16,7 +16,7 @@ export function hookContext(env: Readonly<Record<string, string | undefined>>): 
       body: JSON.stringify(input),
       signal: AbortSignal.timeout(5000),
     });
-    if (!response.ok) throw new Error(`${operation} : ${String(response.status)}`);
+    if (!response.ok) throw new Error(`${operation}: ${String(response.status)}`);
     return await response.json();
   };
   return {

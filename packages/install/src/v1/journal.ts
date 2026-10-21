@@ -145,15 +145,15 @@ function toQuestion(
 }
 
 function choiceLabel(question: V1Question, choice: string): string {
-  if (question.type === 'yesno') return choice === 'yes' ? 'Oui' : 'Non';
+  if (question.type === 'yesno') return choice === 'yes' ? 'Yes' : 'No';
   return question.options?.find((option) => option.id === choice)?.label ?? choice;
 }
 
 function describeRun(run: V1TestRun): string {
   const counts = [
-    run.passed === undefined ? '' : `${String(run.passed)} réussis`,
-    run.failed === undefined ? '' : `${String(run.failed)} échoués`,
-    run.skipped === undefined ? '' : `${String(run.skipped)} ignorés`,
+    run.passed === undefined ? '' : `${String(run.passed)} passed`,
+    run.failed === undefined ? '' : `${String(run.failed)} failed`,
+    run.skipped === undefined ? '' : `${String(run.skipped)} skipped`,
   ].filter(Boolean);
   return `Tests ${run.kind} : ${run.status}${counts.length > 0 ? ` (${counts.join(', ')})` : ''}`;
 }

@@ -14,7 +14,7 @@
   }: { ticket: TicketSummary; group: GroupId; now: string; selected: boolean } = $props();
 
   const phaseIndex = $derived(PHASES.indexOf(ticket.situation.phase));
-  const phaseLabel = $derived(group === 'done' ? 'Terminé' : PHASE_LABELS[ticket.situation.phase]);
+  const phaseLabel = $derived(group === 'done' ? 'Closed' : PHASE_LABELS[ticket.situation.phase]);
 </script>
 
 <a
@@ -27,18 +27,18 @@
     <span class="key-line">
       <span class="key">{ticket.key}</span>
       <PriorityMark priority={ticket.priority} />
-      {#if ticket.dueDate !== null}<span class="due">éch. {shortDate(ticket.dueDate)}</span>{/if}
+      {#if ticket.dueDate !== null}<span class="due">due {shortDate(ticket.dueDate)}</span>{/if}
     </span>
     <span class="meta">
       {#if ticket.working}<AgentRunning />{/if}
-      {#if ticket.unread}<span class="unread" role="img" aria-label="Nouveautés"></span>{/if}
+      {#if ticket.unread}<span class="unread" role="img" aria-label="Novelties"></span>{/if}
       {ago(ticket.lastActivityAt, now)}
     </span>
   </span>
   <span class="title" class:bold={ticket.unread}>{ticket.title}</span>
   {#if ticket.group !== null}<span class="group">{ticket.group}</span>{/if}
   <span class="progress">{progressText(ticket)}</span>
-  <span class="phases" aria-label="Phase : {phaseLabel}">
+  <span class="phases" aria-label="Phase: {phaseLabel}">
     {#each PHASES as phase, index (phase)}
       <span class="step tone-{group}" class:reached={index <= phaseIndex}></span>
     {/each}
@@ -46,7 +46,7 @@
   </span>
   <span class="pill wait-{group}">{waitText(ticket, now)}</span>
   {#if ticket.overlaps.length > 0}
-    <span class="overlap">Fichiers en commun avec {ticket.overlaps.join(', ')}</span>
+    <span class="overlap">Files in common with {ticket.overlaps.join(', ')}</span>
   {/if}
 </a>
 

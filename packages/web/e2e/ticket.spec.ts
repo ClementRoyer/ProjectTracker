@@ -29,12 +29,12 @@ test('answering a question with one of its options reaches the agent', async ({
   });
 
   await page.goto(`/#/ticket/${key}`);
-  const card = page.getByRole('group', { name: 'Question pour toi' });
+  const card = page.getByRole('group', { name: 'Question for you' });
   await expect(card).toContainText('Compound names are not found today.');
   await card.getByRole('button', { name: /Start of each word/ }).click();
   await expect(card).toHaveCount(0);
   await expect(page.getByRole('region', { name: 'Discussion' })).toContainText(
-    'pas encore prise en compte',
+    'not acknowledged yet',
   );
   const inbox = (await front('listInbox', {})) as { items: { body: string }[] };
   expect(inbox.items.map((item) => item.body)).toEqual(['Start of each word']);
@@ -46,28 +46,28 @@ test('changing the phase resets the progress and says so in the discussion', asy
 }) => {
   const key = await createTicket(request, 'Rename the export button');
   await page.goto(`/#/ticket/${key}`);
-  await page.getByRole('button', { name: 'Changer de phase' }).click();
+  await page.getByRole('button', { name: 'Change phase' }).click();
   await page.getByRole('menuitem', { name: 'Test' }).click();
   await expect(page.getByRole('list', { name: 'Phase' }).locator('.now')).toHaveText('Test');
   await expect(page.getByRole('region', { name: 'Discussion' })).toContainText(
-    'Phase : À faire → Test',
+    'Phase: To do → Test',
   );
-  await expect(page.getByRole('main', { name: `Ticket ${key}` })).toContainText('Pas démarré');
+  await expect(page.getByRole('main', { name: `Ticket ${key}` })).toContainText('Not started');
 });
 
 test('a ticket can be declared done only after its QA validation', async ({ page, request }) => {
   const key = await createTicket(request, 'Fix the date format');
   await page.goto(`/#/ticket/${key}`);
-  const close = page.getByRole('button', { name: 'Déclarer terminé' });
+  const close = page.getByRole('button', { name: 'Close ticket' });
   await expect(close).toBeDisabled();
 
-  const batch = (await developerCall(request, 'deliverBatch', { name: 'Lot', keys: [key] })) as {
+  const batch = (await developerCall(request, 'deliverBatch', { name: 'Batch', keys: [key] })) as {
     id: string;
   };
   await developerCall(request, 'validateBatch', { batchId: batch.id });
   await expect(close).toBeEnabled();
   await close.click();
-  await expect(page.getByRole('main', { name: `Ticket ${key}` })).toContainText('Clos le');
+  await expect(page.getByRole('main', { name: `Ticket ${key}` })).toContainText('Closed on');
 });
 
 test('a message to the front assignee reaches its next call', async ({ page, request }) => {
@@ -77,7 +77,7 @@ test('a message to the front assignee reaches its next call', async ({ page, req
 
   await page.goto(`/#/ticket/${key}`);
   await page.getByLabel('Message').fill('Use the existing spinner.');
-  await page.getByRole('button', { name: 'Envoyer' }).click();
+  await page.getByRole('button', { name: 'Send' }).click();
   await expect(page.getByRole('region', { name: 'Discussion' })).toContainText(
     'Use the existing spinner.',
   );
@@ -91,12 +91,12 @@ test('setting the priority marks the ticket in the list, and is noted in the jou
 }) => {
   const key = await createTicket(request, 'Fix the payment error');
   await page.goto(`/#/ticket/${key}`);
-  await page.getByLabel('Priorité').selectOption('urgent');
+  await page.getByLabel('Priority').selectOption('urgent');
   await expect(page.getByRole('region', { name: 'Discussion' })).toContainText(
-    'Priorité : normale → urgente',
+    'Priority: normal → urgent',
   );
-  // The row of the list; the ticket may also be suggested in « À prendre ensuite ».
-  await expect(page.locator('a.row', { hasText: key })).toContainText('Urgente');
+  // The row of the list; the ticket may also be suggested in "Up next".
+  await expect(page.locator('a.row', { hasText: key })).toContainText('Urgent');
 });
 
 test('the folder shows the last test run of each kind, failed ones in colour', async ({
@@ -108,9 +108,9 @@ test('the folder shows the last test run of each kind, failed ones in colour', a
   await front('recordTestRun', { key, kind: 'auto', passed: true, note: '16 of 16' });
   await front('recordTestRun', { key, kind: 'visual', passed: false, note: 'button cut on phone' });
   await page.goto(`/#/ticket/${key}`);
-  const folder = page.getByRole('complementary', { name: 'Dossier du ticket' });
-  await expect(folder).toContainText('Tests automatiques réussis : 16 of 16');
-  await expect(folder).toContainText('Tests visuels en échec : button cut on phone');
+  const folder = page.getByRole('complementary', { name: 'Ticket file' });
+  await expect(folder).toContainText('Automatic tests passed: 16 of 16');
+  await expect(folder).toContainText('Visual tests failed: button cut on phone');
 });
 
 test('the folder lists the changed files, and those shared with another ticket (F23)', async ({
@@ -125,9 +125,9 @@ test('the folder lists the changed files, and those shared with another ticket (
   });
   await developerCall(request, 'reportChangedFiles', { key: other, files: ['src/ui/list.ts'] });
   await page.goto(`/#/ticket/${key}`);
-  const folder = page.getByRole('complementary', { name: 'Dossier du ticket' });
+  const folder = page.getByRole('complementary', { name: 'Ticket file' });
   await expect(folder).toContainText('src/ui/view.ts');
-  await expect(folder).toContainText(`src/ui/list.ts · aussi ${other}`);
+  await expect(folder).toContainText(`src/ui/list.ts · also ${other}`);
 });
 
 test('the folder shows the working folder, and says to remove it once the ticket is closed (ADR 0041)', async ({
@@ -141,29 +141,29 @@ test('the folder shows the working folder, and says to remove it once the ticket
     branch: `ticket/${key}`,
   });
   await page.goto(`/#/ticket/${key}`);
-  const folder = page.getByRole('complementary', { name: 'Dossier du ticket' });
-  await expect(folder).toContainText(`.worktrees/${key} · branche ticket/${key}`);
+  const folder = page.getByRole('complementary', { name: 'Ticket file' });
+  await expect(folder).toContainText(`.worktrees/${key} · branch ticket/${key}`);
   await expect(folder).not.toContainText('tracker worktree remove');
 
-  const batch = (await developerCall(request, 'deliverBatch', { name: 'Lot', keys: [key] })) as {
+  const batch = (await developerCall(request, 'deliverBatch', { name: 'Batch', keys: [key] })) as {
     id: string;
   };
   await developerCall(request, 'validateBatch', { batchId: batch.id });
   await developerCall(request, 'closeTicket', { key });
-  await expect(folder).toContainText(`Encore présent : tracker worktree remove ${key}`);
+  await expect(folder).toContainText(`Still there: tracker worktree remove ${key}`);
 });
 
 test('the developer notes a manual test from the folder (F24)', async ({ page, request }) => {
   const key = await createTicket(request, 'Check the colours');
   await page.goto(`/#/ticket/${key}`);
-  const folder = page.getByRole('complementary', { name: 'Dossier du ticket' });
-  await folder.getByRole('button', { name: 'Noter un test manuel' }).click();
-  const form = folder.getByRole('form', { name: 'Noter un test manuel' });
+  const folder = page.getByRole('complementary', { name: 'Ticket file' });
+  await folder.getByRole('button', { name: 'Record a manual test' }).click();
+  const form = folder.getByRole('form', { name: 'Record a manual test' });
   await form.getByLabel('Test').selectOption('user');
-  await form.getByLabel('en échec').check();
-  await form.getByLabel('Retour').fill('The button is too small');
-  await form.getByRole('button', { name: 'Noter' }).click();
-  await expect(folder).toContainText('Tests par l’utilisateur en échec : The button is too small');
+  await form.getByLabel('failed').check();
+  await form.getByLabel('Feedback').fill('The button is too small');
+  await form.getByRole('button', { name: 'Save' }).click();
+  await expect(folder).toContainText('User tests failed: The button is too small');
 });
 
 test('a capture joined to a message shows in the discussion and reaches the agent (F30)', async ({
@@ -179,14 +179,14 @@ test('a capture joined to a message shows in the discussion and reaches the agen
     'base64',
   );
   await page.goto(`/#/ticket/${key}`);
-  await page.getByLabel('Fichiers à joindre').setInputFiles({
+  await page.getByLabel('Files to attach').setInputFiles({
     name: 'capture.png',
     mimeType: 'image/png',
     buffer: png,
   });
-  await expect(page.getByRole('list', { name: 'Pièces à joindre' })).toContainText('capture.png');
+  await expect(page.getByRole('list', { name: 'Files to attach' })).toContainText('capture.png');
   await page.getByLabel('Message').fill('The button is cut on phones.');
-  await page.getByRole('button', { name: 'Envoyer' }).click();
+  await page.getByRole('button', { name: 'Send' }).click();
 
   const discussion = page.getByRole('region', { name: 'Discussion' });
   await expect(discussion.getByRole('img', { name: 'capture.png' })).toBeVisible();
@@ -205,5 +205,5 @@ test('a file dropped on the ticket waits in the composer', async ({ page, reques
     data.items.add(new File(['log line'], 'server.log', { type: 'text/plain' }));
     main.dispatchEvent(new DragEvent('drop', { dataTransfer: data, bubbles: true }));
   });
-  await expect(page.getByRole('list', { name: 'Pièces à joindre' })).toContainText('server.log');
+  await expect(page.getByRole('list', { name: 'Files to attach' })).toContainText('server.log');
 });

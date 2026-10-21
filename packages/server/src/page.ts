@@ -10,7 +10,7 @@ export function mountPage(app: Hono, webRoot: string | undefined, developerToken
   const index = webRoot ? join(webRoot, 'index.html') : null;
   app.get('/', (c) => {
     if (index === null || !existsSync(index)) {
-      return c.text('La page n’est pas construite : lance « npm run build ».', 404);
+      return c.text('The page is not built: run "npm run build".', 404);
     }
     c.header('cache-control', 'no-store');
     return c.html(readFileSync(index, 'utf8').replace(TOKEN_PLACEHOLDER, developerToken));
