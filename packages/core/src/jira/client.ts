@@ -38,7 +38,10 @@ const searchPage = z.object({
       key: z.string(),
       fields: z.object({
         summary: z.string(),
-        status: z.object({ name: z.string() }),
+        status: z.object({
+          name: z.string(),
+          statusCategory: z.object({ key: z.string() }).optional(),
+        }),
         updated: z.string(),
         description: richText,
         priority: z.object({ name: z.string() }).nullable().optional(),
@@ -111,6 +114,7 @@ function toIssue(base: string, issue: z.infer<typeof searchPage>['issues'][numbe
     key: issue.key,
     title: issue.fields.summary,
     status: issue.fields.status.name,
+    done: issue.fields.status.statusCategory?.key === 'done',
     url: `${base}/browse/${issue.key}`,
     description: plainText(issue.fields.description),
     ...(issue.fields.priority ? { priority: issue.fields.priority.name } : {}),

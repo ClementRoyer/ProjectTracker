@@ -1,6 +1,6 @@
 {
   "name": "project-tracker",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "private": true,
   "license": "MIT",
   "description": "Local ticket tracker for one developer working with several AI agents.",

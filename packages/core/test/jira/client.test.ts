@@ -103,6 +103,39 @@ describe('Jira client (read-only, ADR 0026)', () => {
     });
   });
 
+  it('tells a done issue by its status category, whatever its status is named (ADR 0056)', async () => {
+    const page = {
+      issues: [
+        {
+          key: 'DEMO-1',
+          fields: {
+            summary: 'Open',
+            status: { name: 'In Review', statusCategory: { key: 'indeterminate' } },
+            updated: '2026-10-19T08:00:00.000+0200',
+            description: null,
+          },
+        },
+        {
+          key: 'DEMO-2',
+          fields: {
+            summary: 'Shipped',
+            status: { name: 'Clôturé', statusCategory: { key: 'done' } },
+            updated: '2026-10-19T08:00:00.000+0200',
+            description: null,
+          },
+        },
+      ],
+      isLast: true,
+    };
+    const jira: typeof fetch = () =>
+      Promise.resolve(new Response(JSON.stringify(page), { status: 200 }));
+    const issues = await jiraReader(connection, jira)();
+    expect(issues.map((found) => [found.key, found.done])).toEqual([
+      ['DEMO-1', false],
+      ['DEMO-2', true],
+    ]);
+  });
+
   it('fails without ever showing the token', async () => {
     const failing: typeof fetch = () => Promise.resolve(new Response('nope', { status: 401 }));
     const error = await jiraReader(connection, failing)().catch((caught: unknown) => caught);

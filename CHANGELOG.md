@@ -4,6 +4,12 @@ Every published version of project-tracker, newest first. The format follows [Ke
 
 ## [Unreleased]
 
+## [2.0.8] - 2026-10-21
+
+### Changed
+
+- Loading from Jira no longer creates tickets for issues already done (status category Done); a tracked ticket still follows its issue when it gets done ([ADR 0056](docs/adr/0056-pas-de-tickets-jira-deja-termines.md)).
+
 ## [2.0.7] - 2026-10-21
 
 ### Fixed
@@ -82,7 +88,8 @@ First public version: a full rewrite of project-tracker.
 - Back-end agents on another machine through a launcher, without SSH.
 - Install and start scripts from the GitHub releases, with a checksum check.
 
-[Unreleased]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.7...HEAD
+[Unreleased]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.8...HEAD
+[2.0.8]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.7...v2.0.8
 [2.0.7]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.6...v2.0.7
 [2.0.6]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.4...v2.0.5

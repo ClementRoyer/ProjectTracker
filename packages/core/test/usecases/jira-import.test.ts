@@ -134,3 +134,30 @@ describe('counting what a Jira load would bring (ADR 0052)', () => {
     expect(preview.ok ? '' : preview.error).toBe('jiraNotConfigured');
   });
 });
+
+describe('issues already done in Jira (ADR 0056)', () => {
+  it('creates no ticket for an issue already done, and still follows a tracked one that gets done', async () => {
+    const ctx = withJira([issue('DEMO-1'), issue('DEMO-2', { done: true, status: 'Done' })]);
+    const first = await loadFromJira(ctx, {});
+    expect(first.ok && first.value.created).toEqual(['DEMO-1']);
+    ctx.jira = () =>
+      Promise.resolve([
+        issue('DEMO-1', { done: true, status: 'Done' }),
+        issue('DEMO-2', { done: true, status: 'Done' }),
+      ]);
+    const second = await loadFromJira(ctx, {});
+    expect(second.ok && second.value).toMatchObject({
+      created: [],
+      changed: ['DEMO-1'],
+      notAssigned: [],
+    });
+    const ticket = getTicket(ctx, { key: 'DEMO-1' });
+    expect(ticket.ok && ticket.value.jiraStatus).toBe('Done');
+  });
+
+  it('counts no issue already done among the new ones', async () => {
+    const ctx = withJira([issue('DEMO-1'), issue('DEMO-2', { done: true })]);
+    const preview = await previewJiraLoad(ctx, {});
+    expect(preview.ok && preview.value).toEqual({ read: 2, created: ['DEMO-1'] });
+  });
+});

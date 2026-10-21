@@ -41,6 +41,8 @@ export async function loadFromJira(
     for (const issue of issues) {
       const existing = tickets.get(issue.key);
       if (!existing) {
+        // An issue already done in Jira is not taken up (ADR 0056); a tracked one keeps being followed.
+        if (issue.done === true) continue;
         create(ctx, issue);
         summary.created.push(issue.key);
       } else if (update(ctx, existing, issue)) {
@@ -71,7 +73,9 @@ export async function previewJiraLoad(
   const known = new Set(allTickets(ctx.db).map((ticket) => ticket.key));
   return ok({
     read: issues.length,
-    created: issues.map((issue) => issue.key).filter((key) => !known.has(key)),
+    created: issues
+      .filter((issue) => issue.done !== true && !known.has(issue.key))
+      .map((issue) => issue.key),
   });
 }
 
