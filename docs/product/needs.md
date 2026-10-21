@@ -1,322 +1,322 @@
-# Besoins du développeur
+# Developer needs
 
-- Statut : **validé par l'utilisateur (2026-10-18)**, besoins et priorités
-- Date : 2026-10-18
-- Méthode : on part de la journée du développeur, pas de l'outil existant. Aucun mot de solution ici (pas de tableau, de commande, de hook…). Les fonctionnalités en seront déduites ensuite.
+- Status: **validated by the user (2026-10-18)**, needs and priorities
+- Date: 2026-10-18
+- Method: we start from the developer's day, not from the existing tool. No solution words here (no table, command, hook…). The features are derived from them afterwards.
 
-Chaque besoin est écrit à la première personne, du point de vue du développeur : « J'ai besoin de… pour… ». Les besoins marqués **(H)** sont des hypothèses de l'IA, à confirmer, corriger ou rayer. Les besoins confirmés perdent leur **(H)**.
+Each need is written in the first person, from the developer's point of view: "I need… to…". Needs marked **(H)** are the AI's assumptions, to be confirmed, corrected or struck out. Confirmed needs lose their **(H)**.
 
-## Synthèse des besoins
+## Summary of needs
 
-Validation par l'utilisateur le 2026-10-18. Le détail et ses mots sont dans les sections M1 à M10 ci-dessous.
+Validated by the user on 2026-10-18. The details and their words are in sections M1 to M10 below.
 
-Priorité : **P** = primaire, obligatoire, c'est le besoin de base ; **S** = secondaire, une aide. L'IA a proposé ces priorités, puis l'utilisateur a tranché les lignes incertaines le 2026-10-18 : B5.4 P, B6.7 S, B8.2 S, B8.3 S, B10.2 et B10.3 P. Il n'a pas contesté les autres lignes. Il a aussi confirmé qu'aucun moment de sa journée ne manque. Les besoins B11 reprennent des fonctionnalités de la V1 que l'utilisateur veut garder (« Ajoute ces points que tu as trouvés de la V1, je les veux », 2026-10-18). Ils sont classés secondaires par défaut.
+Priority: **P** = primary, mandatory, it is the basic need; **S** = secondary, a helper. The AI proposed these priorities, then the user settled the uncertain lines on 2026-10-18: B5.4 P, B6.7 S, B8.2 S, B8.3 S, B10.2 and B10.3 P. They did not dispute the other lines. They also confirmed that no moment of their day is missing. The B11 needs take up features from V1 that the user wants to keep ("Add these points you found in V1, I want them", 2026-10-18). They are classed as secondary by default.
 
-| ID | J'ai besoin de… | Priorité |
+| ID | I need to… | Priority |
 |---|---|---|
-| **Savoir ce qui a changé** | | |
-| B1.1 | voir les nouveaux tickets qui me sont assignés, révélés par le chargement Jira que je lance | P |
-| B1.2 | voir les tickets mis à jour depuis ma dernière visite (statut, retours d'utilisateurs…) | P |
-| B1.4 | savoir ce que les agents ont fait et terminé depuis ma dernière visite | P |
-| **Savoir où en est chaque ticket** | | |
-| B1.3 / B6.4 | voir la situation de chaque ticket : phase, avancement, attente éventuelle | P |
-| B3.1 | savoir qui s'occupe de chaque ticket (moi ou tel agent) | P |
-| B7.1 | savoir qu'un ticket attend quelqu'un d'extérieur, qui, et depuis quand | P |
-| B4.2 | repérer un ticket qui n'avance plus | P |
-| B4.1 | voir tout cela quand je viens regarder, sans être interrompu | P (principe) |
-| **Ce qui m'attend** | | |
-| B1.6 / B5.1 | voir à un seul endroit ce qui attend une réponse de ma part, et depuis quand | P |
-| B5.2 | recevoir chaque demande avec historique, dernière étape, contexte, options et recommandation | P |
-| B5.3 | suivre la suite après ma réponse : prise en compte, et où en est le ticket | P |
-| B5.4 | que ma réponse reparte vers celui qui attend, sans faire le facteur | P |
-| **Revoir un ticket** | | |
-| B6.1 | retrouver toutes les infos du ticket au même endroit | P |
-| B6.2 | retrouver la demande initiale | P |
-| B6.3 | connaître l'histoire du ticket avant moi (commentaires Jira, ou ce que je fournis) | P |
-| B5.5 | retrouver ce qui a été décidé et pourquoi | P |
-| B6.6 / B7.2 | retrouver ce qui a été dit exactement (échanges, décisions), jamais un résumé | P |
-| B7.3 | avoir les échanges avec le back-end (agent IA) rattachés au ticket | P |
-| **Alimenter le suivi** | | |
-| B2.1 | noter un nouveau sujet très vite, sans perdre ma concentration | P |
-| B2.2 | qu'un sujet local reste local | P (contrainte) |
-| B2.3 | lancer moi-même le chargement depuis Jira | P |
-| B2.4 | ne rien recopier d'un ticket Jira, et garder le lien | P |
-| B1.7 / B7.4 | rapporter vite un retour reçu par mail ou à l'oral, en le disant à un agent | P |
-| B3.2 | que ce que produit mon skill de démarrage (infos Jira, analyse) rejoigne le ticket | P |
-| B3.3 | confier un ou plusieurs tickets à un intervenant, sans règle imposée | P |
-| **Travailler en parallèle** | | |
-| B4.3 | reprendre un ticket arrêté dans une nouvelle conversation, sans perte | P |
-| B4.4 | que deux tickets traités en même temps ne se gênent pas (code, environnement) | P |
-| **Terminer et livrer** | | |
-| B8.1 | voir le résultat des tests du ticket | P |
-| B8.4 | être le seul à déclarer un ticket terminé | P |
-| B9.1 | savoir quels tickets partent ensemble en qualité | P |
-| B9.2 | noter qu'un lot a été livré en qualité | P |
-| **Usage de l'IA** | | |
-| B10.2 | connaître l'usage de l'IA par ticket, en gros | P |
-| B10.3 | connaître l'usage global par jour, semaine, mois | P |
-| **Aides** | | |
-| B1.5 | qu'on me propose la suite (gain rapide, presque fini, échéance) | S (« bonus ») |
-| B9.3 | produire un changelog de livraison, en option | S (« bonus, non primaire ») |
-| B6.7 | voir ce qui a changé dans le code pour ce ticket | S |
-| B8.2 | noter qu'un test visuel manuel a été fait | S |
-| B8.3 | suivre le test utilisateur (fait ou non, retour) | S |
-| B0.1 | suivre plusieurs projets (cas rare, environ 5 %) | S (« bonus », voir [understanding.md](understanding.md) §5) |
-| **Repris de la V1, à la demande de l'utilisateur** | | |
-| B11.1 | être notifié (cloche, titre de l'onglet, navigateur) | S |
-| B11.2 | choisir le thème de couleur et la langue de l'interface | S |
-| B11.3 | générer des fichiers à partir de modèles (exports) | S |
-| B11.4 | voir les écarts entre le statut Jira et la situation locale | S |
-| B11.5 | joindre des captures d'écran et des pièces jointes à un ticket | S |
-| B11.6 | voir les dépôts, les lots et les documents du projet | S |
-| B11.7 | demander « où en est-on ? » à l'intervenant d'un ticket | S |
-| B11.8 | que les messages du back-end soient capturés automatiquement, et qu'il reçoive les consignes d'échange | S |
-| B11.9 | coordonner explicitement les intervenants : réservation d'un ticket, fichiers tenus, verrou d'une ressource partagée, garde contre les écritures interdites | S |
+| **Knowing what has changed** | | |
+| B1.1 | see the new tickets assigned to me, revealed by the Jira import I run | P |
+| B1.2 | see the tickets updated since my last visit (status, user feedback…) | P |
+| B1.4 | know what the agents did and finished since my last visit | P |
+| **Knowing where each ticket stands** | | |
+| B1.3 / B6.4 | see the situation of each ticket: phase, progress, any wait | P |
+| B3.1 | know who handles each ticket (me or a given agent) | P |
+| B7.1 | know that a ticket waits for someone outside, who, and since when | P |
+| B4.2 | spot a ticket that no longer moves | P |
+| B4.1 | see all this when I come to look, without being interrupted | P (principle) |
+| **What is waiting for me** | | |
+| B1.6 / B5.1 | see in one place what waits for an answer from me, and since when | P |
+| B5.2 | receive each request with its history, last step, context, options and a recommendation | P |
+| B5.3 | follow what happens after my answer: whether it was taken into account, and where the ticket stands | P |
+| B5.4 | have my answer go back to whoever is waiting, without me acting as the courier | P |
+| **Reviewing a ticket** | | |
+| B6.1 | find all the ticket's information in one place | P |
+| B6.2 | find the initial request | P |
+| B6.3 | know the ticket's history before me (Jira comments, or what I provide) | P |
+| B5.5 | find what was decided and why | P |
+| B6.6 / B7.2 | find what was said exactly (exchanges, decisions), never a summary | P |
+| B7.3 | have the exchanges with the back-end (AI agent) attached to the ticket | P |
+| **Feeding the tracking** | | |
+| B2.1 | note a new subject very fast, without losing my focus | P |
+| B2.2 | a subject found locally stays local | P (constraint) |
+| B2.3 | start the Jira import myself | P |
+| B2.4 | copy nothing from a Jira ticket, and keep the link | P |
+| B1.7 / B7.4 | quickly report feedback received by email or in person, by telling an agent | P |
+| B3.2 | have what my start-up skill produces (Jira info, analysis) join the ticket | P |
+| B3.3 | entrust one or several tickets to an assignee, with no fixed rule | P |
+| **Working in parallel** | | |
+| B4.3 | resume a stopped ticket in a new conversation, without loss | P |
+| B4.4 | have two tickets handled at the same time not get in each other's way (code, environment) | P |
+| **Finishing and delivering** | | |
+| B8.1 | see the test results of the ticket | P |
+| B8.4 | be the only one to declare a ticket closed | P |
+| B9.1 | know which tickets go together to QA | P |
+| B9.2 | note that a batch was delivered to QA | P |
+| **AI usage** | | |
+| B10.2 | know the AI usage per ticket, roughly | P |
+| B10.3 | know the overall usage per day, week and month | P |
+| **Helpers** | | |
+| B1.5 | be offered what comes next (quick win, nearly done, deadline) | S ("bonus") |
+| B9.3 | produce a delivery changelog, as an option | S ("bonus, not primary") |
+| B6.7 | see what changed in the code for this ticket | S |
+| B8.2 | note that a manual visual test was done | S |
+| B8.3 | follow the user test (done or not, feedback) | S |
+| B0.1 | follow several projects (rare case, about 5%) | S ("bonus", see [understanding.md](understanding.md) §5) |
+| **Taken from V1, at the user's request** | | |
+| B11.1 | be notified (bell, tab title, browser) | S |
+| B11.2 | choose the interface's colour theme and language | S |
+| B11.3 | generate files from templates (exports) | S |
+| B11.4 | see the gaps between the Jira status and the local situation | S |
+| B11.5 | attach screenshots and attachments to a ticket | S |
+| B11.6 | see the repositories, batches and documents of the project | S |
+| B11.7 | ask "Où en est-on ?" of a ticket's assignee | S |
+| B11.8 | have the back-end's messages captured automatically, and have it receive the exchange rules | S |
+| B11.9 | explicitly coordinate the assignees: claiming a ticket, held files, lock of a shared resource, guard against forbidden writes | S |
 
-## Qui je suis
+## Who I am
 
-Je suis développeur sur un projet, rarement plusieurs. J'ai plusieurs tickets ouverts en même temps. Certains, je les traite moi-même ; d'autres sont confiés à des agents d'IA, un agent pouvant en porter un ou plusieurs. Les tickets viennent de Jira (bug en qualité ou en prod, demande de fonctionnalité) ou de moi (bug trouvé en testant, idée, amélioration invisible).
+I am a developer on a project, rarely more than one. I have several tickets open at the same time. Some I handle myself; others are entrusted to AI agents, an agent possibly carrying one or several. Tickets come from Jira (a bug in QA or in production, a feature request) or from me (a bug found while testing, an idea, an invisible improvement).
 
 ---
 
-## M1. Je commence ma journée, ou je reviens après une coupure
+## M1. I start my day, or I come back after a break
 
-**Situation** : j'ai plusieurs tickets en cours. Je ne me souviens plus précisément de l'état de chacun.
+**Situation**: I have several tickets in progress. I no longer remember exactly where each one stands.
 
-**Les mots de l'utilisateur (2026-10-18)** :
-> « Je cherche à savoir si des nouveaux tickets sont apparus, si certains tickets ont eu des mises à jour (de statut, de retours utilisateurs, etc.), puis où en sont les tickets en cours, est-ce que des agents ont travaillé et fini des tâches, si tout est bon, qu'est-ce qu'il y a à faire ensuite. »
+**The user's words (2026-10-18)**:
+> "I want to know whether new tickets have appeared, whether some tickets have had updates (status, user feedback, etc.), then where the tickets in progress stand, whether agents have worked and finished tasks, whether everything is fine, what there is to do next."
 
-Dans l'ordre où il les cherche :
-- B1.1 J'ai besoin de savoir **quels nouveaux tickets sont apparus**.
-- B1.2 J'ai besoin de savoir **quels tickets ont été mis à jour depuis ma dernière visite** : changement de statut, retours d'utilisateurs, etc.
-- B1.3 J'ai besoin de voir **où en sont les tickets en cours**.
-- B1.4 J'ai besoin de savoir **ce que les agents ont fait et terminé** depuis ma dernière visite.
-- B1.5 J'ai besoin de savoir **ce qu'il y a à faire ensuite**.
-- B1.6 J'ai besoin de savoir **lesquels m'attendent**, et depuis quand.
+In the order I look for them:
+- B1.1 I need to know **which new tickets have appeared**.
+- B1.2 I need to know **which tickets have been updated since my last visit**: status change, user feedback, etc.
+- B1.3 I need to see **where the tickets in progress stand**.
+- B1.4 I need to know **what the agents did and finished** since my last visit.
+- B1.5 I need to know **what there is to do next**.
+- B1.6 I need to know **which ones are waiting for me**, and since when.
 
-**Ce que ça nous apprend** : les changements qui comptent ne viennent pas seulement des agents. Ils viennent aussi de **l'extérieur** : un nouveau ticket, un statut changé, un retour d'utilisateur. Le point de départ de la journée, c'est **« qu'est-ce qui a changé ? »**, puis seulement **« où en est-on ? »**, et enfin **« que fait-on ? »**.
+**What this teaches us**: the changes that matter do not only come from the agents. They also come from **outside**: a new ticket, a changed status, user feedback. The starting point of the day is **"what has changed?"**, then only **"where do we stand?"**, and finally **"what do we do?"**.
 
-**Précisions de l'utilisateur (2026-10-18)** :
+**The user's clarifications (2026-10-18)**:
 
-| Question | Réponse | Besoin qui en découle |
+| Question | Answer | Need that follows |
 |---|---|---|
-| Quels nouveaux tickets te concernent ? | « Un ticket assigné à moi, sur le projet en question. » | B1.1 précisé : les nouveaux tickets **qui me sont assignés** sur le projet. |
-| Où arrivent les retours d'utilisateurs ? | « Sur Jira (peut être récupéré automatiquement), par mail ou oral, et là c'est à moi de l'indiquer. » | B1.7 J'ai besoin d'**ajouter moi-même, vite, un retour reçu par mail ou à l'oral** sur un ticket. |
-| « Ce qu'il y a à faire ensuite » : décidé ou proposé ? | « Ça pourrait être proposé (quick win, presque fini, deadline, etc.) (bonus ?) » | B1.5 précisé : une **proposition** de la suite, selon des critères comme gain rapide, presque fini ou échéance. **Candidat secondaire.** |
+| Which new tickets concern you? | "A ticket assigned to me, on the project in question." | B1.1 specified: the new tickets **assigned to me** on the project. |
+| Where do user feedbacks arrive? | "On Jira (can be fetched automatically), by email or in person, and then it's up to me to note it." | B1.7 I need to **add myself, quickly, a feedback received by email or in person** on a ticket. |
+| "What to do next": decided or proposed? | "It could be proposed (quick win, nearly done, deadline, etc.) (bonus?)" | B1.5 specified: a **proposal** of what comes next, by criteria such as quick win, nearly done or deadline. **Secondary candidate.** |
 
-## M2. Un nouveau sujet arrive
+## M2. A new subject arrives
 
-**Situation** : un bug remonte de la qualité, une demande arrive dans Jira, ou je trouve moi-même un problème en testant autre chose.
+**Situation**: a bug comes up from QA, a request arrives in Jira, or I find a problem myself while testing something else.
 
-**Réponses de l'utilisateur (2026-10-18)** :
+**The user's answers (2026-10-18)**:
 
-| Question | Réponse |
+| Question | Answer |
 |---|---|
-| Un sujet trouvé par toi : il va dans Jira ensuite, ou il reste local ? | « Il doit rester en local. » |
-| Les tickets Jira : qu'ils apparaissent tout seuls, ou les ajouter toi-même ? | « Je préfère lancer moi-même les chargements de Jira. » |
+| A subject you find yourself: does it go to Jira afterwards, or does it stay local? | "It must stay local." |
+| Jira tickets: do they appear on their own, or do you add them yourself? | "I prefer to start the Jira imports myself." |
 
-- B2.1 J'ai besoin de **noter le sujet très vite**, sans perdre ma concentration sur ce que je fais.
-- B2.2 Un sujet que je trouve moi-même **reste local** : il n'est jamais envoyé vers Jira.
-- B2.3 **C'est moi qui lance le chargement depuis Jira**, quand je le décide. Rien n'arrive tout seul.
-- B2.4 Pour un ticket chargé depuis Jira, j'ai besoin de **ne pas recopier** ce qui y est déjà (titre, description, commentaires) et de garder le lien vers Jira.
-- ~~B2.5 Décider plus tard quand et par qui un nouveau sujet sera traité~~ : **rayé** par l'utilisateur (2026-10-18).
+- B2.1 I need to **note the subject very fast**, without losing my focus on what I am doing.
+- B2.2 A subject I find myself **stays local**: it is never sent to Jira.
+- B2.3 **I start the Jira import myself**, when I decide. Nothing arrives on its own.
+- B2.4 For a ticket imported from Jira, I need to **not copy** what is already there (title, description, comments) and to keep the link to Jira.
+- ~~B2.5 Decide later when and by whom a new subject will be handled~~: **struck out** by the user (2026-10-18).
 
-**Ce que ça nous apprend** : la relation avec Jira est **en lecture, et à ma demande**. Les « nouveaux tickets » et les « mises à jour » du matin (B1.1, B1.2) sont ceux révélés par **le chargement que je lance**.
+**What this teaches us**: the relationship with Jira is **read-only, and on my request**. The "new tickets" and "updates" of the morning (B1.1, B1.2) are those revealed by **the import I run**.
 
-## M3. Je lance le travail sur un ticket
+## M3. I launch the work on a ticket
 
-**Situation** : je décide de traiter un ticket, moi-même ou en le confiant à un agent.
+**Situation**: I decide to handle a ticket, myself or by entrusting it to an agent.
 
-**Réponses de l'utilisateur (2026-10-18)** :
+**The user's answers (2026-10-18)**:
 
-| Question | Réponse |
+| Question | Answer |
 |---|---|
-| Comment confies-tu un ticket à un agent aujourd'hui ? | « J'utilise un skill pour aller chercher les infos Jira, scanner la codebase et commencer l'analyse. » |
-| Qu'est-ce qui est pénible ou répétitif ? | « NA » (rien de particulier) |
-| Comment décides-tu qui fait quoi, et les regroupements ? | « Il n'y a pas de règle. » |
+| How do you entrust a ticket to an agent today? | "I use a skill to fetch the Jira info, scan the codebase and start the analysis." |
+| What is painful or repetitive? | "NA" (nothing in particular) |
+| How do you decide who does what, and the groupings? | "There is no rule." |
 
-- B3.1 J'ai besoin de **savoir qui s'occupe de chaque ticket** (moi ou tel agent).
-- B3.2 Le démarrage d'un ticket est **déjà outillé** : un skill récupère les infos Jira, parcourt le code et lance l'analyse. J'ai besoin que **ce qui en sort (infos du ticket, analyse) rejoigne le suivi du ticket**, sans le refaire.
-- B3.3 Je confie un ou plusieurs tickets à un intervenant **sans règle fixe** : le suivi doit l'accepter, sans rien imposer.
+- B3.1 I need to **know who handles each ticket** (me or a given agent).
+- B3.2 Starting a ticket is **already tooled**: a skill fetches the Jira info, goes through the code and starts the analysis. I need **what it produces (ticket info, analysis) to join the ticket's tracking**, without redoing it.
+- B3.3 I entrust one or several tickets to an assignee **with no fixed rule**: the tracking must accept this, without imposing anything.
 
-**Ce que ça nous apprend** : le lancement n'est pas un point de douleur. Le suivi ne doit **pas remplacer** cet outil de démarrage, mais **récupérer ce qu'il produit**. Les choix d'attribution restent libres.
+**What this teaches us**: starting is not a pain point. The tracking must **not replace** this start-up tool, but **pick up what it produces**. Assignment choices stay free.
 
-## M4. Plusieurs tickets avancent en même temps
+## M4. Several tickets move forward at the same time
 
-**Situation** : des agents travaillent sur plusieurs tickets pendant que je fais autre chose, parfois mon propre ticket.
+**Situation**: agents work on several tickets while I do something else, sometimes my own ticket.
 
-**Réponses de l'utilisateur (2026-10-18)** :
+**The user's answers (2026-10-18)**:
 
-| Question | Réponse |
+| Question | Answer |
 |---|---|
-| Quand veux-tu savoir ce qui se passe ? | « Quand je viens regarder. » |
-| Un ticket qui n'avance plus : ça arrive, comment le vois-tu ? | « Oui, je cherche la conversation, ou recrée une nouvelle. » |
-| Deux tickets qui se gênent : déjà arrivé ? | « Oui, très très souvent. Pour le moment, je ne fais pas trop plusieurs tickets en simultané (même moment la modif du code), donc je n'ai pas le problème, mais on l'aura avec le nouvel outil. » |
+| When do you want to know what is happening? | "When I come to look." |
+| A ticket that no longer moves: does it happen, and how do you see it? | "Yes, I look for the conversation, or I create a new one." |
+| Two tickets getting in each other's way: has it already happened? | "Yes, very very often. For now, I don't do many tickets at the same time (same moment as the code change), so I don't have the problem, but we'll have it with the new tool." |
 
-- B4.1 J'ai besoin de savoir **ce qui se passe sur chaque ticket quand je viens regarder**. Je n'ai pas besoin d'être interrompu.
-- B4.2 J'ai besoin de **repérer un ticket qui n'avance plus**.
-- B4.3 J'ai besoin de **reprendre un ticket arrêté dans une nouvelle conversation, sans perte** : le nouvel intervenant doit repartir de tout ce qui a été fait et dit.
-- B4.4 J'ai besoin que **deux tickets traités en même temps ne se gênent pas**, sur le même code ou sur un environnement partagé.
+- B4.1 I need to know **what is happening on each ticket when I come to look**. I don't need to be interrupted.
+- B4.2 I need to **spot a ticket that no longer moves**.
+- B4.3 I need to **resume a stopped ticket in a new conversation, without loss**: the new assignee must start from everything that was done and said.
+- B4.4 I need **two tickets handled at the same time not to get in each other's way**, on the same code or on a shared environment.
 
-**Ce que ça nous apprend** :
-- L'information est **consultée, pas poussée** : le développeur vient voir quand il le décide.
-- Quand un ticket s'arrête, la reprise passe aujourd'hui par **la recherche de l'ancienne conversation ou par une nouvelle conversation**. Le ticket doit donc porter assez d'information pour être repris par n'importe qui, à n'importe quel moment.
-- **Les conflits sont fréquents** dès que l'on modifie du code en parallèle. Aujourd'hui, le développeur les évite en **ne parallélisant pas** les modifications. Or traiter plusieurs tickets en même temps est justement la promesse du nouvel outil : sans réponse aux conflits, cette promesse ne tient pas.
+**What this teaches us**:
+- The information is **consulted, not pushed**: the developer comes to look when they decide.
+- When a ticket stops, resuming it today goes through **searching for the old conversation, or through a new conversation**. The ticket must therefore carry enough information to be resumed by anyone, at any moment.
+- **Conflicts are frequent** as soon as code is changed in parallel. Today the developer avoids them by **not parallelizing** the changes. Yet handling several tickets at once is exactly the promise of the new tool: without an answer to conflicts, this promise does not hold.
 
-## M5. On a besoin de moi
+## M5. Someone needs me
 
-**Situation** : celui qui traite un ticket a besoin d'une décision ou d'une information de ma part.
+**Situation**: the one handling a ticket needs a decision or information from me.
 
-**Ce que fait l'utilisateur aujourd'hui (2026-10-18)** :
+**What the user does today (2026-10-18)**:
 
-| Question | Réponse |
+| Question | Answer |
 |---|---|
-| Où arrivent ces demandes, comment t'en rends-tu compte ? | « Je check juste les dernières conversations que j'ai, et c'est surtout dans ma mémoire. » |
-| Qu'est-ce qu'il te faut pour décider vite ? | « L'historique, la dernière étape utilisée, et le contexte, les options + recommandations. » |
-| Qu'est-ce qui est pénible après avoir répondu ? | « Le suivi, savoir où ça en est. » |
+| Where do these requests arrive, and how do you notice them? | "I just check the latest conversations I have, and it's mostly in my memory." |
+| What do you need to decide quickly? | "The history, the last step used, and the context, the options + recommendations." |
+| What is painful after answering? | "The follow-up, knowing where it stands." |
 
-- B5.1 J'ai besoin de **voir à un seul endroit tout ce qui attend une réponse de ma part**, sans dépendre de ma mémoire ni rouvrir chaque conversation.
-- B5.2 Pour décider vite, j'ai besoin que la demande vienne avec **l'historique du ticket, la dernière étape, le contexte, les options et une recommandation**.
-- B5.3 Après avoir répondu, j'ai besoin de **suivre la suite** : que ma réponse a été prise en compte, et où en est le ticket depuis.
-- B5.4 J'ai besoin que **ma réponse reparte vers celui qui attend** sans que je fasse le facteur.
-- B5.5 J'ai besoin de **retrouver plus tard ce que j'ai décidé** et pourquoi.
+- B5.1 I need **to see in one place everything that waits for an answer from me**, without relying on my memory or reopening each conversation.
+- B5.2 To decide quickly, I need the request to come with **the ticket's history, the last step, the context, the options and a recommendation**.
+- B5.3 After answering, I need to **follow what happens next**: that my answer was taken into account, and where the ticket stands since then.
+- B5.4 I need **my answer to go back to whoever is waiting**, without me acting as the courier.
+- B5.5 I need to **find later what I decided** and why.
 
-**Ce que ça nous apprend** : aujourd'hui, **rien ne garantit qu'une demande en attente ne soit pas oubliée**. Tout repose sur la mémoire du développeur. Et répondre ne clôt rien : le vrai souci, c'est le **suivi après la réponse**.
+**What this teaches us**: today, **nothing guarantees that a pending request is not forgotten**. Everything relies on the developer's memory. And answering closes nothing: the real issue is **the follow-up after the answer**.
 
-## M6. Je reviens sur un ticket
+## M6. I come back to a ticket
 
-**Situation** : je reprends un ticket après plusieurs jours, ou après avoir travaillé sur d'autres. C'est le cœur de la difficulté exprimée par l'utilisateur.
+**Situation**: I pick up a ticket after several days, or after working on others. This is the heart of the difficulty expressed by the user.
 
-**Les mots de l'utilisateur (2026-10-18)** :
-> « Le contexte principalement. Quelle est la demande initiale, puis quelle est la situation quand j'ai pris en main le ticket (ex. : une demande de dev a été prise en charge par un autre dev, c'est resté en test un temps, puis finalement des corrections sont nécessaires), et quelle est la situation aujourd'hui. »
+**The user's words (2026-10-18)**:
+> "Mainly the context. What is the initial request, then what was the situation when I took the ticket over (e.g. a dev request was taken on by another dev, it stayed in test for a while, then finally fixes are needed), and what is the situation today."
 
-- B6.1 J'ai besoin de **revoir toutes les informations du ticket** au même endroit.
-- B6.2 J'ai besoin de retrouver **la demande initiale**.
-- B6.3 J'ai besoin de connaître **la situation quand j'ai pris le ticket en main** : son histoire avant moi (qui l'a eu, par où il est passé, pourquoi il revient).
-- B6.4 J'ai besoin de connaître **la situation aujourd'hui**.
-- B6.5 *Fusionné avec B5.5* (même besoin : retrouver ce qui a été décidé et pourquoi, sans relire les conversations).
-- B6.6 J'ai besoin de retrouver **ce qui a été dit exactement**, avec un partenaire comme pour une décision, et pas un résumé.
-- B6.7 J'ai besoin de voir **ce qui a changé dans le code** pour ce ticket.
+- B6.1 I need to **review all the ticket's information** in one place.
+- B6.2 I need to find **the initial request**.
+- B6.3 I need to know **the situation when I took the ticket over**: its history before me (who had it, where it went, why it came back).
+- B6.4 I need to know **the situation today**.
+- B6.5 *Merged with B5.5* (same need: find what was decided and why, without rereading the conversations).
+- B6.6 I need to find **what was said exactly**, with a partner as well as for a decision, and not a summary.
+- B6.7 I need to see **what changed in the code** for this ticket.
 
-**Ce que ça nous apprend** : le contexte se lit en **trois temps** : la demande, l'histoire jusqu'à ma prise en main, la situation actuelle. **Un ticket a une vie avant moi** : un autre développeur, un passage en test, un retour en correction. Le suivi ne peut pas commencer au moment où je prends le ticket.
+**What this teaches us**: the context is read in **three steps**: the request, the history up to my taking over, the current situation. **A ticket has a life before me**: another developer, a move to test, a return for fixes. Tracking cannot start at the moment I take the ticket.
 
-**Précisions de l'utilisateur (2026-10-18)** :
+**The user's clarifications (2026-10-18)**:
 
-| Question | Réponse | Besoin qui en découle |
+| Question | Answer | Need that follows |
 |---|---|---|
-| Où se trouve l'histoire avant toi ? | « Jira commentaires, ou alors c'est à moi de le donner. » | B6.3 précisé : l'histoire vient **des commentaires Jira**, ou c'est **moi qui la fournis**. |
-| « La situation aujourd'hui », c'est quoi ? | « C'est dire si le développement a démarré, si oui où il en est, si l'analyse est faite ou en cours, si c'est en attente d'une réponse utilisateur ou back-end par ex. » | B6.4 précisé, voir ci-dessous. |
+| Where is the history before you? | "Jira comments, or else it's up to me to provide it." | B6.3 specified: the history comes from **the Jira comments**, or **I provide it**. |
+| What is "the situation today"? | "It's saying whether development has started, if so where it is, whether the analysis is done or in progress, whether it's waiting for a user or back-end answer, for example." | B6.4 specified, see below. |
 
-**La situation d'un ticket**, selon l'utilisateur, se dit en trois points :
-1. **La phase** : analyse, développement, test, livraison en qualité, validation en qualité (cycle complet donné en M8).
-2. **L'avancement dans cette phase** : pas démarrée, en cours (où on en est), faite.
-3. **L'attente éventuelle** : une réponse d'un utilisateur, du back-end, etc.
+**The situation of a ticket**, according to the user, is stated in three points:
+1. **The phase**: analysis, development, test, QA delivery, QA validation (full cycle given in M8).
+2. **The progress within this phase**: not started, in progress (where it stands), done.
+3. **The possible wait**: an answer from a user, from the back-end, etc.
 
-## M7. J'attends quelqu'un d'autre
+## M7. I am waiting for someone else
 
-**Situation** : le ticket dépend d'une autre équipe ou d'un partenaire (par exemple le back-end) ou d'un environnement.
+**Situation**: the ticket depends on another team, a partner (for example the back-end) or an environment.
 
-**Réponses de l'utilisateur (2026-10-18)** :
+**The user's answers (2026-10-18)**:
 
-| Question | Réponse |
+| Question | Answer |
 |---|---|
-| Qui sont les partenaires ? | « Le back-end est un agent IA joignable via un channel exposé (la solution peut changer si tu me recommandes une autre solution). La qualité, c'est moi qui déploie en qual, teste avec les users (ou non) et valide manuellement, pareil pour les utilisateurs. » |
-| Par quel canal ? | « Jira, c'est via l'API, mais je pense que le soft ne doit pas connaître l'URL du Jira ni le token, mais configurable via un fichier. Mail, messagerie et oral, c'est moi qui te rapporterai cela. » |
-| Texte exact ou résumé ? | « Historique exact. » |
+| Who are the partners? | "The back-end is an AI agent reachable through an exposed channel (the solution can change if you recommend another one). QA, it's me who deploys to QA, tests with users (or not) and validates manually, same for users." |
+| Through which channel? | "Jira, it's through the API, but I think the software must not know the Jira URL or the token, but configurable via a file. Email, messaging and in person, it's me who will report those to you." |
+| Exact text or summary? | "Exact history." |
 
-- B7.1 J'ai besoin de savoir **qu'un ticket attend quelqu'un d'extérieur**, qui, et depuis quand.
-- B7.2 J'ai besoin de **garder l'historique exact des échanges**, rattaché au ticket. Un résumé ne suffit pas.
-- B7.3 J'ai besoin que **les échanges avec le back-end**, qui est un agent d'IA, soient rattachés au ticket concerné.
-- B7.4 J'ai besoin de **rapporter moi-même** un échange reçu par mail, par messagerie ou à l'oral, en le disant simplement à un agent qui le consigne.
+- B7.1 I need to know **that a ticket waits for someone outside**, who, and since when.
+- B7.2 I need to **keep the exact history of the exchanges**, attached to the ticket. A summary is not enough.
+- B7.3 I need **the exchanges with the back-end**, which is an AI agent, to be attached to the ticket concerned.
+- B7.4 I need to **report myself** an exchange received by email, messaging or in person, by simply telling an agent who records it.
 
-**Les acteurs autour d'un ticket** :
+**The actors around a ticket**:
 
-| Acteur | Nature | Comment l'information arrive |
+| Actor | Nature | How the information arrives |
 |---|---|---|
-| Moi | Humain | Je travaille, je rapporte, je décide |
-| Agents qui traitent les tickets | IA | Ils alimentent le suivi |
-| Back-end | Agent d'IA, joint par un canal exposé | Échanges à conserver mot pour mot |
-| Qualité | Moi : je déploie, je teste, je valide | C'est moi qui l'indique |
-| Utilisateurs | Humains, en recette ou non | Jira (automatique) ou moi (mail, oral) |
-| Jira | Outil externe | Par son API, configurée hors du logiciel |
+| Me | Human | I work, I report, I decide |
+| Agents that handle the tickets | AI | They feed the tracking |
+| Back-end | AI agent, reached through an exposed channel | Exchanges to keep word for word |
+| QA | Me: I deploy, I test, I validate | I am the one who notes it |
+| Users | Humans, in acceptance testing or not | Jira (automatic) or me (email, in person) |
+| Jira | External tool | Through its API, configured outside the software |
 
-**Ce que ça nous apprend** :
-- La **qualité n'est pas un tiers** : c'est le développeur lui-même. Les étapes « livraison en qualité » et « validation en qualité » sont donc ses propres actions à consigner.
-- **Le canal vers le back-end n'est pas figé** : l'utilisateur est ouvert à une recommandation (question technique, à traiter dans l'architecture).
-- **La saisie manuelle passe par la conversation** : le développeur rapporte à un agent, qui consigne.
+**What this teaches us**:
+- **QA is not a third party**: it is the developer themselves. The steps "QA delivery" and "QA validation" are therefore their own actions, to be recorded.
+- **The channel to the back-end is not fixed**: the user is open to a recommendation (a technical question, to be handled in the architecture).
+- **Manual entry goes through the conversation**: the developer reports to an agent, who records it.
 
-## M8. Je vérifie qu'un ticket est vraiment fini
+## M8. I check that a ticket is really done
 
-**Situation** : on me dit que le ticket est terminé.
+**Situation**: I am told the ticket is finished.
 
-**Réponses de l'utilisateur (2026-10-18)** :
+**The user's answers (2026-10-18)**:
 
-| Question | Réponse |
+| Question | Answer |
 |---|---|
-| Qu'est-ce qui te fait dire qu'un ticket est terminé ? | « Test OK + test visuel manuel si besoin, + test utilisateur. » |
-| Qui décide qu'il est fini ? | « Moi. » |
-| Quelles phases comptent après le développement ? | « Test, livraison en qualité, validation en qualité. » |
+| What makes you say a ticket is finished? | "Test OK + manual visual test if needed, + user test." |
+| Who decides it is finished? | "Me." |
+| Which phases count after development? | "Test, QA delivery, QA validation." |
 
-- B8.1 J'ai besoin de **voir le résultat des tests** du ticket.
-- B8.2 J'ai besoin de **noter qu'un test visuel manuel a été fait**, quand le ticket en demande un.
-- B8.3 J'ai besoin de **suivre le test utilisateur** : fait ou non, et son retour.
-- B8.4 **C'est moi qui déclare un ticket terminé.** Aucun intervenant ne le fait à ma place.
+- B8.1 I need to **see the test results** of the ticket.
+- B8.2 I need to **note that a manual visual test was done**, when the ticket asks for one.
+- B8.3 I need to **follow the user test**: done or not, and its feedback.
+- B8.4 **I am the one who declares a ticket finished.** No assignee does it in my place.
 
-**Le cycle de vie d'un ticket**, complété par l'utilisateur :
+**The lifecycle of a ticket**, completed by the user:
 
 ```
-Analyse → Développement → Test → Livraison en qualité → Validation en qualité
+Analysis → Development → Test → QA delivery → QA validation
 ```
 
-Le glossaire ajoute en tête la phase **À faire**, pour un ticket pas encore commencé (décision de l'utilisateur, 2026-10-18).
+The glossary adds at the head the phase **To do**, for a ticket not yet started (user's decision, 2026-10-18).
 
-Le suivi s'arrête à la validation en qualité ; la mise en production n'est pas citée. Dans chaque phase, la situation se dit toujours par son **avancement** et une **attente** éventuelle (voir M6).
+Tracking stops at QA validation; production is not mentioned. In each phase, the situation is always stated by its **progress** and a possible **wait** (see M6).
 
-## M9. Je livre
+## M9. I deliver
 
-**Situation** : un ou plusieurs tickets partent en qualité ou en production.
+**Situation**: one or more tickets go to QA or to production.
 
-**Réponses de l'utilisateur (2026-10-18)** :
+**The user's answers (2026-10-18)**:
 
-| Question | Réponse |
+| Question | Answer |
 |---|---|
-| Comment se passe une livraison ? | « Souvent un lot de tickets. Produire un changelog peut parfois être utile. Rendre cela configurable via une option dans le dashboard peut-être utile (bonus, non primaire). » |
-| Qu'est-ce qui est pénible ? | « NA » (rien de particulier) |
+| How does a delivery go? | "Often a batch of tickets. Producing a changelog can sometimes be useful. Making it configurable through an option in the dashboard may be useful (bonus, not primary)." |
+| What is painful? | "NA" (nothing in particular) |
 
-- B9.1 J'ai besoin de savoir **quels tickets partent ensemble** dans une livraison en qualité.
-- B9.2 J'ai besoin de **noter qu'un lot a été livré en qualité**, pour que chaque ticket passe à l'étape suivante.
-- B9.3 J'aimerais pouvoir **produire un changelog** de la livraison, en option. **Secondaire (bonus), selon l'utilisateur.**
+- B9.1 I need to know **which tickets go together** in a QA delivery.
+- B9.2 I need to **note that a batch was delivered to QA**, so that each ticket moves on to the next step.
+- B9.3 I would like to be able to **produce a changelog** of the delivery, as an option. **Secondary (bonus), according to the user.**
 
-## M10. Je prends du recul
+## M10. I step back
 
-**Situation** : en fin de semaine, ou quand on me demande où en est le projet.
+**Situation**: at the end of the week, or when I am asked where the project stands.
 
-**Réponses de l'utilisateur (2026-10-18)** :
+**The user's answers (2026-10-18)**:
 
-| Question | Réponse |
+| Question | Answer |
 |---|---|
-| Te demande-t-on où en est le projet ? | « Non. » |
-| As-tu besoin de connaître le coût de l'IA ? | « Oui, j'ai besoin de savoir en gros un usage par ticket, et niveau dashboard un usage journalier, semaine et mensuel. » |
+| Are you asked where the project stands? | "No." |
+| Do you need to know the cost of AI? | "Yes, I need to know roughly the usage per ticket, and on the dashboard a daily, weekly and monthly usage." |
 
-- ~~B10.1 Dire où en est le projet à quelqu'un~~ : **rayé**, personne ne le demande.
-- B10.2 J'ai besoin de connaître **l'usage de l'IA, approximatif, par ticket**.
-- B10.3 J'ai besoin de connaître **l'usage global par jour, par semaine et par mois**.
+- ~~B10.1 Say where the project stands to someone~~: **struck out**, nobody asks.
+- B10.2 I need to know **AI usage, approximate, per ticket**.
+- B10.3 I need to know **overall usage per day, per week and per month**.
 
-## Contraintes exprimées
+## Stated constraints
 
-- **C1. Le logiciel ne contient ni l'URL ni le jeton de Jira.** Ils sont fournis par un fichier de configuration (2026-10-18).
-- **C2. Jira en lecture seule, à la demande.** Le chargement est lancé par le développeur ; rien n'est écrit dans Jira, et les tickets locaux restent locaux (2026-10-18).
+- **C1. The software contains neither the URL nor the token of Jira.** They are provided by a configuration file (2026-10-18).
+- **C2. Jira is read-only, on request.** The import is started by the developer; nothing is written to Jira, and local tickets stay local (2026-10-18).
 
-## Constats transverses
+## Cross-cutting findings
 
-Ce qui revient d'un moment à l'autre :
+What comes up again and again:
 
-- **T1. Deux sources d'information.** Une partie arrive **automatiquement** : Jira, le travail des agents. L'autre ne peut venir que **de moi** : un retour reçu par mail ou à l'oral, l'histoire d'un ticket qui n'est écrite nulle part. Les deux doivent aboutir au même endroit, et ma saisie doit être rapide.
-- **T2. Les changements viennent aussi de l'extérieur** : un nouveau ticket assigné, un changement de statut, un retour d'utilisateur. Le travail des agents n'est qu'une partie de ce qui bouge.
-- **T3. Un ticket a une vie avant moi et en dehors de moi.** Le suivi doit pouvoir porter cette histoire.
-- **T4. Primaire et secondaire.** L'utilisateur commence à classer. Sont des « bonus » : proposer la suite (B1.5) et le changelog optionnel (B9.3).
-- **T5. Le développeur est à la fois intervenant, qualité et décideur.** Beaucoup d'étapes du ticket sont ses propres actions, à consigner aussi simplement que celles des agents.
+- **T1. Two sources of information.** One part arrives **automatically**: Jira, the agents' work. The other can only come **from me**: feedback received by email or in person, the history of a ticket that is written nowhere. Both must end up in the same place, and my entry must be quick.
+- **T2. The changes also come from outside**: a new ticket assigned, a status change, user feedback. The agents' work is only one part of what moves.
+- **T3. A ticket has a life before me and outside me.** The tracking must be able to carry that history.
+- **T4. Primary and secondary.** The user starts to sort. Count as "bonuses": proposing what comes next (B1.5) and the optional changelog (B9.3).
+- **T5. The developer is at once assignee, QA and decider.** Many of the ticket's steps are their own actions, to be recorded as simply as the agents' ones.
 
-## Ce qui manque
+## What is missing
 
-Rien : l'utilisateur confirme qu'aucun moment de sa journée ne manque (2026-10-18).
+Nothing: the user confirms that no moment of their day is missing (2026-10-18).

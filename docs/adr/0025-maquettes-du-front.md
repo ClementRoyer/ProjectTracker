@@ -1,29 +1,29 @@
-# 0025. Maquettes du front : pages HTML publiées, fil de fer puis version fidèle
+# 0025. Front-end mockups: published HTML pages, wireframe first, then the faithful version
 
-- Statut : Acceptée
-- Date : 2026-10-19
-- Décideur : l'utilisateur (« ajoute une étape 8b pour faire des maquettes du front avec validation » ; choix du format et de la finition)
-- Liens : [plan](../plan/v2-plan.md) étape 8b ; [features.md](../product/features.md) ; [ADR 0005](0005-frontend-svelte.md), [0016](0016-stack-serveur-et-validation.md)
+- Status: Accepted
+- Date: 2026-10-19
+- Decider: the user ("add a step 8b to make front-end mockups with validation"; choice of format and finish)
+- Links: [plan](../plan/v2-plan.md) step 8b; [features.md](../product/features.md); [ADR 0005](0005-frontend-svelte.md), [0016](0016-stack-serveur-et-validation.md)
 
-## Contexte
+## Context
 
-Avant d'écrire les interfaces (étape 9) et la page Svelte (étape 10), l'utilisateur veut voir et valider les écrans.
+Before writing the interfaces (step 9) and the Svelte page (step 10), the user wants to see and validate the screens.
 
-## Options étudiées
+## Options considered
 
-| Question | Options | Choix |
+| Question | Options | Choice |
 |---|---|---|
-| Format | **Pages HTML publiées** en privé sur claude.ai (recommandé) ; prototype Svelte dans `packages/web` ; fichiers HTML locaux | Pages HTML publiées |
-| Finition | Fidèle (recommandé) ; fil de fer | **D'abord un fil de fer, puis une version fidèle** une fois le fil de fer validé |
+| Format | **HTML pages published** privately on claude.ai (recommended); Svelte prototype in `packages/web`; local HTML files | HTML pages published |
+| Finish | Faithful (recommended); wireframe | **First a wireframe, then a faithful version** once the wireframe is validated |
 
-## Décision
+## Decision
 
-- Les maquettes sont des **pages HTML cliquables, avec des données fictives génériques**, publiées en privé sur claude.ai. L'utilisateur les commente directement ; l'IA corrige et republie à la même adresse.
-- **Deux passes** :
-  1. **Fil de fer** : organisation et contenu de chaque écran (blocs gris, libellés réels en français) ;
-  2. **Version fidèle** : mise en page, couleurs, thèmes clair et sombre. Elle sert de référence à l'étape 10.
-- Le code des maquettes est **jetable** : ce n'est pas le code de `packages/web`. Une copie de chaque version validée est gardée dans `docs/mockups/`, avec la liste des choix faits.
+- The mockups are **clickable HTML pages, with generic fictitious data**, published privately on claude.ai. The user comments on them directly; the AI corrects them and republishes at the same address.
+- **Two passes**:
+  1. **Wireframe**: organisation and content of each screen (grey blocks, real labels in French);
+  2. **Faithful version**: layout, colours, light and dark themes. It serves as the reference for step 10.
+- The mockup code is **disposable**: it is not the code of `packages/web`. A copy of each validated version is kept in `docs/mockups/`, with the list of choices made.
 
-## Conséquences
+## Consequences
 
-- Les choix d'écran faits pendant la validation qui touchent au produit (une fonctionnalité ajoutée, retirée ou changée) sont reportés dans `features.md`, et dans une ADR s'ils changent une décision.
+- The screen choices made during validation that affect the product (a feature added, removed or changed) are recorded in `features.md`, and in an ADR if they change a decision.

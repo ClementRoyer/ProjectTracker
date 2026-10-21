@@ -1,31 +1,31 @@
-# Documentation de la refonte V2
+# V2 overhaul documentation
 
-Ce dossier rassemble ce qui sert à **piloter la refonte V2** de project-tracker, qui passe d'un skill à une application structurée. Il permet de retrouver plus tard **ce qui a été décidé, quand, et pourquoi**.
+This folder gathers what is used to **steer the V2 overhaul** of project-tracker, which moves from a skill to a structured application. It makes it possible to find later **what was decided, when, and why**.
 
-La V1 (code et documentation : contrats, journal de décisions `review-2026-10-12.md`, roadmap) est rangée dans `../legacy/` et sert d'historique ([ADR 0018](adr/0018-outillage-et-code-v1.md)).
+The V1 (code and documentation: contracts, the decision journal `review-2026-10-12.md`, the roadmap) is kept in `../legacy/` and serves as history ([ADR 0018](adr/0018-outillage-et-code-v1.md)).
 
-Les règles pour les agents qui codent sont dans [`../AGENTS.md`](../AGENTS.md) et [`code-style.md`](code-style.md) ([ADR 0019](adr/0019-regles-de-code.md)).
+The rules for agents that write code are in [`../AGENTS.md`](../AGENTS.md) and [`code-style.md`](code-style.md) ([ADR 0019](adr/0019-regles-de-code.md)).
 
-## Organisation
+## Organization
 
-| Dossier | Contenu | Règle de vie |
+| Folder | Content | Lifecycle rule |
 |---|---|---|
-| [`product/`](product/) | Ce que le produit doit faire : compréhension, besoins, fonctionnalités (primaires / secondaires), glossaire. | Document vivant, tenu à jour. Fait foi sur le « quoi ». |
-| [`adr/`](adr/) | Décisions d'architecture et de produit, une par fichier, numérotées (ADR). | Une ADR acceptée n'est jamais réécrite : on en crée une nouvelle qui la **remplace**. |
-| [`analysis/`](analysis/) | Audits et analyses datés (photographies de l'existant à un instant donné). | Jamais modifiés après coup. Une nouvelle analyse crée un nouveau dossier daté. |
-| [`plan/`](plan/) | Plan de la refonte : phases, critères de fin, état d'avancement. | Document vivant, mis à jour à chaque phase. |
-| [`architecture.md`](architecture.md) | L'architecture cible, une section par ADR. | Document vivant. |
-| [`code-style.md`](code-style.md) | Le guide de style du code, avec un exemple par règle. | Document vivant ; un changement de seuil passe par une ADR. |
+| [`product/`](product/) | What the product must do: understanding, needs, features (primary / secondary), glossary. | Living document, kept up to date. It is the reference for the "what". |
+| [`adr/`](adr/) | Architecture and product decisions, one per file, numbered (ADR). | An accepted ADR is never rewritten: a new one is created that **replaces** it. |
+| [`analysis/`](analysis/) | Dated audits and analyses (snapshots of the existing state at a given moment). | Never modified afterwards. A new analysis creates a new dated folder. |
+| [`plan/`](plan/) | Plan of the overhaul: phases, exit criteria, progress. | Living document, updated at each phase. |
+| [`architecture.md`](architecture.md) | The target architecture, one section per ADR. | Living document. |
+| [`code-style.md`](code-style.md) | The code style guide, with one example per rule. | Living document; a change of threshold goes through an ADR. |
 
-## Comment retrouver le « pourquoi »
+## How to find the "why"
 
-1. **Une décision** : chercher dans [`adr/README.md`](adr/README.md) (index avec statut). Chaque ADR renvoie vers l'analyse qui l'a motivée.
-2. **Un constat sur l'existant** : [`analysis/2026-10-16-audit-v1/`](analysis/2026-10-16-audit-v1/), qui contient l'audit V1 en quatre volets plus une synthèse.
-3. **Un besoin ou une fonctionnalité** : [`product/`](product/).
-4. **Où en est la refonte** : [`plan/v2-plan.md`](plan/v2-plan.md).
+1. **A decision**: search [`adr/README.md`](adr/README.md) (index with status). Each ADR points to the analysis that motivated it.
+2. **A finding about the current state**: [`analysis/2026-10-16-audit-v1/`](analysis/2026-10-16-audit-v1/), which contains the V1 audit in four parts plus a summary.
+3. **A need or a feature**: [`product/`](product/).
+4. **Where the overhaul stands**: [`plan/v2-plan.md`](plan/v2-plan.md).
 
 ## Conventions
 
-- Langue : français pour les documents, anglais pour le code ([ADR 0006](adr/0006-langues.md)).
-- Dates au format `AAAA-MM-JJ`.
-- Toute décision prise avec l'utilisateur devient une ADR, rédigée si possible avec ses mots.
+- Language: code, commit messages and documents in English; the interface in French ([ADR 0006](adr/0006-langues.md), [ADR 0048](adr/0048-documentation-en-anglais.md)).
+- Dates in the format `YYYY-MM-DD`.
+- Every decision made with the user becomes an ADR, written, if possible, with the user's own words.

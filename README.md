@@ -58,7 +58,7 @@ project-tracker puts **the ticket at the centre**. Agents report their progress,
 </table>
 
 > [!NOTE]
-> The interface and the design documents are in French for now. Translations are a welcome contribution.
+> The interface is in French for now; the code and the documentation are in English. Translating the interface is a welcome contribution.
 
 ## How it works
 

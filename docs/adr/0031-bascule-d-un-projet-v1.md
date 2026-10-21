@@ -1,35 +1,35 @@
-# 0031. Bascule d'un projet V1 : la V1 mise de côté
+# 0031. Switching a V1 project: V1 set aside
 
-- Statut : Acceptée
-- Date : 2026-10-20
-- Décideur : l'utilisateur
-- Liens : [ADR 0024](0024-migration-des-donnees-v1.md), [0030](0030-installation-dans-un-projet.md) ; [plan de l'étape 11](../plan/etape-11.md)
+- Status: Accepted
+- Date: 2026-10-20
+- Decider: the user
+- Links: [ADR 0024](0024-migration-des-donnees-v1.md), [0030](0030-installation-dans-un-projet.md); [plan of step 11](../plan/etape-11.md)
 
-## Contexte
+## Context
 
-La V1 occupe déjà `tools/tracker/` dans les projets, avec son propre `app/` et son propre `tracker.config.json`. Installer la V2 au même endroit écraserait des fichiers V1, ce que l'ADR 0024 interdit (« la V1 n'est jamais modifiée »). Cette collision n'avait pas été vue par l'ADR 0030.
+V1 already occupies `tools/tracker/` in the projects, with its own `app/` and its own `tracker.config.json`. Installing V2 in the same place would overwrite V1 files, which ADR 0024 forbids ("V1 is never modified"). This collision had not been seen by ADR 0030.
 
-## Options étudiées
+## Options considered
 
-| Option | Pour | Contre |
+| Option | For | Against |
 |---|---|---|
-| **V1 mise de côté** (recommandé) : `tools/tracker/` renommé `tools/tracker-v1/`, hooks V1 retirés, V2 installée dans `tools/tracker/` et migrée depuis `tools/tracker-v1/` | Un seul outil actif ; la V2 garde l'emplacement de l'ADR 0013 ; retour arrière simple | La V1 cesse de tourner dans ce projet |
-| V2 à côté, dans un autre dossier | Les deux tournent en même temps | Deux jeux de hooks dans Claude Code ; un emplacement provisoire qui dure |
-| Dossier au choix, refus si une V1 est là | Rien n'est déplacé automatiquement | La bascule reste à faire à la main |
+| **V1 set aside** (recommended): `tools/tracker/` renamed `tools/tracker-v1/`, V1 hooks removed, V2 installed in `tools/tracker/` and migrated from `tools/tracker-v1/` | A single active tool; V2 keeps the location of ADR 0013; simple rollback | V1 stops running in this project |
+| V2 next to it, in another folder | Both run at the same time | Two sets of hooks in Claude Code; a temporary location that lasts |
+| Folder of choice, refusal if a V1 is there | Nothing is moved automatically | The switch is still to be done by hand |
 
-## Décision
+## Decision
 
-**La V1 est mise de côté.** Sur un projet où `tools/tracker/` contient une V1, la commande d'installation :
+**V1 is set aside.** On a project where `tools/tracker/` contains a V1, the installation command:
 
-1. retire les hooks, les commandes et le bloc `CLAUDE.md` de la V1 avec **la commande de désinstallation de la V1 elle-même** (`legacy/scripts/install.mjs --uninstall`), qui garde ses données ;
-2. renomme `tools/tracker/` en `tools/tracker-v1/`, **sans rien changer dedans** ;
-3. installe la V2 dans `tools/tracker/` (ADR 0030) ;
-4. migre les données depuis `tools/tracker-v1/` (ADR 0024).
+1. removes the hooks, the commands and the `CLAUDE.md` block of V1 with **V1's own uninstall command** (`legacy/scripts/install.mjs --uninstall`), which keeps its data;
+2. renames `tools/tracker/` to `tools/tracker-v1/`, **without changing anything inside it**;
+3. installs V2 in `tools/tracker/` (ADR 0030);
+4. migrates the data from `tools/tracker-v1/` (ADR 0024).
 
-Si une étape échoue, ce qui a été fait est défait : le dossier V1 reprend sa place et ses hooks sont remis par la commande d'installation de la V1. Une commande de **retour arrière** fait la même chose plus tard, sur demande. `tools/tracker-v1/` se supprime à la main, quand l'utilisateur le décide.
+If a step fails, what was done is undone: the V1 folder takes back its place and its hooks are put back by V1's installation command. A **rollback** command does the same thing later, on request. `tools/tracker-v1/` is deleted by hand, when the user decides.
 
-## Conséquences
+## Consequences
 
-- La bascule se lance depuis ce dépôt, qui contient la V1 (`legacy/`) et la V2 (`dist/`).
-- Le code de la V1 n'est pas modifié : il est seulement exécuté pour sa désinstallation et sa réinstallation.
-- Un tracker V1 qui suit plusieurs projets demande l'id du projet à migrer.
+- The switch is launched from this repository, which contains V1 (`legacy/`) and V2 (`dist/`).
+- The V1 code is not modified: it is only run for its uninstallation and its reinstallation.
+- A V1 tracker that follows several projects requires the id of the project to migrate.

@@ -1,26 +1,26 @@
-# 0033. La priorité ordonne toutes les demandes back-end
+# 0033. Priority orders all back-end requests
 
-- Statut : Acceptée
-- Date : 2026-10-20
-- Décideur : l'utilisateur (« ok pour toutes les demandes »)
-- Liens : complète [ADR 0021](0021-suites-du-poc-reseau-et-lanceur.md) et [ADR 0032](0032-niveaux-de-priorite.md)
+- Status: Accepted
+- Date: 2026-10-20
+- Decider: the user ("ok for all the requests")
+- Links: completes [ADR 0021](0021-suites-du-poc-reseau-et-lanceur.md) and [ADR 0032](0032-niveaux-de-priorite.md)
 
-## Contexte
+## Context
 
-L'ADR 0021 ne faisait jouer la priorité que lorsque plusieurs demandes back-end attendent le même fichier tenu. En l'écrivant (ADR 0032), l'IA a appliqué le même ordre à toutes les demandes en attente, et l'a soumis à l'utilisateur.
+ADR 0021 only applied priority when several back-end requests were waiting for the same held file. While writing it (ADR 0032), the AI applied the same order to all pending requests, and submitted it to the user.
 
-## Options étudiées
+## Options considered
 
-| Option | Effet |
+| Option | Effect |
 |---|---|
-| **Toutes les demandes** (proposé) | Le lanceur prend toujours la demande du ticket le plus prioritaire, puis la plus ancienne |
-| Seulement à fichier tenu libéré | Ordre d'arrivée, sauf entre demandes qui attendaient le même fichier |
+| **All requests** (proposed) | The launcher always takes the request of the most urgent ticket, then the oldest |
+| Only when the held file is freed | Arrival order, except between requests that were waiting for the same file |
 
-## Décision
+## Decision
 
-**Toutes les demandes en attente** sont prises par priorité du ticket, puis par ancienneté. Une nouvelle demande d'un ticket urgent passe devant des demandes plus anciennes de tickets normaux.
+**All pending requests** are taken by ticket priority, then by age. A new request from an urgent ticket goes ahead of older requests from normal tickets.
 
-## Conséquences
+## Consequences
 
-- Une seule règle d'ordre pour le lanceur, déjà en place.
-- Un ticket de priorité basse peut attendre longtemps si d'autres demandes arrivent sans cesse ; le développeur le voit dans l'attente affichée et peut relever sa priorité.
+- One single ordering rule for the launcher, already in place.
+- A low-priority ticket can wait a long time if other requests keep arriving; the developer sees it in the displayed wait and can raise its priority.

@@ -1,39 +1,39 @@
-# 0046. Installation et lancement par scripts, depuis les releases
+# 0046. Installation and launch by scripts, from releases
 
-- Statut : Acceptée
-- Date : 2026-10-21
-- Décideur : l'utilisateur (message et réponses du 2026-10-21)
-- Liens : complète l'[ADR 0030](0030-installation-dans-un-projet.md) (installation dans un projet) et l'[ADR 0010](0010-back-end-intervenant-du-ticket.md) (lanceur back-end) ; [ADR 0045](0045-projet-open-source-readme-en-anglais.md) (projet open-source) ; [plan de l'étape 18](../plan/etape-18.md)
+- Status: Accepted
+- Date: 2026-10-21
+- Decider: the user (message and answers of 2026-10-21)
+- Links: complements [ADR 0030](0030-installation-dans-un-projet.md) (installation in a project) and [ADR 0010](0010-back-end-intervenant-du-ticket.md) (back-end launcher); [ADR 0045](0045-projet-open-source-readme-en-anglais.md) (open-source project); [step 18 plan](../plan/etape-18.md)
 
-## Contexte
+## Context
 
-L'utilisateur (2026-10-21) :
+The user (2026-10-21):
 
-> « J'ai l'impression que le déploiement n'est pas simple, surtout pour l'agent back-end. Crée un start.sh pour le front et pour le back-end, ainsi qu'un install.sh. Le but c'est qu'ils soient simples à utiliser, qu'ils posent les questions si nécessaire pour le setup ou le lancement. »
+> "I feel like deployment is not simple, especially for the back-end agent. Create a start.sh for the front and for the back-end, as well as an install.sh. The goal is that they be simple to use, and that they ask questions if needed for the setup or the launch."
 
-Jusqu'ici, il fallait cloner ce dépôt, construire `dist/`, lancer `install.js`, écrire la configuration à la main, et, pour le back-end, copier `launcher.js` et `hold.js`, écrire `launcher.config.json` et exporter le jeton.
+Until now, one had to clone this repository, build `dist/`, run `install.js`, write the configuration by hand, and, for the back-end, copy `launcher.js` and `hold.js`, write `launcher.config.json` and export the token.
 
-## Options étudiées
+## Options considered
 
-| Question | Options | Choix |
+| Question | Options | Choice |
 |---|---|---|
-| 1. Forme | un `install.sh` et deux `start.sh` (recommandé) ; trois scripts dans le dépôt | « Deux install.sh et deux start.sh, front & back à chaque fois. » |
-| 2. Arrivée sur le serveur back-end | cloner le dépôt là-bas (recommandé) ; archive à copier ; les deux | « Je vais déployer ce repository, créer des releases, et le script d'install doit être appelé un peu comme les scripts d'install des CLI IA : `curl … install-{back/front}.sh`, et ce script va chercher l'archive en release et soit met à jour, soit installe la nouvelle version. » |
-| 3. Secrets au lancement | **demandés une fois, fichier local** (recommandé) ; à chaque lancement ; environnement seulement | Demandés une fois, fichier local |
-| 4. Fabrication des releases | **GitHub Actions sur un tag** (recommandé) ; commande locale | GitHub Actions sur un tag |
-| 5. Dépôt | — | `https://github.com/ClementRoyer/ProjectTracker` |
+| 1. Shape | one `install.sh` and two `start.sh` (recommended); three scripts in the repository | "Two install.sh and two start.sh, front & back every time." |
+| 2. Arrival on the back-end server | clone the repository there (recommended); archive to copy; both | "I am going to deploy this repository, create releases, and the install script must be called a bit like the install scripts of the AI CLIs: `curl … install-{back/front}.sh`, and this script fetches the archive from the release and either updates or installs the new version." |
+| 3. Secrets at launch | **asked once, local file** (recommended); at each launch; environment only | Asked once, local file |
+| 4. Building the releases | **GitHub Actions on a tag** (recommended); local command | GitHub Actions on a tag |
+| 5. Repository | — | `https://github.com/ClementRoyer/ProjectTracker` |
 
-## Décision
+## Decision
 
-1. **Quatre scripts** : `install-front.sh`, `install-back.sh`, `start-front.sh`, `start-back.sh`. Les questions et messages sont en français, comme l'interface (ADR 0006).
-2. **Installation par `curl`** : `curl -fsSL https://github.com/ClementRoyer/ProjectTracker/releases/latest/download/install-front.sh | bash` (de même pour `install-back.sh`). Le script télécharge l'archive de la release (`project-tracker.tar.gz`), vérifie son empreinte (`SHA256SUMS`) et refuse une archive qui ne correspond pas. `PROJECT_TRACKER_VERSION` choisit une version ; `PROJECT_TRACKER_REPO` un autre dépôt.
-3. **Installer ou mettre à jour** : relancer le même script met à jour ce qui est installé. Côté front, c'est `install.js` (ADR 0030) qui fait le travail, base sauvegardée d'abord. Côté back-end, seuls le lanceur et ses scripts sont remplacés ; la configuration et les secrets restent.
-4. **Questions** : seulement à l'installation neuve et seulement ce qui manque. Front : dossier du projet, port, Jira (adresse et projet), back-end sur une autre machine (adresse privée). Back-end : dossier d'installation, adresse de l'outil, miroir, commande de l'agent, nombre d'agents en parallèle, proxy. Sans terminal, ou avec `PROJECT_TRACKER_YES=1`, les valeurs par défaut et les variables d'environnement répondent.
-5. **Lancement** : `tools/tracker/app/start-front.sh` dans le projet, `start-back.sh` dans le dossier du lanceur. Au premier lancement, ils demandent les secrets qui manquent (saisie masquée) et les rangent dans `secrets.env`, droits 600, ignoré par git. Une variable déjà présente dans l'environnement passe avant. Le jeton du lanceur est généré côté front et affiché une fois, pour l'installation du back-end.
-6. **Releases** : un tag `v<version>` (égal à la version du `package.json`) lance un workflow GitHub Actions : `npm run verify`, parcours Playwright, construction, puis release avec l'archive, son empreinte et les deux scripts d'installation.
+1. **Four scripts**: `install-front.sh`, `install-back.sh`, `start-front.sh`, `start-back.sh`. Questions and messages are in French, like the interface (ADR 0006).
+2. **Installation by `curl`**: `curl -fsSL https://github.com/ClementRoyer/ProjectTracker/releases/latest/download/install-front.sh | bash` (same for `install-back.sh`). The script downloads the release archive (`project-tracker.tar.gz`), checks its checksum (`SHA256SUMS`) and refuses an archive that does not match. `PROJECT_TRACKER_VERSION` chooses a version; `PROJECT_TRACKER_REPO` another repository.
+3. **Install or update**: running the same script again updates what is installed. On the front side, it is `install.js` (ADR 0030) that does the work, with the database backed up first. On the back-end side, only the launcher and its scripts are replaced; the configuration and the secrets stay.
+4. **Questions**: only on a fresh installation and only for what is missing. Front: project folder, port, Jira (address and project), back-end on another machine (private address). Back-end: installation folder, tool address, mirror, agent command, number of agents in parallel, proxy. Without a terminal, or with `PROJECT_TRACKER_YES=1`, the default values and the environment variables answer.
+5. **Launch**: `tools/tracker/app/start-front.sh` in the project, `start-back.sh` in the launcher's folder. On first launch, they ask for the missing secrets (masked input) and store them in `secrets.env`, permissions 600, ignored by git. A variable already present in the environment takes precedence. The launcher's token is generated on the front side and shown once, for the back-end installation.
+6. **Releases**: a tag `v<version>` (equal to the version in `package.json`) starts a GitHub Actions workflow: `npm run verify`, Playwright journeys, build, then release with the archive, its checksum and the two installation scripts.
 
-## Conséquences
+## Consequences
 
-- L'archive contient `dist/` et les deux scripts de lancement ; `install.js` copie `start-front.sh` dans `tools/tracker/app/`.
-- La bascule depuis la V1 (`--from-v1`) a besoin de l'installeur V1 du dépôt : elle reste une commande lancée depuis un clone, pas depuis l'archive.
-- Le serveur back-end a seulement besoin de Node 22.13 et de `curl` : ni git, ni npm, ni build.
+- The archive contains `dist/` and the two launch scripts; `install.js` copies `start-front.sh` into `tools/tracker/app/`.
+- Switching from V1 (`--from-v1`) needs the repository's V1 installer: it remains a command run from a clone, not from the archive.
+- The back-end server only needs Node 22.13 and `curl`: no git, no npm, no build.

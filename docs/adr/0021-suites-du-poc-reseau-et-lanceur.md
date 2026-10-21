@@ -1,55 +1,55 @@
-# 0021. Suites du POC, partie B : réseau sans TUN, relance des demandes bloquées, garde-fou en parallèle
+# 0021. Follow-ups of the POC, part B: network without TUN, retry of blocked requests, guard rail in parallel
 
-- Statut : Acceptée
-- Date : 2026-10-19
-- Décideur : l'utilisateur (« Mode sans TUN. Oui relancer automatiquement si lock quand lock fini. Avoir une priorité » ; puis choix « File d'attente d'un fichier » et « Signaler sur tous »)
-- Liens : [compte rendu du POC B](../analysis/2026-10-19-poc-connexion-b/README.md) ; complète l'[ADR 0010](0010-back-end-intervenant-du-ticket.md)
+- Status: Accepted
+- Date: 2026-10-19
+- Decider: the user ("Mode without TUN. Yes, retry automatically if locked when the lock is finished. Have a priority"; then the choices "Waiting queue for a file" and "Report on all")
+- Links: [report of POC B](../analysis/2026-10-19-poc-connexion-b/README.md); completes [ADR 0010](0010-back-end-intervenant-du-ticket.md)
 
-## Contexte
+## Context
 
-Le POC B a confirmé le lanceur et les verrous (R6), mais trois points de l'ADR 0010 se sont révélés incomplets :
+POC B confirmed the launcher and the locks (R6), but three points of ADR 0010 turned out to be incomplete:
 
-1. **Réseau.** Le poste du développeur est un conteneur sans `/dev/net/tun`, et TUN ne peut pas y être activé. Tailscale tourne alors en mode userspace :
-   - il n'y a pas d'interface réseau privée, donc l'outil ne peut pas écouter « sur l'interface du réseau privé » comme le prévoit l'ADR 0010 ;
-   - les connexions venues du réseau privé sont livrées sur la boucle locale ;
-   - un programme local ne joint le réseau privé que par le proxy de `tailscaled`.
-2. **Fichier tenu.** Un agent back-end qui trouve son fichier tenu par un autre ticket s'arrête en `blocked`, et rien ne relance la demande.
-3. **Garde-fou.** Quand plusieurs exécutions tournent en même temps dans le miroir, une modification non déclarée ne peut pas être attribuée à l'une d'elles.
+1. **Network.** The developer's machine is a container without `/dev/net/tun`, and TUN cannot be enabled there. Tailscale then runs in userspace mode:
+   - there is no private network interface, so the tool cannot listen "on the private network interface" as ADR 0010 foresees;
+   - connections coming from the private network are delivered on the loopback;
+   - a local program reaches the private network only through the proxy of `tailscaled`.
+2. **Held file.** A back-end agent that finds its file held by another ticket stops in `blocked`, and nothing retries the request.
+3. **Guard rail.** When several executions run at the same time in the mirror, an undeclared change cannot be attributed to one of them.
 
-## Options étudiées
+## Options considered
 
-| Point | Options | Choix |
+| Point | Options | Choice |
 |---|---|---|
-| 1. Réseau sans TUN | Activer TUN (impossible ici) ; mode userspace avec une règle d'accès Headscale | Mode userspace |
-| 2. Fichier tenu | Relance manuelle ; relance automatique à la libération | Relance automatique |
-| 2b. Plusieurs demandes attendent le même fichier | Ordre d'arrivée ; priorité | Priorité, puis ordre d'arrivée |
-| 3. Garde-fou en parallèle | Signaler sur tous les tickets en cours ; une exécution à la fois ; imputer par priorité | Signaler sur tous |
+| 1. Network without TUN | Enable TUN (impossible here); userspace mode with a Headscale access rule | Userspace mode |
+| 2. Held file | Manual retry; automatic retry when released | Automatic retry |
+| 2b. Several requests wait for the same file | Order of arrival; priority | Priority, then order of arrival |
+| 3. Guard rail in parallel | Report on all running tickets; one execution at a time; attribute by priority | Report on all |
 
-## Décision
+## Decision
 
-### 1. Mode sans TUN accepté
+### 1. Mode without TUN accepted
 
-- Quand TUN n'est pas disponible, Tailscale tourne en **mode userspace** sur la machine concernée.
-- L'outil écoute **sur la boucle locale seulement** ; Tailscale y livre les connexions du réseau privé.
-- **Condition : une règle d'accès Headscale (ACL).** Seul le serveur back-end (et un appareil du développeur, s'il le veut) peut joindre le poste du développeur, **et seulement sur le port de l'outil**. Sans elle, tous les services locaux du poste seraient exposés au réseau privé.
-- Le lanceur sait passer par un **proxy HTTP** (celui de `tailscaled`), réglé dans sa configuration.
-- L'outil n'est toujours **jamais exposé sur Internet**, et les connexions partent toujours du serveur back-end.
+- When TUN is not available, Tailscale runs in **userspace mode** on the machine concerned.
+- The tool listens **on the loopback only**; Tailscale delivers the private network connections there.
+- **Condition: a Headscale access rule (ACL).** Only the back-end server (and a developer's device, if they want) can reach the developer's machine, **and only on the tool's port**. Without it, all the local services of the machine would be exposed to the private network.
+- The launcher can go through an **HTTP proxy** (that of `tailscaled`), set in its configuration.
+- The tool is still **never exposed on the Internet**, and the connections always start from the back-end server.
 
-### 2. Relance automatique des demandes bloquées par un fichier tenu
+### 2. Automatic retry of requests blocked by a held file
 
-- Quand l'agent signale qu'un fichier est tenu, la demande passe en **« attente : fichier tenu par <ticket> »**. Elle n'est pas en échec.
-- **À la libération du fichier, le lanceur relance la demande** sans intervention : il reprend la conversation de l'agent si l'outil d'agent sait le faire, sinon il démarre un agent neuf.
-- **Plusieurs demandes attendent le même fichier** : la demande dont le **ticket a la plus haute priorité** passe en premier ; à priorité égale, la plus ancienne.
-- La **priorité du ticket** est une notion nouvelle, réglée par le développeur.
+- When the agent reports that a file is held, the request goes to **"waiting: file held by <ticket>"**. It is not in failure.
+- **When the file is released, the launcher retries the request** without intervention: it resumes the agent's conversation if the agent tool knows how to do it, otherwise it starts a new agent.
+- **Several requests wait for the same file**: the request whose **ticket has the highest priority** goes first; at equal priority, the oldest.
+- The **ticket priority** is a new notion, set by the developer.
 
-### 3. Garde-fou avec plusieurs exécutions en parallèle
+### 3. Guard rail with several executions in parallel
 
-- Une modification non déclarée constatée pendant que plusieurs exécutions tournent est **signalée sur chacun des tickets en cours**, avec la mention **« auteur incertain »**. Le développeur tranche.
-- Avec une seule exécution en cours, le signalement reste celui de l'ADR 0010.
+- An undeclared change noticed while several executions are running is **reported on each of the running tickets**, with the mention **"uncertain author"**. The developer decides.
+- With a single running execution, the report stays the one of ADR 0010.
 
-## Conséquences
+## Consequences
 
-- Le glossaire gagne la **priorité** (`priority`) du ticket, et le modèle de données (ADR 0015) un champ `priority` sur `ticket`.
-- Détails laissés à l'étape du lanceur, à soumettre au développeur à ce moment : les niveaux de priorité, et la valeur par défaut.
-- L'installation décrira la règle d'accès Headscale à poser, et la configuration du proxy quand TUN manque.
-- Restent à vérifier sur le vrai serveur back-end : le passage à travers le réseau d'entreprise (R5), le lanceur entre deux machines (R6) et le coût d'un worktree (R7).
+- The glossary gains the ticket's **priority** (`priority`), and the data model (ADR 0015) a `priority` field on `ticket`.
+- Details left to the launcher step, to be submitted to the developer at that time: the priority levels, and the default value.
+- The installation will describe the Headscale access rule to set, and the proxy configuration when TUN is missing.
+- Still to check on the real back-end server: passing through the company network (R5), the launcher between two machines (R6) and the cost of a worktree (R7).

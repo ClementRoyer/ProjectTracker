@@ -1,30 +1,30 @@
-# 0037. Changelog de livraison
+# 0037. Delivery changelog
 
-- Statut : Acceptée
-- Date : 2026-10-20
-- Décideur : l'utilisateur (sous-étape 13d)
-- Liens : [features.md](../product/features.md) F22, F19 ; [plan de l'étape 13](../plan/etape-13.md)
+- Status: Accepted
+- Date: 2026-10-20
+- Decider: the user (sub-step 13d)
+- Links: [features.md](../product/features.md) F22, F19; [step 13 plan](../plan/etape-13.md)
 
-## Contexte
+## Context
 
-F22 : un changelog de livraison, activable. Chaque ticket livré en qualité y apporte une ligne.
+F22: a delivery changelog, which can be turned on. Each ticket delivered to QA adds one line to it.
 
-## Options étudiées
+## Options considered
 
-| Question | Options | Choix |
+| Question | Options | Choice |
 |---|---|---|
-| 1. Rédaction de la ligne | **L'agent propose, le développeur valide** (recommandé) ; le développeur seul ; l'agent seul | L'agent propose, le développeur valide |
-| 2. Sortie à la livraison | Texte à copier dans le bilan (recommandé) ; **fichier dans le dépôt** | Fichier dans le dépôt (choix de l'utilisateur contre la recommandation) |
-| 3. Activation | **Option de la configuration** (recommandé) ; toujours actif | Option |
+| 1. Writing the line | **The agent proposes, the developer validates** (recommended); the developer alone; the agent alone | The agent proposes, the developer validates |
+| 2. Output at delivery | Text to copy into the summary (recommended); **file in the repository** | File in the repository (user's choice against the recommendation) |
+| 3. Activation | **Option in the configuration** (recommended); always on | Option |
 
-## Décision
+## Decision
 
-- **Activation** : `"changelog": true` dans `tracker.config.json` ; `changelogFile` donne le fichier, `CHANGELOG.md` à la racine du projet par défaut. Sans l'option, rien n'apparaît.
-- **Une ligne par ticket.** Un agent la propose (opération `proposeChangelog`) ; le développeur la relit, la corrige et l'accepte dans le dossier du ticket. Seule une ligne acceptée part dans le changelog. Proposition et acceptation sont notées au journal.
-- **À la livraison en qualité** (F19), le serveur ajoute au fichier une section pour la livraison : son nom et sa date, puis une ligne `- <clé> : <ligne>` par ticket qui a une ligne acceptée. La section la plus récente vient en tête, sous le titre du fichier ; un fichier absent est créé avec le titre « Changelog ». Les tickets sans ligne acceptée sont nommés dans le compte rendu de la livraison.
-- Format proposé par l'IA.
+- **Activation**: `"changelog": true` in `tracker.config.json`; `changelogFile` gives the file, `CHANGELOG.md` at the project root by default. Without the option, nothing appears.
+- **One line per ticket.** An agent proposes it (operation `proposeChangelog`); the developer rereads it, corrects it and accepts it in the ticket record. Only an accepted line goes into the changelog. Proposal and acceptance are noted in the journal.
+- **At QA delivery** (F19), the server adds to the file a section for the delivery: its name and its date, then a line `- <key> : <line>` per ticket that has an accepted line. The most recent section comes first, under the file's title; a missing file is created with the title "Changelog". Tickets without an accepted line are named in the delivery report.
+- Format proposed by the AI.
 
-## Conséquences
+## Consequences
 
-- C'est le seul endroit où l'outil écrit dans le dépôt du projet ; il n'écrit que ce fichier, et seulement à une livraison.
-- La migration 5 de la base ajoute la table des lignes de changelog.
+- It is the only place where the tool writes in the project repository; it only writes this file, and only at a delivery.
+- Migration 5 of the database adds the table of changelog lines.

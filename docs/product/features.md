@@ -1,94 +1,94 @@
-# Fonctionnalités
+# Features
 
-- Statut : **validé par l'utilisateur (2026-10-18)**
-- Date : 2026-10-18
-- Source : [needs.md](needs.md), validé le 2026-10-18
+- Status: **validated by the user (2026-10-18)**
+- Date: 2026-10-18
+- Source: [needs.md](needs.md), validated on 2026-10-18
 
-## Règles de ce document
+## Rules of this document
 
-- **Chaque fonctionnalité cite les besoins qu'elle sert.** Une fonctionnalité sans besoin n'a pas sa place ici.
-- **La priorité est héritée des besoins** : primaire (P) si elle sert au moins un besoin primaire, secondaire (S) sinon.
-- On décrit **ce que fait** l'outil, pas **comment** il est construit. Les choix techniques relèvent de l'architecture et des ADR.
+- **Each feature cites the needs it serves.** A feature with no need has no place here.
+- **The priority is inherited from the needs**: primary (P) if it serves at least one primary need, secondary (S) otherwise.
+- We describe **what** the tool does, not **how** it is built. Technical choices belong to the architecture and the ADRs.
 
-## Le ticket et son dossier
+## The ticket and its record
 
-| ID | Fonctionnalité | Besoins | Prio |
+| ID | Feature | Needs | Prio |
 |---|---|---|---|
-| F1 | **Ticket** : identité, titre, origine (Jira ou local), lien vers Jira, demande initiale | B2.2, B2.4, B6.2 | P |
-| F2 | **Chargement Jira à la demande** : je le lance ; il récupère les tickets qui me sont assignés sur le projet (titre, description, statut, commentaires), et signale les nouveaux et ceux qui ont changé. L'adresse et le jeton viennent d'un fichier de configuration. Rien n'est jamais écrit dans Jira. | B1.1, B1.2, B2.3, B2.4, B6.3, C1, C2 | P |
-| F3 | **Création rapide d'un ticket local**, en une phrase, sans quitter ce que je fais. Il reste local. | B2.1, B2.2 | P |
-| F4 | **Situation du ticket** : la phase (à faire → analyse → développement → test → livraison en qualité → validation en qualité), son avancement (pas démarrée, en cours avec où on en est, faite), l'attente éventuelle (qui, depuis quand) et l'intervenant (moi ou tel agent, un agent pouvant en porter plusieurs) | B1.3, B6.4, B7.1, B3.1, B3.3 | P |
-| F5 | **Fiche du ticket**, lisible en trois temps : la demande initiale, l'histoire jusqu'à ma prise en main, la situation aujourd'hui. Elle contient aussi les décisions et leur raison, et les derniers tests. | B6.1, B6.2, B6.3, B6.4, B5.5, B8.1 | P |
-| F6 | **Journal du ticket** : tout ce qui s'est passé, daté, avec son auteur (moi, un agent, Jira, le back-end), en texte intégral et jamais résumé. Les échanges avec le back-end y figurent. | B1.2, B1.4, B6.3, B6.6, B7.2, B7.3 | P |
+| F1 | **Ticket**: identity, title, origin (Jira or local), link to Jira, initial request | B2.2, B2.4, B6.2 | P |
+| F2 | **Jira import on request**: I start it; it fetches the tickets assigned to me on the project (title, description, status, comments), and flags the new ones and those that changed. The address and the token come from a configuration file. Nothing is ever written to Jira. | B1.1, B1.2, B2.3, B2.4, B6.3, C1, C2 | P |
+| F3 | **Quick creation of a local ticket**, in one sentence, without leaving what I am doing. It stays local. | B2.1, B2.2 | P |
+| F4 | **Ticket situation**: the phase (to do → analysis → development → test → QA delivery → QA validation), its progress (not started, in progress with where it stands, done), the possible wait (who, since when) and the assignee (me or a given agent, an agent being able to carry several) | B1.3, B6.4, B7.1, B3.1, B3.3 | P |
+| F5 | **Ticket sheet**, readable in three parts: the initial request, the history up to my taking over, the situation today. It also contains the decisions and their reasons, and the latest tests. | B6.1, B6.2, B6.3, B6.4, B5.5, B8.1 | P |
+| F6 | **Ticket journal**: everything that happened, dated, with its author (me, an agent, Jira, the back-end), in full text and never summarized. The exchanges with the back-end appear there. | B1.2, B1.4, B6.3, B6.6, B7.2, B7.3 | P |
 
-## Alimenter le suivi
+## Feeding the tracking
 
-| ID | Fonctionnalité | Besoins | Prio |
+| ID | Feature | Needs | Prio |
 |---|---|---|---|
-| F7 | **Les agents tiennent le ticket à jour** : avancement, décisions, échanges, tests, questions. Cela vaut pour tout type d'agent ([ADR 0002](../adr/0002-perimetre-multi-agents-ouvert.md)), et les infos et l'analyse produites par le skill de démarrage y entrent aussi. | B1.4, B3.2, B7.3 | P |
-| F8 | **Je rapporte en le disant à un agent** : un retour reçu par mail ou à l'oral, une histoire que je connais, une action que j'ai faite (livré en qualité, validé). L'agent le consigne dans le ticket. | B1.7, B7.4, B6.3 | P |
+| F7 | **The agents keep the ticket up to date**: progress, decisions, exchanges, tests, questions. This holds for every kind of agent ([ADR 0002](../adr/0002-perimetre-multi-agents-ouvert.md)), and the information and analysis produced by the start-up skill also enter here. | B1.4, B3.2, B7.3 | P |
+| F8 | **I report by telling an agent**: feedback received by email or in person, a history I know, an action I took (delivered to QA, validated). The agent records it in the ticket. | B1.7, B7.4, B6.3 | P |
 
-## Voir
+## Seeing
 
-| ID | Fonctionnalité | Besoins | Prio |
+| ID | Feature | Needs | Prio |
 |---|---|---|---|
-| F9 | **Ce qui a changé depuis ma dernière visite** : nouveaux tickets, mises à jour venues de Jira, travail fait ou terminé par les agents | B1.1, B1.2, B1.4 | P |
-| F10 | **Vue d'ensemble des tickets** et de leur situation, consultée quand je le décide, sans interruption | B1.3, B4.1 | P |
-| F11 | **Ticket sans nouvelles** : un ticket qui n'avance plus est signalé | B4.2 | P |
-| F12 | **Ce qui m'attend** : à un seul endroit, tout ce qui attend une réponse ou une action de ma part, du plus ancien au plus récent | B1.6, B5.1 | P |
+| F9 | **What has changed since my last visit**: new tickets, updates from Jira, work done or finished by the agents | B1.1, B1.2, B1.4 | P |
+| F10 | **Overview of the tickets** and their situation, consulted when I decide, without interruption | B1.3, B4.1 | P |
+| F11 | **Ticket with no news**: a ticket that no longer moves is flagged | B4.2 | P |
+| F12 | **What is waiting for me**: in one place, everything that waits for an answer or an action from me, from the oldest to the newest | B1.6, B5.1 | P |
 
-## Décider
+## Deciding
 
-| ID | Fonctionnalité | Besoins | Prio |
+| ID | Feature | Needs | Prio |
 |---|---|---|---|
-| F13 | **Question complète** : chaque demande qui m'est adressée porte l'historique utile, la dernière étape, le contexte, les options et une recommandation | B5.2 | P |
-| F14 | **Ma réponse arrive à celui qui attend**, sans que je passe par sa conversation ; je vois qu'elle a été prise en compte, puis la suite du ticket | B5.3, B5.4 | P |
+| F13 | **Complete question**: each request addressed to me carries the useful history, the last step, the context, the options and a recommendation | B5.2 | P |
+| F14 | **My answer reaches the one waiting**, without me going through their conversation; I see that it was taken into account, then the rest of the ticket | B5.3, B5.4 | P |
 
-## Travailler en parallèle
+## Working in parallel
 
-| ID | Fonctionnalité | Besoins | Prio |
+| ID | Feature | Needs | Prio |
 |---|---|---|---|
-| F15 | **Reprise sans perte** : n'importe quelle nouvelle conversation reprend un ticket à partir de son dossier (F5 et F6) | B4.3 | P |
-| F16 | **Pas de conflit entre tickets** : deux tickets traités en même temps ne modifient pas le même code et n'utilisent pas le même environnement partagé au même moment ; le conflit est évité ou signalé avant de se produire | B4.4 | P |
+| F15 | **Resuming without loss**: any new conversation resumes a ticket from its record (F5 and F6) | B4.3 | P |
+| F16 | **No conflict between tickets**: two tickets handled at the same time do not change the same code and do not use the same shared environment at the same moment; the conflict is avoided or flagged before it happens | B4.4 | P |
 
-## Terminer et livrer
+## Finishing and delivering
 
-| ID | Fonctionnalité | Besoins | Prio |
+| ID | Feature | Needs | Prio |
 |---|---|---|---|
-| F17 | **Résultat des tests** du ticket : dernier passage, réussi ou non, date | B8.1 | P |
-| F18 | **Moi seul déclare un ticket terminé** ; aucun agent ne peut le faire | B8.4 | P |
-| F19 | **Lot de livraison en qualité** : je regroupe les tickets qui partent ensemble, je note la livraison puis la validation, et chaque ticket avance en conséquence | B9.1, B9.2 | P |
+| F17 | **Test results** of the ticket: last run, passed or not, date | B8.1 | P |
+| F18 | **Only I declare a ticket finished**; no agent can do it | B8.4 | P |
+| F19 | **QA delivery batch**: I group the tickets that go together, I note the delivery then the validation, and each ticket moves on accordingly | B9.1, B9.2 | P |
 
-## Usage de l'IA
+## AI usage
 
-| ID | Fonctionnalité | Besoins | Prio |
+| ID | Feature | Needs | Prio |
 |---|---|---|---|
-| F20 | **Usage de l'IA**, approximatif, par ticket, et global par jour, par semaine et par mois | B10.2, B10.3 | P |
+| F20 | **AI usage**, approximate, per ticket, and overall per day, per week and per month | B10.2, B10.3 | P |
 
-## Secondaires
+## Secondary
 
-| ID | Fonctionnalité | Besoins | Prio |
+| ID | Feature | Needs | Prio |
 |---|---|---|---|
-| F21 | **Proposition de la suite** : gain rapide, presque fini, échéance proche | B1.5 | S |
-| F22 | **Changelog de livraison**, à activer par une option | B9.3 | S |
-| F23 | **Changements de code** du ticket | B6.7 | S |
-| F24 | **Tests manuels** : test visuel fait, test utilisateur fait ou non, avec son retour | B8.2, B8.3 | S |
-| F25 | **Plusieurs projets** | B0.1 | S |
+| F21 | **Proposal of what comes next**: quick win, nearly done, close deadline | B1.5 | S |
+| F22 | **Delivery changelog**, enabled by an option | B9.3 | S |
+| F23 | **Code changes** of the ticket | B6.7 | S |
+| F24 | **Manual tests**: visual test done, user test done or not, with its feedback | B8.2, B8.3 | S |
+| F25 | **Several projects** | B0.1 | S |
 
-## Reprises de la V1 (demande de l'utilisateur, 2026-10-18)
+## Takeovers from V1 (user's request, 2026-10-18)
 
-L'IA proposait de ne pas reprendre ces fonctionnalités, faute de besoin exprimé. L'utilisateur a répondu : « Ajoute ces points que tu as trouvés de la V1, je les veux. » Elles sont **secondaires par défaut**.
+The AI had proposed not to take over these features, for lack of an expressed need. The user answered: "Add these points you found in V1, I want them." They are **secondary by default**.
 
-| ID | Fonctionnalité | Besoins | Prio |
+| ID | Feature | Needs | Prio |
 |---|---|---|---|
-| F26 | **Notifications** : cloche des nouveautés, compteur dans le titre de l'onglet, notifications du navigateur | B11.1 | S |
-| F27 | **Thèmes** (système, clair, sombre, contraste élevé) et **langue** de l'interface (français, anglais) | B11.2 | S |
-| F28 | **Exports par modèle** : générer un fichier de suivi d'un ticket depuis un modèle du projet | B11.3 | S |
-| F29 | **Écarts avec Jira** : signaler quand le statut Jira ne correspond pas à la situation locale (affichage seulement, sans rien écrire dans Jira) | B11.4 | S |
-| F30 | **Captures d'écran et pièces jointes** sur un ticket | B11.5 | S |
-| F31 | **Dépôts, lots et documents du projet** : fichiers modifiés par dépôt, regroupements de tickets, documents de référence | B11.6 | S |
-| F32 | **« Où en est-on ? »** : demander un point à l'intervenant, qui répond dans le journal | B11.7 | S |
-| F33 | **Messagerie entre intervenants d'un ticket** (front et back-end) : chaque échange est une entrée du journal, gardée mot pour mot et acheminée selon l'ADR 0007 ; le back-end est lancé par le lanceur ([ADR 0010](../adr/0010-back-end-intervenant-du-ticket.md)). Remplace la capture des échanges avec le back-end de la V1 | B11.8 | S |
-| F34 | **Coordination explicite** : réservation d'un ticket par un intervenant, déclaration des fichiers tenus, verrou d'une ressource partagée (tests e2e), garde contre les écritures interdites. Ce sont les moyens visibles de F16. | B11.9 | S |
+| F26 | **Notifications**: bell for updates, counter in the tab title, browser notifications | B11.1 | S |
+| F27 | **Themes** (system, light, dark, high contrast) and interface **language** (French, English) | B11.2 | S |
+| F28 | **Template exports**: generate a tracking file of a ticket from a project template | B11.3 | S |
+| F29 | **Gaps with Jira**: flag when the Jira status does not match the local situation (display only, nothing written to Jira) | B11.4 | S |
+| F30 | **Screenshots and attachments** on a ticket | B11.5 | S |
+| F31 | **Repositories, batches and project documents**: files changed per repository, groupings of tickets, reference documents | B11.6 | S |
+| F32 | **"Où en est-on ?"**: ask the ticket's assignee for a status update, who answers in the journal | B11.7 | S |
+| F33 | **Messaging between a ticket's assignees** (front and back-end): each exchange is a journal entry, kept word for word and routed according to ADR 0007; the back-end is launched by the launcher ([ADR 0010](../adr/0010-back-end-intervenant-du-ticket.md)). Replaces the capture of back-end exchanges from V1 | B11.8 | S |
+| F34 | **Explicit coordination**: a ticket claimed by an assignee, declared held files, lock of a shared resource (e2e tests), guard against forbidden writes. These are the visible means of F16. | B11.9 | S |
 
-Les mécanismes techniques de la V1 qui les portent (hooks, format de capture, garde par regex…) seront réévalués à l'étape architecture : on garde la fonctionnalité, pas forcément sa réalisation V1.
+The V1 technical mechanisms that carry them (hooks, capture format, regex-based guard…) will be re-evaluated at the architecture step: we keep the feature, not necessarily its V1 implementation.

@@ -1,40 +1,40 @@
-# 0017. Réponse structurée des agents en JSON
+# 0017. Structured agent answer in JSON
 
-- Statut : Acceptée
-- Date : 2026-10-19
-- Décideur : l'utilisateur (idée et choix du 2026-10-19)
-- Liens : complète l'[ADR 0010](0010-back-end-intervenant-du-ticket.md) (lanceur) ; [0007](0007-acheminement-des-reponses.md), [0011](0011-interface-des-agents.md), [0012](0012-mesure-de-l-usage-ia.md), [0016](0016-stack-serveur-et-validation.md) (Zod)
+- Status: Accepted
+- Date: 2026-10-19
+- Decider: the user (idea and choice of 2026-10-19)
+- Links: completes [ADR 0010](0010-back-end-intervenant-du-ticket.md) (launcher); [0007](0007-acheminement-des-reponses.md), [0011](0011-interface-des-agents.md), [0012](0012-mesure-de-l-usage-ia.md), [0016](0016-stack-serveur-et-validation.md) (Zod)
 
-## Contexte
+## Context
 
-Idée de l'utilisateur : « Dans le prompt donné aux agents IA, ils doivent répondre un format JSON que tu peux interpréter. »
+Idea of the user: "In the prompt given to the AI agents, they must answer in a JSON format that you can interpret."
 
-Aujourd'hui (ADR 0010 et 0011), un agent tient le ticket à jour en appelant l'outil (MCP ou CLI). Cela dépend de sa discipline : un oubli laisse le ticket sans nouvelles. Une réponse finale dans un format imposé peut être lue par un programme et enregistrée sans que l'agent ait à penser à appeler l'outil.
+Today (ADR 0010 and 0011), an agent keeps the ticket up to date by calling the tool (MCP or CLI). This depends on its discipline: one forgotten call leaves the ticket without news. A final answer in an imposed format can be read by a program and recorded without the agent having to think about calling the tool.
 
-## Options étudiées
+## Options considered
 
-| Option | Avantages | Inconvénients |
+| Option | Advantages | Drawbacks |
 |---|---|---|
-| JSON pour le lanceur seulement (proposition de l'IA) | Là où la sortie est toujours lue par un programme | Les agents front n'en profitent pas |
-| **JSON pour tous les agents** | Une seule façon de rendre compte, quel que soit l'agent | Dans une conversation interactive, la sortie n'est lue par un programme que si l'adaptateur sait la capter ; le développeur y voit du JSON |
-| Pas maintenant | Rien à faire | L'idée attend l'étape 9 |
+| JSON for the launcher only (AI proposal) | Where the output is always read by a program | Front-end agents do not benefit |
+| **JSON for all agents** | One way to report, whatever the agent | In an interactive conversation, the output is read by a program only if the adapter can capture it; the developer sees the JSON |
+| Not now | Nothing to do | The idea waits for step 9 |
 
-## Décision
+## Decision
 
-**Oui, pour tous les agents.**
+**Yes, for all agents.**
 
-Fonctionnement retenu :
-- **Un seul schéma de réponse**, défini en Zod dans `contract` et transmis dans le texte de lancement (et par l'option de l'outil d'agent qui impose un schéma, quand elle existe). Il contient au moins : le ticket, le statut (`done`, `inProgress`, `blocked`, `question`), un message lisible, la question éventuelle (contexte, options, recommandation), l'avancement (fait, reste), les fichiers modifiés, et l'usage si l'agent le connaît.
-- **Qui le lit** :
-  - le **lanceur**, pour chaque exécution back-end (`claude -p`, `codex exec`, `opencode run`…) ;
-  - l'**adaptateur Claude Code**, à la fin de chaque tour d'un agent front (hook de fin de tour) ;
-  - tout autre lecteur de la sortie d'un agent en mode non interactif.
-- Le lecteur **valide** le JSON et le transmet au serveur, qui l'enregistre dans le journal et met à jour la situation, comme un appel MCP.
-- **JSON invalide ou absent** : la sortie brute est gardée telle quelle dans le journal et marquée « réponse non structurée ». Rien n'est perdu.
-- **MCP et CLI restent le socle** : un agent dont la sortie n'est lue par aucun programme (outil interactif sans adaptateur) continue d'appeler l'outil.
+Chosen way of working:
+- **One single answer schema**, defined in Zod in `contract` and passed in the launch text (and by the agent tool's option that imposes a schema, when it exists). It contains at least: the ticket, the status (`done`, `inProgress`, `blocked`, `question`), a readable message, the optional question (context, options, recommendation), the progress (done, remaining), the modified files, and the usage if the agent knows it.
+- **Who reads it**:
+  - the **launcher**, for each back-end execution (`claude -p`, `codex exec`, `opencode run`...);
+  - the **Claude Code adapter**, at the end of each turn of a front-end agent (end-of-turn hook);
+  - any other reader of the output of an agent in non-interactive mode.
+- The reader **validates** the JSON and passes it to the server, which records it in the journal and updates the situation, like an MCP call.
+- **Invalid or missing JSON**: the raw output is kept as it is in the journal and marked "unstructured answer". Nothing is lost.
+- **MCP and CLI remain the base**: an agent whose output is read by no program (interactive tool without adapter) keeps calling the tool.
 
-## Conséquences
+## Consequences
 
-- Le champ « message lisible » garde la conversation compréhensible pour le développeur.
-- L'adaptateur Claude Code gagne la lecture de la réponse de fin de tour.
-- Risque à vérifier à l'essai de l'étape 9 : la fiabilité du JSON produit par chaque outil d'agent, et l'existence d'une option pour imposer un schéma.
+- The "readable message" field keeps the conversation understandable for the developer.
+- The Claude Code adapter gains the reading of the end-of-turn answer.
+- Risk to check in the trial of step 9: the reliability of the JSON produced by each agent tool, and the existence of an option to impose a schema.

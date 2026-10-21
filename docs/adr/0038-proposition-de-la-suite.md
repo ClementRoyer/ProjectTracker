@@ -1,32 +1,32 @@
-# 0038. Proposition de la suite
+# 0038. Proposal for what's next
 
-- Statut : Acceptée (critères et affichage) ; la règle de classement est une proposition de l'IA, à ajuster par l'utilisateur
-- Date : 2026-10-20
-- Décideur : l'utilisateur (sous-étape 13e)
-- Liens : [features.md](../product/features.md) F21 ; [ADR 0032](0032-niveaux-de-priorite.md) ; [plan de l'étape 13](../plan/etape-13.md)
+- Status: Accepted (criteria and display); the ranking rule is an AI proposal, to be adjusted by the user
+- Date: 2026-10-20
+- Decider: the user (sub-step 13e)
+- Links: [features.md](../product/features.md) F21; [ADR 0032](0032-niveaux-de-priorite.md); [step 13 plan](../plan/etape-13.md)
 
-## Contexte
+## Context
 
-F21 : l'outil suggère quoi prendre ensuite. L'utilisateur a retenu les quatre critères proposés : presque fini, priorité, échéance proche, gain rapide. Les deux derniers demandent des données que l'outil n'a pas encore : une date d'échéance et une taille.
+F21: the tool suggests what to take up next. The user kept the four proposed criteria: almost done, priority, near due date, quick win. The last two need data that the tool does not have yet: a due date and a size.
 
-## Décision
+## Decision
 
-- **Échéance** (`dueDate`) : pour un ticket Jira, lue dans Jira (champ `duedate`, lecture seule) à chaque chargement ; pour un ticket local, réglée par le développeur.
-- **Taille** (`size`) : petite, moyenne, grande ; réglée par un agent (à l'analyse) ou par le développeur, le dernier qui parle l'emporte.
-- **Affichage** : un encart « À prendre ensuite » en tête de la liste, repliable, avec au plus trois tickets et, pour chacun, ses raisons.
-- **Candidats** : les tickets ouverts sur lesquels personne ne travaille et qui n'attendent personne ; ce qui attend le développeur est déjà dans le triage.
-- **Classement proposé par l'IA** (des points par raison, les plus forts d'abord ; un ticket sans aucune raison n'est pas proposé) :
+- **Due date** (`dueDate`): for a Jira ticket, read from Jira (field `duedate`, read-only) at each load; for a local ticket, set by the developer.
+- **Size** (`size`): small, medium, large; set by an agent (at analysis) or by the developer, the last one to speak wins.
+- **Display**: a box "À prendre ensuite" at the top of the list, collapsible, with at most three tickets and, for each one, its reasons.
+- **Candidates**: open tickets on which nobody works and which wait for nobody; what waits for the developer is already in triage.
+- **Ranking proposed by the AI** (points per reason, highest first; a ticket with no reason is not proposed):
 
-| Raison | Points |
+| Reason | Points |
 |---|---|
-| Échéance dépassée | 50 |
-| Échéance dans 2 jours ou moins | 30 |
-| Échéance dans 7 jours ou moins | 15 |
-| Priorité urgente / haute | 40 / 20 |
-| Presque fini : en test ou plus loin | 20 |
-| Gain rapide : petite taille | 15 |
+| Due date passed | 50 |
+| Due in 2 days or less | 30 |
+| Due in 7 days or less | 15 |
+| Urgent / high priority | 40 / 20 |
+| Almost done: in test or further | 20 |
+| Quick win: small size | 15 |
 
-## Conséquences
+## Consequences
 
-- La migration 6 ajoute l'échéance et la taille au ticket.
-- Le classement est une règle du domaine, testée ; l'opération `suggestNext` la sert à la page.
+- Migration 6 adds the due date and the size to the ticket.
+- The ranking is a domain rule, tested; the `suggestNext` operation serves it to the page.

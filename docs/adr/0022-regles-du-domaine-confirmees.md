@@ -1,31 +1,31 @@
-# 0022. Règles du domaine confirmées
+# 0022. Domain rules confirmed
 
-- Statut : Acceptée
-- Date : 2026-10-19
-- Décideur : l'utilisateur (réponses aux cinq questions du 2026-10-19)
-- Liens : `packages/core/src/domain/` ; complète l'[ADR 0012](0012-mesure-de-l-usage-ia.md) (usage) et l'[ADR 0015](0015-modele-de-donnees.md) (modèle)
+- Status: Accepted
+- Date: 2026-10-19
+- Decider: the user (answers to the five questions of 2026-10-19)
+- Links: `packages/core/src/domain/`; completes [ADR 0012](0012-mesure-de-l-usage-ia.md) (usage) and [ADR 0015](0015-modele-de-donnees.md) (model)
 
-## Contexte
+## Context
 
-À l'étape 7, l'IA a écrit `core/domain` en tranchant seule cinq règles que les documents produit ne fixaient pas. Elles devaient être confirmées par l'utilisateur.
+At step 7, the AI wrote `core/domain` by deciding alone five rules that the product documents did not set. They had to be confirmed by the user.
 
-## Options étudiées
+## Options considered
 
-| Règle | Interprétation de l'IA (codée) | Autres options présentées |
+| Rule | AI interpretation (coded) | Other options presented |
 |---|---|---|
-| 1. Attente affichée | Le développeur d'abord, sinon l'attente la plus ancienne | La plus ancienne ; toutes les attentes affichées |
-| 2. « Sans nouvelles » | Seulement un ticket « en cours » et non clos | Tout ticket ouvert |
-| 3. Changement de phase | Retour permis ; changer de phase remet l'avancement à « pas démarré » | En avant seulement ; retour avec avancement gardé |
-| 4. Clôture | Par le développeur, seulement après une validation qualité « faite » | À tout moment par le développeur ; anticipée avec motif |
-| 5. Périodes d'usage | UTC, semaines ISO | Heure locale, semaine du lundi (recommandée) |
+| 1. Displayed wait | The developer first, otherwise the oldest wait | The oldest; all displayed waits |
+| 2. "Without news" | Only an "in progress" ticket that is not closed | Any open ticket |
+| 3. Change of phase | Going back allowed; changing phase resets the progress to "not started" | Forward only; going back with the progress kept |
+| 4. Closing | By the developer, only after a QA validation "done" | At any time by the developer; early with a reason |
+| 5. Usage periods | UTC, ISO weeks | Local time, week starting Monday (recommended) |
 
-## Décision
+## Decision
 
-- **Règles 1 à 4 : confirmées** telles qu'elles sont codées.
-- **Règle 5 : heure locale.** Les jours, semaines et mois d'usage suivent le **fuseau du développeur** (minuit chez lui), et la semaine va du lundi au dimanche (numérotation ISO).
+- **Rules 1 to 4: confirmed** as they are coded.
+- **Rule 5: local time.** The days, weeks and months of usage follow the **developer's time zone** (midnight at their place), and the week runs from Monday to Sunday (ISO numbering).
 
-## Conséquences
+## Consequences
 
-- `periodKey` et `summarizeUsage` reçoivent le fuseau (nom IANA, par exemple `Europe/Paris`) : le domaine reste pur, sans lire l'environnement.
-- Le fuseau vient de la configuration de l'outil. Si elle ne le donne pas, c'est le fuseau de la machine.
-- Les instants restent enregistrés en UTC ; seul le regroupement par période dépend du fuseau.
+- `periodKey` and `summarizeUsage` receive the time zone (IANA name, for example `Europe/Paris`): the domain stays pure, without reading the environment.
+- The time zone comes from the tool's configuration. If it does not give it, it is the time zone of the machine.
+- Instants stay recorded in UTC; only the grouping by period depends on the time zone.

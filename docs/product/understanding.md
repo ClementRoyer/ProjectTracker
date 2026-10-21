@@ -1,53 +1,53 @@
-# Compréhension du produit
+# Product understanding
 
-- Statut : **Validé** (2026-10-19)
-- Version : 2 (2026-10-18), corrigée après la remarque de l'utilisateur
-- Sources : `README.md`, `SKILL.md`, `references/review-2026-10-12.md`, [audit V1](../analysis/2026-10-16-audit-v1/README.md)
+- Status: **Validated** (2026-10-19)
+- Version: 2 (2026-10-18), corrected after the user's remark
+- Sources: `README.md`, `SKILL.md`, `references/review-2026-10-12.md`, [V1 audit](../analysis/2026-10-16-audit-v1/README.md)
 
-Ce document reformule pourquoi project-tracker existe et ce qu'il doit faire. Il sert de cadre aux besoins ([needs.md](needs.md)). Une fois validé, il devient la référence du « quoi ».
+This document restates why project-tracker exists and what it must do. It frames the needs ([needs.md](needs.md)). Once validated, it becomes the reference for the "what".
 
-## Correction de l'utilisateur (2026-10-18)
+## The user's correction (2026-10-18)
 
-La version 1 de ce document plaçait les **agents d'IA** au centre. L'utilisateur l'a corrigée :
+Version 1 of this document put **AI agents** at the centre. The user corrected it:
 
-> « Le but initial du projet n'est pas [celui-là]. La genèse, c'est de gérer plusieurs tickets sur un projet, pouvoir traiter plusieurs tickets en même temps, et la difficulté est de suivre où en est chaque ticket, revoir les infos du ticket. »
+> "The initial purpose of the project is not [that one]. The genesis is to manage several tickets on a project, to be able to work on several tickets at the same time, and the difficulty is to track where each ticket stands, and to review the ticket's information."
 
-Le centre du produit est donc **le ticket**. Les agents sont un moyen de traiter les tickets, pas le sujet.
+The centre of the product is therefore **the ticket**. Agents are a means of handling tickets, not the subject.
 
-## 1. Le problème
+## 1. The problem
 
-Sur un projet, le développeur a **plusieurs tickets à traiter, et il les traite en même temps**. Ce parallélisme est rendu possible par les agents d'IA. La difficulté :
+On a project, the developer has **several tickets to handle, and handles them at the same time**. This parallelism is made possible by AI agents. The difficulty:
 
-- **Savoir où en est chaque ticket** : à quelle étape il est, ce qui a été fait, ce qui reste, ce qui le bloque, s'il attend quelque chose du développeur.
-- **Revoir les informations d'un ticket** : en revenant sur un ticket après avoir travaillé sur d'autres, retrouver tout ce qui le concerne au même endroit. Cela comprend la description, le contexte, les décisions, les questions et réponses, les échanges, les tests et les fichiers touchés.
+- **Knowing where each ticket stands**: which step it is at, what has been done, what remains, what blocks it, whether it waits for something from the developer.
+- **Reviewing a ticket's information**: coming back to a ticket after working on others, finding everything about it in one place. This includes the description, the context, the decisions, the questions and answers, the exchanges, the tests and the files touched.
 
-Sans outil, ces informations sont éparpillées entre les conversations, la mémoire du développeur et l'outil de tickets. Plus il y a de tickets en parallèle, plus on perd le fil.
+Without a tool, this information is scattered across the conversations, the developer's memory and the ticket tool. The more tickets in parallel, the more the thread is lost.
 
-## 2. La réponse
+## 2. The answer
 
-project-tracker est **le dossier de suivi de chaque ticket, plus une vue d'ensemble de tous les tickets en cours** :
+project-tracker is **the tracking record of each ticket, plus an overview of all the tickets in progress**:
 
-- **Vue d'ensemble** : tous les tickets du projet, leur étape, et en un coup d'œil ceux qui avancent, ceux qui sont bloqués et ceux qui attendent le développeur.
-- **Fiche du ticket** : tout ce qui concerne un ticket, à jour, au même endroit, lisible pour reprendre le fil.
-- **Alimentation** : ceux qui travaillent sur le ticket, des agents d'IA le plus souvent, tiennent la fiche à jour au fur et à mesure. Le développeur n'a pas à la remplir.
+- **Overview**: all the project's tickets, their step, and at a glance those moving forward, those blocked and those waiting for the developer.
+- **Ticket sheet**: everything about a ticket, up to date, in one place, readable enough to pick up the thread.
+- **Feeding**: those who work on the ticket, most often AI agents, keep the sheet up to date as they go. The developer does not have to fill it in.
 
-## 3. Principes
+## 3. Principles
 
-- **Le ticket est l'unité centrale** : tout se rattache à un ticket.
-- **Où en est un ticket doit se voir sans chercher.**
-- **Rien n'est résumé ni tronqué** dans la fiche : ce qui a été dit ou échangé reste intact.
-- **Le développeur ne remplit pas le suivi à la main** : ceux qui font le travail l'alimentent.
-- **Tout reste local**, et l'outil est générique, sans nom de client.
+- **The ticket is the central unit**: everything attaches to a ticket.
+- **Where a ticket stands must be visible without searching.**
+- **Nothing is summarized or truncated** in the sheet: what was said or exchanged stays intact.
+- **The developer does not fill in the tracking by hand**: those who do the work feed it.
+- **Everything stays local**, and the tool is generic, with no client name.
 
-## 4. Décisions déjà prises
+## 4. Decisions already made
 
-- [ADR 0002](../adr/0002-perimetre-multi-agents-ouvert.md) : plusieurs types d'agents peuvent alimenter le suivi, pas seulement Claude Code.
-- [ADR 0003](../adr/0003-build-a-la-release.md), [0004](../adr/0004-stockage-sqlite.md), [0005](../adr/0005-frontend-svelte.md) : choix techniques, sans effet sur le « quoi ».
+- [ADR 0002](../adr/0002-perimetre-multi-agents-ouvert.md): several kinds of agents can feed the tracking, not only Claude Code.
+- [ADR 0003](../adr/0003-build-a-la-release.md), [0004](../adr/0004-stockage-sqlite.md), [0005](../adr/0005-frontend-svelte.md): technical choices, with no effect on the "what".
 
-## 5. Précisions de l'utilisateur (2026-10-18)
+## 5. The user's clarifications (2026-10-18)
 
-| Question | Réponse de l'utilisateur | Conséquence pour le produit |
+| Question | User's answer | Consequence for the product |
 |---|---|---|
-| Un agent par ticket ? | « Parfois je fais certains tickets, parfois un agent doit en gérer plusieurs, parfois 1. » | Le lien entre un ticket et celui qui le traite est libre. Un agent peut porter plusieurs tickets, et **le développeur est lui-même un intervenant** : il doit pouvoir faire avancer un ticket depuis la page (étape, note), comme un agent. |
-| D'où viennent les tickets ? | « Les deux sont possibles. Certains tickets viennent de Jira (ex. : bug en qualité ou en prod, demande de fonctionnalité), parfois ça vient de moi qui demande (ex. : un bug trouvé pendant les tests, une idée de fonctionnalité, une amélioration invisible). » | Deux origines : **importé** d'un outil de tickets (avec sa clé et son lien) ou **créé localement**. Un ticket local doit pouvoir se créer simplement, par le développeur ou par un agent à sa demande. |
-| Plusieurs projets ? | « 95 % du temps ce sera un projet, mais de temps en temps peut-être plusieurs (plusieurs serait un bonus). » | **Un projet est le cas normal**. Le multi-projets est une fonctionnalité secondaire, et la conception ne doit pas le rendre impossible. |
+| One agent per ticket? | "Sometimes I do some tickets myself, sometimes an agent has to handle several, sometimes one." | The link between a ticket and whoever handles it is free. An agent can carry several tickets, and **the developer is an assignee too**: they must be able to move a ticket forward from the page (step, note), like an agent. |
+| Where do tickets come from? | "Both are possible. Some tickets come from Jira (e.g. a bug in QA or in production, a feature request), sometimes it comes from me asking (e.g. a bug found during testing, a feature idea, an invisible improvement)." | Two origins: **imported** from a ticket tool (with its key and link) or **created locally**. A local ticket must be easy to create, by the developer or by an agent at their request. |
+| Several projects? | "95% of the time it will be one project, but from time to time maybe several (several would be a bonus)." | **One project is the normal case**. Multi-project is a secondary feature, and the design must not make it impossible. |

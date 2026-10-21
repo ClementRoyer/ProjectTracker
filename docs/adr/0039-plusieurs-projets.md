@@ -1,29 +1,29 @@
-# 0039. Plusieurs projets : un sélecteur
+# 0039. Several projects: a selector
 
-- Statut : Acceptée
-- Date : 2026-10-20
-- Décideur : l'utilisateur (sous-étape 13f)
-- Liens : [features.md](../product/features.md) F25 ; [ADR 0013](0013-base-par-projet-et-sauvegarde.md), [0030](0030-installation-dans-un-projet.md)
+- Status: Accepted
+- Date: 2026-10-20
+- Decider: the user (sub-step 13f)
+- Links: [features.md](../product/features.md) F25; [ADR 0013](0013-base-par-projet-et-sauvegarde.md), [0030](0030-installation-dans-un-projet.md)
 
-## Contexte
+## Context
 
-F25 : passer d'un projet à l'autre. L'ADR 0013 donne à chaque projet son serveur, sa base et son port ; rien ne relie aujourd'hui les projets d'une même machine.
+F25: switch from one project to another. ADR 0013 gives each project its server, its database and its port; nothing currently links the projects on the same machine.
 
-## Options étudiées
+## Options considered
 
-| Option | Pour | Contre |
+| Option | For | Against |
 |---|---|---|
-| **Sélecteur de projet** (recommandé) | Garde l'ADR 0013 tel quel | On ne voit pas ce qui attend dans les autres projets |
-| Sélecteur et nombre de décisions par projet | Vue d'ensemble | Une question publique, sans jeton, sur chaque serveur |
-| Un seul serveur pour tous les projets | Une seule page | Remet en cause l'ADR 0013 |
+| **Project selector** (recommended) | Keeps ADR 0013 as it is | We do not see what waits in the other projects |
+| Selector and number of decisions per project | Overview | A public question, with no token, on each server |
+| One single server for all projects | One single page | Calls ADR 0013 into question |
 
-## Décision
+## Decision
 
-- **L'installation note chaque projet** (son nom, son adresse, sa racine) dans un registre de la machine : `~/.config/project-tracker/projects.json`. Le retour arrière vers la V1 l'en retire.
-- **Un menu « Projet »** dans l'en-tête, quand la machine en a plusieurs, liste ceux dont le serveur répond et ouvre leur page. Chaque projet garde son serveur, sa base et son jeton.
-- Le nom d'un projet est le nom de son dossier.
+- **The installation records each project** (its name, its address, its root) in a register on the machine: `~/.config/project-tracker/projects.json`. Rolling back to V1 removes it from there.
+- **A "Projet" menu** in the header, when the machine has several, lists those whose server answers and opens their page. Each project keeps its server, its database and its token.
+- A project's name is its folder's name.
 
-## Conséquences
+## Consequences
 
-- Le serveur lit le registre et vérifie, pour la page, quels serveurs répondent (sur leurs adresses locales).
-- Un projet installé avant cette décision n'apparaît qu'après une nouvelle installation (mise à jour).
+- The server reads the register and checks, for the page, which servers answer (on their local addresses).
+- A project installed before this decision only appears after a new installation (update).

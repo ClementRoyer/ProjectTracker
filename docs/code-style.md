@@ -1,13 +1,13 @@
-# Guide de style du code
+# Code style guide
 
-- Statut : Accepté ([ADR 0019](adr/0019-regles-de-code.md))
-- Sources : le [guide TypeScript de Google](https://google.github.io/styleguide/tsguide.html), le guide de style de la V1 (`legacy/references/code-style.md`) et les leçons de son [audit](analysis/2026-10-16-audit-v1/README.md).
+- Status: Accepted ([ADR 0019](adr/0019-regles-de-code.md))
+- Sources: [Google's TypeScript guide](https://google.github.io/styleguide/tsguide.html), the style guide of V1 (`legacy/references/code-style.md`) and the lessons of its [audit](analysis/2026-10-16-audit-v1/README.md).
 
-Ce guide ne contient que ce qu'un outil ne vérifie pas. Les règles vérifiées par ESLint sont listées à la fin : on ne les répète pas dans le code par des commentaires, on les respecte.
+This guide contains only what a tool does not check. The rules checked by ESLint are listed at the end: we do not repeat them in the code as comments, we follow them.
 
-## 1. Nommer avec le glossaire
+## 1. Name with the glossary
 
-Les notions du domaine portent le nom de la colonne `Code` du [glossaire](product/glossary.md). Jamais de synonyme.
+The domain concepts carry the name of the `Code` column of the [glossary](product/glossary.md). Never a synonym.
 
 ```ts
 // ✗ item, card, owner, blockedBy
@@ -15,23 +15,23 @@ Les notions du domaine portent le nom de la colonne `Code` du [glossaire](produc
 interface ActiveAssignment { ticketId: string; role: Role; assignee: Assignee }
 ```
 
-- Une fonction commence par un verbe : `computeWait`, `closeTicket`, `findOverlaps`.
-- Un booléen se lit comme une question : `isStale`, `hasOpenQuestion`, `canClose`.
-- Pas d'abréviation obscure : `ctx`, `cfg`, `tmp`, `res2`, `x`.
-- Un fichier porte le nom de sa responsabilité, en kebab-case : `situation.ts`, `backend-request.ts`. Jamais `utils`, `helpers`, `misc`, `common`.
+- A function starts with a verb: `computeWait`, `closeTicket`, `findOverlaps`.
+- A boolean reads like a question: `isStale`, `hasOpenQuestion`, `canClose`.
+- No obscure abbreviation: `ctx`, `cfg`, `tmp`, `res2`, `x`.
+- A file carries the name of its responsibility, in kebab-case: `situation.ts`, `backend-request.ts`. Never `utils`, `helpers`, `misc`, `common`.
 
-## 2. Un module, une responsabilité
+## 2. One module, one responsibility
 
-Quand un fichier grossit, on en sort une responsabilité **nommée**. On ne relève pas un plafond, et on ne découpe pas « au hasard » en `part1`, `part2`.
+When a file grows, we move a **named** responsibility out of it. We do not raise a ceiling, and we do not split "at random" into `part1`, `part2`.
 
 ```ts
-// ✗ situation.ts qui calcule aussi l'usage du ticket
-// ✓ situation.ts (phase, avancement) et usage.ts (jetons, coût)
+// ✗ situation.ts that also computes the AI usage of the ticket
+// ✓ situation.ts (phase, progress) and usage.ts (tokens, cost)
 ```
 
-## 3. Fonctions courtes, retours anticipés
+## 3. Short functions, early returns
 
-On traite d'abord les cas qui sortent, puis le cas normal, sans imbrication.
+We handle the exceptional cases first, then the normal case, without nesting.
 
 ```ts
 // ✗
@@ -50,14 +50,14 @@ function closeTicket(situation: Situation, actor: Actor, at: Instant): Result<Si
 }
 ```
 
-## 4. Des types qui rendent les erreurs impossibles
+## 4. Types that make errors impossible
 
-- Une **union discriminée** plutôt que des booléens ou des champs optionnels qui se combinent mal.
-- `interface` pour la forme d'un objet, `type` pour une union.
-- Les paramètres qu'on ne modifie pas sont `readonly`.
+- A **discriminated union** rather than booleans or optional fields that combine badly.
+- `interface` for the shape of an object, `type` for a union.
+- Parameters that are not modified are `readonly`.
 
 ```ts
-// ✗ { started: boolean; done: boolean; note?: string }   // started=false, done=true : que veut dire ce cas ?
+// ✗ { started: boolean; done: boolean; note?: string }   // started=false, done=true : what does this case mean?
 // ✓
 type Progress =
   | { state: 'notStarted' }
@@ -65,13 +65,13 @@ type Progress =
   | { state: 'done' };
 ```
 
-- Pas de `as` pour faire taire le compilateur. Une donnée venue de l'extérieur (HTTP, fichier, sortie d'un agent) est **validée par Zod à la frontière**. Ensuite, on fait confiance au type.
+- No `as` to silence the compiler. Data that comes from outside (HTTP, a file, the output of an agent) is **validated by Zod at the boundary**. After that, we trust the type.
 
-## 5. Erreurs : un chemin pour chaque sorte
+## 5. Errors: one path for each kind
 
-- **Une règle métier refusée** est un résultat attendu. On renvoie un `Result` avec un code d'erreur nommé, et l'appelant le traite.
-- **Un bug ou une panne** (base illisible, invariant cassé) lève une exception, qui remonte jusqu'à la frontière (route HTTP, commande) où elle est journalisée une seule fois.
-- On n'avale jamais une erreur.
+- **A refused business rule** is an expected result. We return a `Result` with a named error code, and the caller handles it.
+- **A bug or a failure** (unreadable database, broken invariant) throws an exception, which goes up to the boundary (HTTP route, command) where it is logged once.
+- We never swallow an error.
 
 ```ts
 // ✗ try { save(ticket); } catch (error) { console.log(error); }
@@ -79,58 +79,58 @@ type Progress =
 //   if (!closed.ok) return reply.refused(closed.error);
 ```
 
-- **L'absence de valeur.** On écrit `null` pour « calculé, et il n'y a rien » (`computeWait` → `null`) et un champ optionnel pour « non renseigné » (`closedAt?`). On ne mélange pas les deux pour une même notion.
+- **The absence of a value.** We write `null` for "computed, and there is nothing" (`computeWait` → `null`) and an optional field for "not provided" (`closedAt?`). We do not mix the two for the same concept.
 
-## 6. Pas de code « en attendant »
+## 6. No "in the meantime" code
 
-Pas d'adaptateur pour un cas qui n'existe pas, pas de branche « si la fonction existe, sinon… », pas de code commenté, pas de `TODO` sans entrée dans le plan.
+No adapter for a case that does not exist, no branch "if the function exists, otherwise…", no commented-out code, no `TODO` without an entry in the plan.
 
 ```ts
 // ✗ if (store.saveWait) store.saveWait(wait); else legacySave(wait);
-// ✓ store.saveWait(wait);   // on ajoute la méthode au store si elle manque
+// ✓ store.saveWait(wait);   // add the method to the store if it is missing
 ```
 
-## 7. Commentaires : le pourquoi, en une phrase
+## 7. Comments: the why, in one sentence
 
-Le code dit **quoi**. Un commentaire n'explique que ce qui n'est pas évident : une raison, une règle du produit, un piège. Jamais d'identifiant de ticket, de date ou d'historique : c'est le rôle de git et des ADR.
+The code says **what**. A comment only explains what is not obvious: a reason, a product rule, a trap. Never a ticket identifier, a date or history: that is the role of git and the ADRs.
 
 ```ts
-// ✗ // Boucle sur les questions (ajouté le 19/10 pour le lot 3)
+// ✗ // Loop over the questions (added on 19/10 for batch 3)
 // ✓ /** A wait on the developer comes first, because it is what they must see. */
 ```
 
-Une fonction exportée dont le nom ne suffit pas a un commentaire `/** … */` d'une ligne.
+An exported function whose name is not enough has a one-line `/** … */` comment.
 
 ## 8. Imports
 
-- Dans un paquet : des chemins relatifs. D'un paquet à l'autre : le nom du paquet (`@project-tracker/contract`), jamais `../../autre-paquet`.
-- Les types s'importent avec `import type`.
-- Les frontières entre paquets et entre dossiers de `core` sont celles de l'[ADR 0014](adr/0014-decoupage-en-paquets.md).
+- Inside a package: relative paths. Between packages: the package name (`@project-tracker/contract`), never `../../autre-paquet`.
+- Types are imported with `import type`.
+- The boundaries between packages and between the folders of `core` are those of [ADR 0014](adr/0014-decoupage-en-paquets.md).
 
 ## 9. Tests
 
-- Un test porte le nom de la **règle** qu'il établit, pas celui de la fonction.
-- Un comportement par test. Les données d'exemple sont génériques, sans nom de client.
-- Ne jamais comparer de gros contenus avec `toEqual` : un échec afficherait un diff énorme. On compare une empreinte, ou les quelques champs utiles.
+- A test carries the name of the **rule** it establishes, not the name of the function.
+- One behavior per test. The sample data is generic, without any client name.
+- Never compare large contents with `toEqual`: a failure would show a huge diff. We compare a fingerprint, or the few useful fields.
 
 ```ts
 // ✗ it('computeWait works', …)
 // ✓ it('puts the developer first, since what needs them must be seen', …)
 ```
 
-## Vérifié par ESLint (`eslint.config.js`)
+## Checked by ESLint (`eslint.config.js`)
 
-| Règle | Seuil |
+| Rule | Threshold |
 |---|---|
-| Règles typées strictes de typescript-eslint (`any`, `!` non nul, promesses non attendues…) | — |
-| Pas d'export par défaut (exports nommés seulement) | — |
-| Type de retour explicite sur ce qu'un module exporte | — |
-| `switch` exhaustif sur une union | — |
-| Pas de ternaire imbriqué, `===` obligatoire, accolades obligatoires, `const` si possible | — |
-| Pas de `console` dans `core` | — |
-| Complexité d'une fonction | 10 |
-| Profondeur d'imbrication | 3 |
-| Paramètres d'une fonction | 4 (au-delà, un objet) |
-| Lignes d'une fonction (hors tests) | 60 |
-| Lignes d'un fichier, sans blancs ni commentaires (hors tests) | 400, sans exception |
-| Frontières de l'ADR 0014 ; domaine sans I/O, sans horloge, sans aléatoire | — |
+| Strict typed rules of typescript-eslint (`any`, non-null `!`, unawaited promises…) | — |
+| No default export (named exports only) | — |
+| Explicit return type on what a module exports | — |
+| Exhaustive `switch` on a union | — |
+| No nested ternary, `===` required, braces required, `const` when possible | — |
+| No `console` in `core` | — |
+| Function complexity | 10 |
+| Nesting depth | 3 |
+| Function parameters | 4 (beyond that, an object) |
+| Lines in a function (excluding tests) | 60 |
+| Lines in a file, without blank lines or comments (excluding tests) | 400, without exception |
+| Boundaries of ADR 0014; domain without I/O, clock or randomness | — |

@@ -1,32 +1,32 @@
-# 0035. Pièces jointes d'un ticket
+# 0035. Attachments on a ticket
 
-- Statut : Acceptée
-- Date : 2026-10-20
-- Décideur : l'utilisateur (sous-étape 13b)
-- Liens : [features.md](../product/features.md) F30 ; [ADR 0013](0013-base-par-projet-et-sauvegarde.md), [0024](0024-migration-des-donnees-v1.md), [0027](0027-authentification-du-developpeur.md), [0030](0030-installation-dans-un-projet.md) ; [plan de l'étape 13](../plan/etape-13.md)
+- Status: Accepted
+- Date: 2026-10-20
+- Decider: the user (sub-step 13b)
+- Links: [features.md](../product/features.md) F30; [ADR 0013](0013-base-par-projet-et-sauvegarde.md), [0024](0024-migration-des-donnees-v1.md), [0027](0027-authentification-du-developpeur.md), [0030](0030-installation-dans-un-projet.md); [step 13 plan](../plan/etape-13.md)
 
-## Contexte
+## Context
 
-F30 : joindre une capture ou un fichier à un ticket, le voir dans la discussion, et que les agents puissent le lire. La table `attachment` existe (ADR 0015) et la migration V1 y range déjà les pièces jointes, à côté de la base.
+F30: attach a screenshot or a file to a ticket, see it in the conversation, and let agents read it. The `attachment` table exists (ADR 0015) and the V1 migration already stores attachments there, next to the database.
 
-## Options étudiées
+## Options considered
 
-| Question | Options | Choix |
+| Question | Options | Choice |
 |---|---|---|
-| 1. Stockage | **À côté de la base**, `tools/tracker/attachments/<ticket>/` (recommandé) ; dans la base | À côté de la base |
-| 2. Fichiers acceptés | **Tout fichier, 20 Mo au plus** (recommandé) ; images seulement, 10 Mo | Tout fichier, 20 Mo |
-| 3. Ajout depuis la page | **Bouton, collage d'une image, glisser-déposer** (recommandé) ; bouton seulement | Les trois |
-| 4. Lecture par les agents | **Chemin sur le disque et adresse HTTP** (recommandé) ; chemin seulement | Chemin et adresse |
+| 1. Storage | **Next to the database**, `tools/tracker/attachments/<ticket>/` (recommended); in the database | Next to the database |
+| 2. Accepted files | **Any file, 20 MB at most** (recommended); images only, 10 MB | Any file, 20 MB |
+| 3. Adding from the page | **Button, pasting an image, drag and drop** (recommended); button only | All three |
+| 4. Reading by agents | **Disk path and HTTP address** (recommended); path only | Path and address |
 
-## Décision
+## Decision
 
-- Les fichiers vont dans `tools/tracker/attachments/<ticket>/`, ignoré par git. **La sauvegarde et la mise à jour copient ce dossier avec la base.**
-- **Tout fichier jusqu'à 20 Mo.** Les images courantes (PNG, JPEG, GIF, WebP) s'affichent dans la discussion ; les autres fichiers, SVG compris, sont des liens à télécharger, jamais affichés dans la page (un SVG peut porter du script).
-- **Depuis la page** : le bouton « Joindre une capture », le collage d'une image dans la zone de message et le glisser-déposer. Les pièces partent avec le message ; le message reçu par l'intervenant les nomme, avec leur chemin et leur adresse.
-- **Pour les agents** : la fiche du ticket donne pour chaque pièce son chemin sur le disque et son adresse HTTP, lisible avec un jeton. Les agents joignent un fichier par la CLI (`tracker attach <ticket> <fichier>`).
-- L'envoi passe par une route HTTP à part, `POST /api/attachments` (contenu brut), avec les mêmes contrôles que le reste de l'API (jeton, `Host`) ; la lecture par `GET /api/attachments/<id>`.
+- Files go in `tools/tracker/attachments/<ticket>/`, ignored by git. **Backup and update copy this folder with the database.**
+- **Any file up to 20 MB.** Common images (PNG, JPEG, GIF, WebP) display in the conversation; other files, SVG included, are links to download, never displayed in the page (an SVG can carry script).
+- **From the page**: the "Joindre une capture" button, pasting an image into the message area and drag and drop. The attachments go with the message; the message received by the assignee names them, with their path and address.
+- **For agents**: the ticket record gives for each attachment its disk path and its HTTP address, readable with a token. Agents attach a file through the CLI (`tracker attach <ticket> <file>`).
+- Sending goes through a separate HTTP route, `POST /api/attachments` (raw content), with the same checks as the rest of the API (token, `Host`); reading through `GET /api/attachments/<id>`.
 
-## Conséquences
+## Consequences
 
-- Une pièce jointe est rattachée à l'entrée du journal qui l'a portée (message, entrée d'un agent).
-- La sauvegarde manuelle et celle d'avant une mise à jour deviennent un dossier : la base et les pièces jointes.
+- An attachment is linked to the journal entry that carried it (message, agent entry).
+- The manual backup and the one before an update become a folder: the database and the attachments.

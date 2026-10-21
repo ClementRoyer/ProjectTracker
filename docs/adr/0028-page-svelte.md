@@ -1,42 +1,42 @@
-# 0028. Page Svelte : structure, styles, navigation, tests, agent actif
+# 0028. Svelte page: structure, styles, navigation, tests, active agent
 
-- Statut : Acceptée
-- Date : 2026-10-20
-- Décideur : l'utilisateur (questions posées au lancement de l'étape 10)
-- Liens : [plan de l'étape 10](../plan/etape-10.md) ; [ADR 0005](0005-frontend-svelte.md), [0016](0016-stack-serveur-et-validation.md), [0025](0025-maquettes-du-front.md), [0027](0027-authentification-du-developpeur.md) ; [maquette validée](../mockups/README.md)
+- Status: Accepted
+- Date: 2026-10-20
+- Decider: the user (questions asked at the start of step 10)
+- Links: [plan of step 10](../plan/etape-10.md); [ADR 0005](0005-frontend-svelte.md), [0016](0016-stack-serveur-et-validation.md), [0025](0025-maquettes-du-front.md), [0027](0027-authentification-du-developpeur.md); [validated mockup](../mockups/README.md)
 
-## Contexte
+## Context
 
-L'étape 10 écrit la page d'après la maquette fidèle validée. Svelte 5, Vite et TypeScript sont déjà retenus (ADR 0005, 0016). Il reste à choisir comment structurer, styler, naviguer et tester la page, et à fixer la règle de l'icône « un agent travaille », laissée ouverte à la maquette.
+Step 10 writes the page from the validated faithful mockup. Svelte 5, Vite and TypeScript are already chosen (ADR 0005, 0016). It remains to choose how to structure, style, navigate and test the page, and to set the rule for the "An agent is working" icon, which was left open in the mockup.
 
-## Options étudiées
+## Options considered
 
-| Question | Options | Choix |
+| Question | Options | Choice |
 |---|---|---|
-| 1. Structure | **Svelte 5 + Vite seul**, une page servie par le serveur Hono (recommandé) ; SvelteKit en sortie statique | Svelte + Vite seul |
-| 2. Styles | **CSS maison avec les variables de la maquette** (recommandé) ; Tailwind | CSS maison |
-| 3. Navigation | **Routage par `#` écrit à la main** (recommandé) ; bibliothèque (svelte-spa-router) | Routage maison |
-| 4. Tests | **Playwright pour les parcours + Vitest pour la logique pure** (recommandé) ; en plus, Testing Library par composant | Playwright + Vitest |
-| 5. Vérifier les `.svelte` | **svelte-check, eslint-plugin-svelte, prettier-plugin-svelte** (recommandé) ; svelte-check seul | Les trois |
-| 6. Polices | **Embarquées (@fontsource, licence OFL)** (recommandé) ; polices du système ; Google Fonts | Embarquées |
-| 7. « Un agent travaille » | Activité récente (recommandé) ; conversation ouverte ; back-end seulement | Voir la décision : réponse de l'utilisateur |
+| 1. Structure | **Svelte 5 + Vite alone**, one page served by the Hono server (recommended); SvelteKit with static output | Svelte + Vite alone |
+| 2. Styles | **Home-made CSS with the mockup's variables** (recommended); Tailwind | Home-made CSS |
+| 3. Navigation | **Routing by `#` written by hand** (recommended); library (svelte-spa-router) | Home-made routing |
+| 4. Tests | **Playwright for the journeys + Vitest for the pure logic** (recommended); in addition, Testing Library per component | Playwright + Vitest |
+| 5. Checking the `.svelte` files | **svelte-check, eslint-plugin-svelte, prettier-plugin-svelte** (recommended); svelte-check alone | All three |
+| 6. Fonts | **Embedded (@fontsource, OFL licence)** (recommended); system fonts; Google Fonts | Embedded |
+| 7. "An agent is working" | Recent activity (recommended); open conversation; back-end only | See the decision: the user's answer |
 
-## Décision
+## Decision
 
-1. **Svelte 5 + Vite**, sans SvelteKit. Le paquet `web` construit des fichiers statiques. Le serveur Hono les sert sur son adresse et injecte le jeton du développeur dans le HTML (ADR 0027).
-2. **CSS maison** : les variables de couleur des thèmes clair et sombre reprises de la maquette, et des styles propres à chaque composant.
-3. **Routage par `#`** (`#/ticket/LOC-1`), écrit à la main.
-4. **Tests** : Playwright pour les parcours, contre un vrai serveur et une base temporaire ; c'est le critère de fin de l'étape. Vitest pour la logique pure de la page (regroupement par qui doit agir, tri, fil de discussion). Pas de tests de composants.
-5. **svelte-check, eslint-plugin-svelte et prettier-plugin-svelte**, ajoutés à `npm run verify`. Les seuils de l'ADR 0019 valent aussi pour les composants.
-6. **IBM Plex Sans et Mono embarquées** : aucune requête vers Internet, la page marche sur le réseau privé et hors ligne.
-7. **« Un agent travaille »**, réponse de l'utilisateur : « L'agent qui travaille doit dire quand il commence puis quand il a fini, ou l'API peut essayer de le faire avec une logique. » Comme pour l'usage (ADR 0012), en couches :
-   - **signalé** : une opération `reportWorking` (début, fin) ouverte aux agents ; l'adaptateur Claude Code la fait seul, au début d'un tour (hook `UserPromptSubmit`) et à la fin (hook `Stop`) ; une exécution du lanceur compte de son début à sa fin ;
-   - **déduit**, quand rien n'est signalé : une écriture d'un agent sur le ticket vaut un début ; une question au développeur, la réponse de fin de tour, ou 15 minutes sans activité valent une fin. Les 15 minutes sont réglables dans la configuration.
+1. **Svelte 5 + Vite**, without SvelteKit. The `web` package builds static files. The Hono server serves them on its address and injects the developer's token into the HTML (ADR 0027).
+2. **Home-made CSS**: the colour variables of the light and dark themes taken from the mockup, and styles specific to each component.
+3. **Routing by `#`** (`#/ticket/LOC-1`), written by hand.
+4. **Tests**: Playwright for the journeys, against a real server and a temporary database; this is the exit criterion of the step. Vitest for the pure logic of the page (grouping by who must act, sorting, discussion thread). No component tests.
+5. **svelte-check, eslint-plugin-svelte and prettier-plugin-svelte**, added to `npm run verify`. The thresholds of ADR 0019 also apply to the components.
+6. **IBM Plex Sans and Mono embedded**: no request to the Internet, the page works on the private network and offline.
+7. **"An agent is working"**, the user's answer: "The agent that works must say when it starts and when it has finished, or the API can try to do it with logic." As for usage (ADR 0012), in layers:
+   - **reported**: an operation `reportWorking` (start, end) open to agents; the Claude Code adapter does it by itself, at the start of a turn (`UserPromptSubmit` hook) and at the end (`Stop` hook); an execution of the launcher counts from its start to its end;
+   - **inferred**, when nothing is reported: a write by an agent on the ticket counts as a start; a question to the developer, the end-of-turn answer, or 15 minutes without activity count as an end. The 15 minutes can be set in the configuration.
 
-## Conséquences
+## Consequences
 
-- Dépendances ajoutées, figées : `svelte`, `@sveltejs/vite-plugin-svelte`, `@playwright/test`, `svelte-check`, `eslint-plugin-svelte`, `prettier-plugin-svelte`, `@fontsource/ibm-plex-sans`, `@fontsource/ibm-plex-mono`.
-- Playwright télécharge un navigateur (Chromium) à l'installation des outils de développement ; l'artefact livré n'en contient pas.
-- `npm run build` construit aussi la page ; `dist/` la contient à côté de `server.js`.
-- La page ne parle au serveur que par le catalogue d'opérations et le flux d'événements, comme la CLI (ADR 0014, 0026).
-- Un agent sans adaptateur qui ne signale rien reste couvert par la règle déduite ; l'icône peut alors s'éteindre avec retard (au plus 15 minutes).
+- Dependencies added, pinned: `svelte`, `@sveltejs/vite-plugin-svelte`, `@playwright/test`, `svelte-check`, `eslint-plugin-svelte`, `prettier-plugin-svelte`, `@fontsource/ibm-plex-sans`, `@fontsource/ibm-plex-mono`.
+- Playwright downloads a browser (Chromium) when the development tools are installed; the shipped artefact does not contain it.
+- `npm run build` also builds the page; `dist/` contains it next to `server.js`.
+- The page talks to the server only through the operations catalogue and the event stream, as the CLI does (ADR 0014, 0026).
+- An agent without an adapter that reports nothing stays covered by the inferred rule; the icon may then switch off late (at most 15 minutes).

@@ -1,33 +1,33 @@
-# 0027. Authentification du développeur auprès du serveur
+# 0027. Authentication of the developer with the server
 
-- Statut : Acceptée
-- Date : 2026-10-19
-- Décideur : l'utilisateur (question du 2026-10-19, au début de l'étape 9c)
-- Liens : [ADR 0011](0011-interface-des-agents.md) (jetons des agents), [0010](0010-back-end-intervenant-du-ticket.md) (jeton du lanceur), [0021](0021-suites-du-poc-reseau-et-lanceur.md) (mode sans TUN), [0026](0026-operations-cli-configuration-jira.md)
+- Status: Accepted
+- Date: 2026-10-19
+- Decider: the user (question of 2026-10-19, at the start of step 9c)
+- Links: [ADR 0011](0011-interface-des-agents.md) (agent tokens), [0010](0010-back-end-intervenant-du-ticket.md) (launcher token), [0021](0021-suites-du-poc-reseau-et-lanceur.md) (mode without TUN), [0026](0026-operations-cli-configuration-jira.md)
 
-## Contexte
+## Context
 
-Les agents ont un jeton de conversation (ADR 0011) et le lanceur a le sien (ADR 0010). Il faut reconnaître le développeur, seul autorisé à clore un ticket, à répondre aux questions ou à noter une livraison. En mode sans TUN (ADR 0021), les connexions du réseau privé arrivent sur la boucle locale : l'adresse d'origine ne suffit pas.
+The agents have a conversation token (ADR 0011) and the launcher has its own (ADR 0010). The developer, the only one allowed to close a ticket, answer questions or record a delivery, must be recognised. In mode without TUN (ADR 0021), the connections of the private network arrive on the loopback: the origin address is not enough.
 
-## Options étudiées
+## Options considered
 
-| Option | Avantages | Inconvénients |
+| Option | Advantages | Drawbacks |
 |---|---|---|
-| **Jeton dans un fichier local**, renouvelé à chaque démarrage (recommandé) | Rien à configurer ; rien ne traîne d'un démarrage à l'autre | Il faut lire le fichier : la CLI le fait seule |
-| Jeton fixe dans une variable d'environnement | Stable | À gérer, et à ne jamais commiter |
-| Pas de jeton développeur | Le plus simple | Un appareil du réseau privé pourrait agir au nom du développeur |
+| **Token in a local file**, renewed at each start (recommended) | Nothing to configure; nothing lingers from one start to the next | The file must be read: the CLI does it by itself |
+| Fixed token in an environment variable | Stable | To manage, and never to commit |
+| No developer token | The simplest | A device of the private network could act in the name of the developer |
 
-## Décision
+## Decision
 
-**Jeton dans un fichier local.**
+**Token in a local file.**
 
-- Au démarrage, le serveur tire un jeton aléatoire et l'écrit dans `developer.token`, à côté de la base, lisible par le seul utilisateur (droits 600) et ignoré par git. Un nouveau jeton remplace l'ancien à chaque démarrage.
-- La page reçoit le jeton dans le HTML qu'elle charge ; la CLI du développeur le lit dans le fichier.
-- Toute requête porte un jeton (`Authorization: Bearer …`) : développeur, conversation d'agent ou lanceur. Sans jeton valide, seule la présentation d'un agent (`introduce`) est acceptée, pour qu'une nouvelle conversation obtienne le sien.
-- Le serveur refuse aussi une requête dont l'en-tête `Host` n'est pas une de ses adresses d'écoute (protection contre le « DNS rebinding »).
+- At startup, the server draws a random token and writes it to `developer.token`, next to the database, readable by the user alone (rights 600) and ignored by git. A new token replaces the old one at each start.
+- The page receives the token in the HTML it loads; the developer's CLI reads it from the file.
+- Every request carries a token (`Authorization: Bearer …`): developer, agent conversation or launcher. Without a valid token, only the introduction of an agent (`introduce`) is accepted, so that a new conversation gets its own.
+- The server also refuses a request whose `Host` header is not one of its listening addresses (protection against "DNS rebinding").
 
-## Conséquences
+## Consequences
 
-- Les opérations réservées au développeur (clôture, réponses, livraisons) ne sont accessibles qu'avec ce jeton.
-- `introduce` reste ouvert : sur le réseau privé, la règle d'accès Headscale (ADR 0021) limite qui peut joindre le serveur.
-- Un agent qui tourne sur la machine du développeur pourrait lire le fichier : le jeton protège du réseau, pas des programmes du développeur lui-même.
+- The operations reserved for the developer (closing, answers, deliveries) are accessible only with this token.
+- `introduce` stays open: on the private network, the Headscale access rule (ADR 0021) limits who can reach the server.
+- An agent running on the developer's machine could read the file: the token protects against the network, not against the developer's own programs.

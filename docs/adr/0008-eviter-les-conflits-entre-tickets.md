@@ -1,96 +1,96 @@
-# 0008. Éviter les conflits entre tickets traités en parallèle
+# 0008. Avoiding conflicts between tickets handled in parallel
 
-- Statut : Acceptée
-- Date : 2026-10-19
-- Décideur : l'utilisateur (réponses aux questions du 2026-10-19)
-- Liens : [features.md](../product/features.md) F16 (B4.4, primaire), F34 (secondaire) ; [needs.md](../product/needs.md) M4 ; [glossaire](../product/glossary.md) (fichier tenu, ressource partagée, verrou, conflit, garde)
+- Status: Accepted
+- Date: 2026-10-19
+- Decider: the user (answers to the questions of 2026-10-19)
+- Links: [features.md](../product/features.md) F16 (B4.4, primary), F34 (secondary); [needs.md](../product/needs.md) M4; [glossary](../product/glossary.md) (held file, shared resource, lock, conflict, guard)
 
-## Contexte
+## Context
 
-Mots de l'utilisateur (M4) : les conflits arrivent « très très souvent ». Aujourd'hui, il les évite en ne modifiant pas le code de plusieurs tickets en même temps. Le nouvel outil doit rendre ce parallélisme possible.
+The user's words (M4): conflicts happen "very, very often". Today, he avoids them by not changing the code of several tickets at the same time. The new tool must make this parallelism possible.
 
-Le problème a deux volets.
-1. **Le code** : deux intervenants modifient les mêmes fichiers. Dans un même dossier, ils partagent aussi l'état de git : modifications non commitées, branche courante, build cassé par l'un et subi par l'autre.
-2. **Les ressources partagées** : un environnement qu'un seul ticket peut utiliser à la fois, par exemple les tests e2e.
+The problem has two parts.
+1. **The code**: two assignees change the same files. In the same folder, they also share the state of git: uncommitted changes, current branch, a build broken by one and suffered by the other.
+2. **The shared resources**: an environment that only one ticket can use at a time, for example the e2e tests.
 
-La V1 traite le code par des **fichiers tenus** (déclarés avant modification, avec une garde par hook qui refuse l'écriture), et les ressources par un **verrou** (`lock run … -- <commande>`). Les deux s'appliquent dans **un seul dossier de travail partagé**. La garde repose sur des expressions régulières sur les commandes shell (faux positifs connus) et sur un hook propre à Claude Code. La détection de vie se fait par numéro de processus.
+V1 handles code through **held files** (declared before a change, with a hook guard that refuses the write), and resources through a **lock** (`lock run … -- <command>`). Both apply in **one single shared working folder**. The guard relies on regular expressions over shell commands (known false positives) and on a hook specific to Claude Code. Liveness is detected by process number.
 
-## Volet 1 : le code
+## Part 1: the code
 
 ### Options
 
-**A. Un dossier de travail par ticket (git worktree)**
+**A. One working folder per ticket (git worktree)**
 
-Chaque ticket a sa branche et son propre dossier. Les intervenants ne se voient pas : ni fichiers, ni état git, ni build partagés. Les conflits n'apparaissent qu'au moment de réunir les branches, sous forme de conflits git classiques.
+Each ticket has its own branch and its own folder. The assignees do not see each other: no shared files, git state or build. Conflicts only appear when the branches are merged, as ordinary git conflicts.
 
-- Avantages :
-  - isolation totale, quel que soit l'outil d'agent ;
-  - la pratique courante pour faire travailler plusieurs agents en parallèle ;
-  - Claude Code sait déjà travailler dans un worktree (outil dédié, isolation des sous-agents).
-- Inconvénients :
-  - chaque dossier doit être installé (dépendances, fichiers d'environnement) ;
-  - les serveurs de développement ont besoin de ports différents ;
-  - il faut réunir les branches avant la livraison ;
-  - un conflit est découvert tard s'il n'est pas détecté avant.
+- Advantages:
+  - total isolation, whatever the agent tool;
+  - the common practice for having several agents work in parallel;
+  - Claude Code already knows how to work in a worktree (dedicated tool, sub-agent isolation).
+- Drawbacks:
+  - each folder must be installed (dependencies, environment files);
+  - development servers need different ports;
+  - the branches must be merged before delivery;
+  - a conflict is found late if it is not detected earlier.
 
-**B. Un seul dossier et des fichiers tenus (V1)**
+**B. One folder and held files (V1)**
 
-- Avantages : pas de duplication, et l'exclusivité est garantie en temps réel.
-- Inconvénients :
-  - dépend de la discipline des agents et d'une garde propre à Claude Code ;
-  - l'état git et le build restent partagés ;
-  - deux tickets qui touchent le même fichier ne peuvent pas avancer ensemble.
+- Advantages: no duplication, and exclusivity is guaranteed in real time.
+- Drawbacks:
+  - depends on the discipline of the agents and on a guard specific to Claude Code;
+  - the git state and the build remain shared;
+  - two tickets that touch the same file cannot move forward together.
 
-**C. Un dossier par ticket, avec détection précoce des chevauchements** (A enrichi)
+**C. One folder per ticket, with early detection of overlaps** (A enriched)
 
-En plus de A, l'outil compare régulièrement les fichiers modifiés par chaque ticket, en lisant git dans chaque dossier. Il signale tout de suite que deux tickets touchent le même fichier. Le développeur voit alors un risque de conflit, et non plus un blocage. Les fichiers tenus restent possibles, comme verrou volontaire sur un fichier sensible (F34).
+On top of A, the tool regularly compares the files changed by each ticket, by reading git in each folder. It immediately signals that two tickets touch the same file. The developer then sees a risk of conflict, not a block. Held files remain possible, as a voluntary lock on a sensitive file (F34).
 
-### Proposition de l'IA
+### AI proposal
 
 **Option C.**
 
-## Volet 2 : les ressources partagées
+## Part 2: the shared resources
 
 ### Options
 
-**R1. Verrou géré par l'outil, avec file d'attente**
+**R1. Lock managed by the tool, with a queue**
 
-- L'intervenant demande la ressource, l'utilise, puis la rend. Une commande enveloppe tient le verrou pendant toute l'exécution : `tracker resource run e2e -- <commande>`.
-- Le verrou est stocké dans la base (ADR 0004), avec une durée de validité renouvelée par des signes de vie, au lieu du numéro de processus.
-- Qui l'attend apparaît dans la situation du ticket : **attente : ressource « e2e »**.
-- Avantage : neutre vis-à-vis de l'outil d'agent.
+- The assignee requests the resource, uses it, then releases it. A wrapper command holds the lock for the whole execution: `tracker resource run e2e -- <command>`.
+- The lock is stored in the database (ADR 0004), with a validity period renewed by signs of life, instead of the process number.
+- Who is waiting appears in the situation of the ticket: **"attente : ressource « e2e »"**.
+- Advantage: neutral with respect to the agent tool.
 
-**R2. R1 plus une garde Claude Code**
+**R2. R1 plus a Claude Code guard**
 
-Un hook refuse une commande e2e lancée hors de la commande enveloppe. Cela rattrape un agent indiscipliné, mais reprend la garde par expressions régulières de la V1, fragile et propre à Claude Code.
+A hook refuses an e2e command started outside the wrapper command. This catches an undisciplined agent, but it reuses the V1 regular-expression guard, which is fragile and specific to Claude Code.
 
-**R3. Rien de spécial** : on reste dans la situation actuelle.
+**R3. Nothing special**: we stay in the current situation.
 
-### Proposition de l'IA
+### AI proposal
 
-**R1**, avec la garde de R2 en **option** (F34, secondaire), désactivée par défaut.
+**R1**, with the guard from R2 as an **option** (F34, secondary), disabled by default.
 
-## Ressources propres à chaque dossier (à explorer)
+## Resources specific to each folder (to explore)
 
-Avec un dossier par ticket, certaines ressources doivent être **distinctes par ticket** plutôt qu'exclusives : le port du serveur de développement, une base locale. L'outil pourrait attribuer un port à chaque ticket. C'est à confirmer selon le projet.
+With one folder per ticket, some resources must be **distinct per ticket** rather than exclusive: the development server port, a local database. The tool could assign a port to each ticket. This must be confirmed according to the project.
 
-## Décision
+## Decision
 
-| Question | Réponse de l'utilisateur |
+| Question | User's answer |
 |---|---|
-| Organisation git d'un ticket aujourd'hui | « Variable » (une branche par ticket ou une branche commune, selon le cas) |
-| Approche pour le code | « Worktree + détection » (option C) |
-| Approche pour les ressources partagées | « Verrou + file d'attente » (R1, garde Claude Code en option désactivée par défaut) |
-| Installer un nouveau dossier de travail sur le projet | « Je ne sais pas » |
+| Git organisation of a ticket today | "Varies" (one branch per ticket or a shared branch, depending on the case) |
+| Approach for the code | "Worktree + detection" (option C) |
+| Approach for shared resources | "Lock + queue" (R1, Claude Code guard as an option disabled by default) |
+| Installing a new working folder on the project | "I don't know" |
 
-Ajustements qui découlent de ces réponses :
-- **Le dossier par ticket est le mode recommandé, pas une obligation.** Comme l'organisation git varie, un ticket peut aussi être traité dans le dossier principal. Dans ce cas, la détection des chevauchements s'applique entre les tickets qui partagent ce dossier, et les fichiers tenus (F34) restent disponibles.
-- **La préparation d'un dossier de travail est configurable par projet** : une commande de préparation (installer les dépendances, copier les fichiers d'environnement, choisir un port), lancée par l'intervenant, jamais par la page.
-- **Risque à lever avant de construire** : le coût réel de la préparation d'un dossier sur le projet de l'utilisateur est inconnu. Un essai sera fait au début de l'étape « interfaces agents » du plan.
+Adjustments that follow from these answers:
+- **The folder per ticket is the recommended mode, not an obligation.** As the git organisation varies, a ticket can also be handled in the main folder. In that case, overlap detection applies between the tickets that share this folder, and held files (F34) remain available.
+- **Preparing a working folder is configurable per project**: a preparation command (install the dependencies, copy the environment files, choose a port), started by the assignee, never by the page.
+- **Risk to clear before building**: the real cost of preparing a folder on the user's project is unknown. A trial will be run at the start of the "agent interfaces" step of the plan.
 
-## Conséquences
+## Consequences
 
-- Le ticket connaît sa **branche** et son **dossier de travail**, s'il en a un. La reprise (F15) se fait dans ce dossier.
-- L'outil lit git dans chaque dossier pour la détection des chevauchements. Cela sert aussi F23 (changements de code du ticket).
-- La livraison en qualité (F19) comprend la réunion des branches des tickets du lot.
-- Le glossaire gagne deux termes : **dossier de travail** (`worktree`) et **chevauchement** (`overlap`), un risque de conflit détecté.
+- The ticket knows its **branch** and its **working folder**, if it has one. Resumption (F15) takes place in this folder.
+- The tool reads git in each folder for overlap detection. This also serves F23 (code changes of the ticket).
+- QA delivery (F19) includes merging the branches of the tickets in the batch.
+- The glossary gains two terms: **working folder** (`worktree`) and **overlap** (`overlap`), a detected risk of conflict.

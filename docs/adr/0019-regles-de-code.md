@@ -1,38 +1,38 @@
-# 0019. Règles de code pour les agents : Karpathy et un guide maison
+# 0019. Code rules for agents: Karpathy and a home-made guide
 
-- Statut : Acceptée
-- Date : 2026-10-19
-- Décideur : l'utilisateur (demande et choix du 2026-10-19)
-- Liens : [AGENTS.md](../../AGENTS.md), [code-style.md](../code-style.md) ; [ADR 0002](0002-perimetre-multi-agents-ouvert.md) (agnostique), [0018](0018-outillage-et-code-v1.md) (ESLint)
+- Status: Accepted
+- Date: 2026-10-19
+- Decider: the user (request and choice of 2026-10-19)
+- Links: [AGENTS.md](../../AGENTS.md), [code-style.md](../code-style.md); [ADR 0002](0002-perimetre-multi-agents-ouvert.md) (agnostic), [0018](0018-outillage-et-code-v1.md) (ESLint)
 
-## Contexte
+## Context
 
-Demande de l'utilisateur, avant tout code du POC : « J'ai besoin que tu mettes en place des règles de code afin de suivre les bons principes, d'avoir un code lisible et professionnel. Est-ce que tu peux chercher en ligne un truc pour ça à donner à un agent ? Un truc populaire. »
+Request of the user, before any POC code: "I need you to set up code rules so as to follow good principles and have readable, professional code. Can you search online for something to give to an agent? A popular one."
 
-Recherche du 2026-10-19 :
-- Les règles les plus populaires pour les agents sont celles tirées des notes d'Andrej Karpathy sur les erreurs des LLM qui codent ([forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills), environ 221 000 étoiles). Ce sont quatre règles de **comportement** : réfléchir avant de coder, la simplicité d'abord, des changements chirurgicaux, viser un résultat vérifiable. Rien sur la forme du code. Le dépôt n'affiche pas de licence.
-- La référence pour un TypeScript lisible est le [guide de style de Google](https://google.github.io/styleguide/tsguide.html), trop long pour être donné tel quel.
-- Les collections de règles (awesome-cursorrules) sont populaires mais de qualité inégale.
-- Les guides sur ces fichiers conseillent : des règles précises plutôt que « écris du code propre », un linter pour tout ce qui se vérifie, un fichier racine court qui renvoie à des fichiers par thème, et un `AGENTS.md` lu par tous les outils d'agent.
+Search of 2026-10-19:
+- The most popular rules for agents are those drawn from Andrej Karpathy's notes on the mistakes of LLMs that write code ([forrestchang/andrej-karpathy-skills](https://github.com/forrestchang/andrej-karpathy-skills), about 221,000 stars). They are four rules of **behaviour**: think before coding, simplicity first, surgical changes, aim for a verifiable result. Nothing on the form of the code. The repository shows no licence.
+- The reference for readable TypeScript is the [Google style guide](https://google.github.io/styleguide/tsguide.html), too long to be given as it is.
+- Collections of rules (awesome-cursorrules) are popular but of uneven quality.
+- The guides on these files advise: precise rules rather than "write clean code"; a linter for everything that can be checked; a short root file that points to files by theme; and an `AGENTS.md` read by all agent tools.
 
-## Options étudiées
+## Options considered
 
-| Option | Avantages | Inconvénients |
+| Option | Advantages | Drawbacks |
 |---|---|---|
-| **Karpathy + guide maison** | Comportement de l'agent et forme du code ; règles vérifiables dans ESLint | Un guide à tenir à jour |
-| Karpathy seul | Court, éprouvé | Rien sur la forme du code |
-| Guide Google en référence | Le standard | Long, ne cadre pas le comportement de l'agent |
+| **Karpathy + home-made guide** | Agent behaviour and code form; rules checkable in ESLint | A guide to keep up to date |
+| Karpathy alone | Short, proven | Nothing on the form of the code |
+| Google guide as reference | The standard | Long, does not frame the agent's behaviour |
 
-## Décision
+## Decision
 
-**Karpathy + guide maison** (proposition de l'IA).
+**Karpathy + home-made guide** (AI proposal).
 
-- **`AGENTS.md`** à la racine, lu par tous les outils d'agent ; `CLAUDE.md` ne fait que l'importer (`@AGENTS.md`). Il contient le contexte du projet, les quatre règles Karpathy **reformulées** avec la source citée (pas de licence, donc pas de copie), et les règles non négociables.
-- **[`docs/code-style.md`](../code-style.md)** : les règles que l'outil ne vérifie pas, chacune avec un exemple « à faire / à éviter ». Elles viennent du guide de Google et du guide de style de la V1.
-- **Ce qui se vérifie va dans ESLint** : exports nommés seulement, types de retour explicites sur ce qui est exporté, `switch` exhaustif, pas de ternaire imbriqué, `===`, `const`, pas de `console` dans `core`, complexité 10, profondeur 3, 4 paramètres, 60 lignes par fonction et 400 lignes par fichier (hors tests).
-- **Le plafond de 400 lignes n'a pas d'exception.** La V1 avait des « tailles assumées » relevées module par module, et leur suivi a encombré sa documentation (audit V1).
+- **`AGENTS.md`** at the root, read by all agent tools; `CLAUDE.md` only imports it (`@AGENTS.md`). It contains the project context, the four Karpathy rules **reworded** with the source cited (no licence, so no copy), and the non-negotiable rules.
+- **[`docs/code-style.md`](../code-style.md)**: the rules the tool does not check, each one with a "to do / to avoid" example. They come from the Google guide and from the V1 style guide.
+- **What can be checked goes into ESLint**: named exports only, explicit return types on what is exported, exhaustive `switch`, no nested ternary, `===`, `const`, no `console` in `core`, complexity 10, depth 3, 4 parameters, 60 lines per function and 400 lines per file (tests excluded).
+- **The 400-line ceiling has no exception.** V1 had "accepted sizes" noted module by module, and their tracking cluttered its documentation (V1 audit).
 
-## Conséquences
+## Consequences
 
-- Tout agent, quel que soit son outil, lit les mêmes règles.
-- Un seuil ESLint qui gêne se discute avec l'utilisateur et se change dans une nouvelle ADR, pas par une exception locale.
+- Every agent, whatever its tool, reads the same rules.
+- A ESLint threshold that gets in the way is discussed with the user and changed in a new ADR, not by a local exception.

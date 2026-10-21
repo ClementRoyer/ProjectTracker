@@ -1,63 +1,63 @@
-# 0015. Modèle de données : état courant et journal immuable
+# 0015. Data model: current state and immutable journal
 
-- Statut : Acceptée
-- Date : 2026-10-19
-- Décideur : l'utilisateur (réponses aux deux questions du 2026-10-19)
-- Liens : [glossaire](../product/glossary.md) (noms des notions et codes) ; [features.md](../product/features.md) ; [ADR 0004](0004-stockage-sqlite.md), [0007](0007-acheminement-des-reponses.md) à [0014](0014-decoupage-en-paquets.md) ; [architecture.md](../architecture.md) §2.6
+- Status: Accepted
+- Date: 2026-10-19
+- Decider: the user (answers to the two questions of 2026-10-19)
+- Links: [glossary](../product/glossary.md) (names of the notions and codes); [features.md](../product/features.md); [ADR 0004](0004-stockage-sqlite.md), [0007](0007-acheminement-des-reponses.md) to [0014](0014-decoupage-en-paquets.md); [architecture.md](../architecture.md) §2.6
 
-## Contexte
+## Context
 
-La V1 range un ticket dans huit flux distincts (history, events, messages, exchanges, notes…) et dans plusieurs fichiers d'état, protégés par des verrous maison. Le glossaire a fixé une notion unique : le **journal**, fait d'**entrées** jamais modifiées. La V2 stocke tout dans une base SQLite par projet (ADR 0004, 0013), ouverte par le seul serveur (ADR 0011).
+V1 stores a ticket in eight separate streams (history, events, messages, exchanges, notes…) and in several state files, protected by home-made locks. The glossary has set a single notion: the **journal**, made of **entries** that are never changed. V2 stores everything in one SQLite database per project (ADR 0004, 0013), opened by the server alone (ADR 0011).
 
-## Options étudiées
+## Options considered
 
-| Option | Avantages | Inconvénients |
+| Option | Advantages | Drawbacks |
 |---|---|---|
-| **État courant + journal**, écrits dans la même transaction | Lectures simples et rapides ; histoire complète | Une incohérence ne peut venir que d'un bug d'un cas d'usage (couvert par les tests) |
-| Tout dérivé du journal (event sourcing) | Une seule source de vérité | Projections, rejeu et évolution des types d'événements : trop complexe pour un outil local mono-utilisateur |
+| **Current state + journal**, written in the same transaction | Simple and fast reads; complete history | An inconsistency can only come from a bug in a use case (covered by the tests) |
+| Everything derived from the journal (event sourcing) | A single source of truth | Projections, replay and evolution of event types: too complex for a local single-user tool |
 
-## Décision
+## Decision
 
-**État courant + journal** (proposition de l'IA), et le modèle ci-dessous, acceptés par l'utilisateur.
+**Current state + journal** (AI proposal), and the model below, accepted by the user.
 
-### Règles générales
+### General rules
 
-- Le **journal** (`entry`) n'est jamais modifié ni effacé : des déclencheurs SQLite refusent `UPDATE` et `DELETE`. Une correction est une nouvelle entrée.
-- Chaque cas d'usage écrit l'état courant et l'entrée du journal **dans la même transaction**.
-- Les noms de tables et de colonnes reprennent les codes du glossaire. Dates en ISO 8601 UTC. Identifiants textuels.
-- Les **jetons** ne sont stockés que hachés. Le **prix des modèles** est dans la configuration, pas dans la base (ADR 0012).
-- Le schéma évolue par migrations numérotées, de façon additive tant que possible.
+- The **journal** (`entry`) is never changed or deleted: SQLite triggers refuse `UPDATE` and `DELETE`. A correction is a new entry.
+- Each use case writes the current state and the journal entry **in the same transaction**.
+- The names of tables and columns take the codes of the glossary. Dates in ISO 8601 UTC. Textual identifiers.
+- **Tokens** are only stored hashed. The **model prices** are in the configuration, not in the database (ADR 0012).
+- The schema evolves through numbered migrations, additive as far as possible.
 
 ### Tables
 
-| Table | Colonnes principales | Notes |
+| Table | Main columns | Notes |
 |---|---|---|
 | `ticket` | `id`, `key`, `origin` (`jira`/`local`), `title`, `initialRequest`, `jiraUrl`, `jiraStatus`, `groupId`, `createdAt`, `closedAt` | `key` unique |
-| `situation` | `ticketId`, `phase`, `progress`, `progressNote`, `waitKind`, `waitSince`, `waitDetail`, `updatedAt` | Une ligne par ticket. L'attente est **calculée** pour ce qui vient de l'outil (question ouverte, demande back-end, file de ressource, fichier tenu) et **déclarée** pour l'extérieur (utilisateur final, partenaire) |
-| `entry` | `id`, `ticketId`, `entryType`, `authorKind` (`developer`/`agent`/`jira`/`launcher`/`system`), `sessionId`, `role`, `body` (texte intégral), `data` (JSON), `replyTo`, `createdAt` | Le journal, immuable |
+| `situation` | `ticketId`, `phase`, `progress`, `progressNote`, `waitKind`, `waitSince`, `waitDetail`, `updatedAt` | One row per ticket. The wait is **computed** for what comes from the tool (open question, back-end request, resource queue, held file) and **declared** for what is outside (end user, partner) |
+| `entry` | `id`, `ticketId`, `entryType`, `authorKind` (`developer`/`agent`/`jira`/`launcher`/`system`), `sessionId`, `role`, `body` (full text), `data` (JSON), `replyTo`, `createdAt` | The journal, immutable |
 | `agent` | `id`, `name`, `tool` | `name` unique, stable |
-| `session` | `id`, `agentId`, `tokenHash`, `startedAt`, `lastSeenAt`, `endedAt` | La conversation (ADR 0011) |
-| `assignment` | `ticketId`, `role` (`front`/`backend`), `assigneeKind` (`developer`/`agent`), `agentId`, `sessionId`, `since`, `releasedAt` | Un intervenant actif par rôle et par ticket (index unique partiel sur `releasedAt IS NULL`) |
-| `question` | `entryId`, `ticketId`, `options` (JSON), `recommendation`, `status` (`open`/`answered`), `answerEntryId` | Le texte est dans l'entrée |
-| `delivery` | `entryId` (réponse ou demande), `ticketId`, `role`, `sessionId`, `deliveredAt`, `acknowledgedAt` | Acheminement et prise en compte (ADR 0007) |
+| `session` | `id`, `agentId`, `tokenHash`, `startedAt`, `lastSeenAt`, `endedAt` | The conversation (ADR 0011) |
+| `assignment` | `ticketId`, `role` (`front`/`backend`), `assigneeKind` (`developer`/`agent`), `agentId`, `sessionId`, `since`, `releasedAt` | One active assignee per role and per ticket (partial unique index on `releasedAt IS NULL`) |
+| `question` | `entryId`, `ticketId`, `options` (JSON), `recommendation`, `status` (`open`/`answered`), `answerEntryId` | The text is in the entry |
+| `delivery` | `entryId` (answer or request), `ticketId`, `role`, `sessionId`, `deliveredAt`, `acknowledgedAt` | Routing and acknowledgement (ADR 0007) |
 | `backendRequest` | `id`, `ticketId`, `entryId`, `status` (`pending`/`taken`/`running`/`done`/`failed`/`unreachable`), `createdAt` | ADR 0010 |
-| `execution` | `id`, `requestId`, `launcherId`, `startedAt`, `endedAt`, `outcome`, `undeclaredChanges` | Un passage d'agent back-end |
-| `launcher` | `id`, `name`, `tokenHash`, `lastSeenAt`, `heldFiles` (JSON, indicatif) | Signes de vie et fichiers tenus annoncés |
+| `execution` | `id`, `requestId`, `launcherId`, `startedAt`, `endedAt`, `outcome`, `undeclaredChanges` | One back-end agent run |
+| `launcher` | `id`, `name`, `tokenHash`, `lastSeenAt`, `heldFiles` (JSON, for information) | Signs of life and announced held files |
 | `worktree` | `ticketId`, `path`, `branch`, `lastReportAt` | ADR 0008 |
-| `changedFile` | `ticketId`, `path`, `reportedAt` | Rapportés par la CLI (ADR 0014) ; les chevauchements en sont déduits |
-| `fileHold` | `ticketId`, `path`, `sessionId`, `since` | Dossier principal, F34 |
-| `resource`, `resourceLock`, `resourceQueue` | `name` ; `resource`, `ticketId`, `sessionId`, `leaseUntil` ; `resource`, `ticketId`, `queuedAt` | Verrou avec bail et file d'attente |
+| `changedFile` | `ticketId`, `path`, `reportedAt` | Reported by the CLI (ADR 0014); the overlaps are deduced from them |
+| `fileHold` | `ticketId`, `path`, `sessionId`, `since` | Main folder, F34 |
+| `resource`, `resourceLock`, `resourceQueue` | `name`; `resource`, `ticketId`, `sessionId`, `leaseUntil`; `resource`, `ticketId`, `queuedAt` | Lock with lease and queue |
 | `testRun` | `id`, `ticketId`, `kind` (`auto`/`visual`/`user`), `result`, `note`, `at` | F17, F24 |
-| `usage` | `id`, `sessionId`, `ticketId` (vide si aucun), `model`, `inputTokens`, `outputTokens`, `cacheReadTokens`, `cacheWriteTokens`, `provenance` (`measured`/`declared`), `at` | ADR 0012 |
-| `deliveryBatch`, `deliveryBatchTicket` | `id`, `name`, `deliveredAt`, `validatedAt`, `changelog` ; lien vers les tickets | Lot de livraison en qualité, F19, F22 |
-| `attachment` | `id`, `ticketId`, `path`, `mime`, `createdAt` | Fichiers à côté de la base |
-| `group`, `document` | `id`, `name` ; `id`, `title`, `path` | Secondaires |
-| `preview` | `builtAt`, `tickets` (JSON), `conflicts` (JSON) | Dernier aperçu reconstruit (ADR 0009) |
-| `developer` | `lastVisitAt` | Les nouveautés (F9) sont les entrées postérieures |
-| `jiraImport` | `id`, `at`, `summary` (JSON) | Chaque chargement ; le détail est aussi dans le journal |
+| `usage` | `id`, `sessionId`, `ticketId` (empty if none), `model`, `inputTokens`, `outputTokens`, `cacheReadTokens`, `cacheWriteTokens`, `provenance` (`measured`/`declared`), `at` | ADR 0012 |
+| `deliveryBatch`, `deliveryBatchTicket` | `id`, `name`, `deliveredAt`, `validatedAt`, `changelog`; link to the tickets | QA delivery batch, F19, F22 |
+| `attachment` | `id`, `ticketId`, `path`, `mime`, `createdAt` | Files next to the database |
+| `group`, `document` | `id`, `name`; `id`, `title`, `path` | Secondary |
+| `preview` | `builtAt`, `tickets` (JSON), `conflicts` (JSON) | Last rebuilt preview (ADR 0009) |
+| `developer` | `lastVisitAt` | The novelties (F9) are the entries posted after it |
+| `jiraImport` | `id`, `at`, `summary` (JSON) | Each load; the detail is also in the journal |
 
-## Conséquences
+## Consequences
 
-- Les nouveautés, l'historique et la fiche se lisent dans le journal ; la vue d'ensemble et « ce qui m'attend » se lisent dans les tables d'état courant.
-- La migration depuis la V1 (paquet `install`) transforme les huit flux en entrées typées et reconstruit les tables d'état.
-- Les tests des cas d'usage vérifient que l'état courant et le journal restent cohérents.
+- The novelties, the history and the record sheet are read from the journal; the overview and "what is waiting for me" are read from the current-state tables.
+- The migration from V1 (`install` package) turns the eight streams into typed entries and rebuilds the state tables.
+- The use-case tests check that the current state and the journal stay consistent.

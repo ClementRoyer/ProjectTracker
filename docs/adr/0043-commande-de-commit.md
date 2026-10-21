@@ -1,35 +1,35 @@
-# 0043. Commande de commit
+# 0043. Commit command
 
-- Statut : Acceptée
-- Date : 2026-10-21
-- Décideur : l'utilisateur (réponses du 2026-10-21)
-- Liens : met en œuvre l'[ADR 0009](0009-apercu-et-commits-des-dossiers-de-travail.md) (commande de commit, attribution désactivée) ; [ADR 0041](0041-dossier-de-travail-par-ticket.md) (dossiers de travail) ; [plan de l'étape 16](../plan/etape-16.md)
+- Status: Accepted
+- Date: 2026-10-21
+- Decider: the user (answers of 2026-10-21)
+- Links: implements [ADR 0009](0009-apercu-et-commits-des-dossiers-de-travail.md) (commit command, attribution disabled); [ADR 0041](0041-dossier-de-travail-par-ticket.md) (working folders); [step 16 plan](../plan/etape-16.md)
 
-## Contexte
+## Context
 
-L'ADR 0009 a retenu une commande de commit fournie par l'outil, utilisable par tout agent, qui applique la convention du projet sans mention de co-auteur, l'auteur étant le développeur. Elle a aussi retenu que l'installation désactive l'attribution automatique de Claude Code, et que les commits d'un ticket pourront être regroupés. Restaient à dire : qui écrit le message, quels fichiers entrent, quelle trace sur le ticket, et quand faire le regroupement.
+ADR 0009 chose a commit command provided by the tool, usable by any agent, which applies the project's convention without any co-author mention, the author being the developer. It also chose that the installation disables Claude Code's automatic attribution, and that the commits of a ticket could be grouped. What remained to be decided: who writes the message, which files go in, what trace goes on the ticket, and when to do the grouping.
 
-## Options étudiées
+## Options considered
 
-| Question | Options | Choix |
+| Question | Options | Choice |
 |---|---|---|
-| 1. Message | **l'agent écrit, l'outil vérifie** (recommandé) ; l'outil compose à partir d'un type ; aucune vérification | L'agent écrit, l'outil vérifie |
-| 2. Fichiers | **tout dans un dossier de ticket, l'indexé dans le dossier principal** (recommandé) ; toujours l'indexé ; toujours tout | Tout dans un dossier de ticket |
-| 3. Trace | **note au journal du ticket** (recommandé) ; clé dans le message ; aucune | Note au journal |
-| 4. Regroupement | **plus tard, avec la livraison** (recommandé) ; maintenant | Plus tard |
+| 1. Message | **The agent writes, the tool checks** (recommended); the tool composes from a type; no check | The agent writes, the tool checks |
+| 2. Files | **Everything in a ticket folder, only the staged files in the main folder** (recommended); always the staged files; always everything | Everything in a ticket folder |
+| 3. Trace | **Note in the ticket journal** (recommended); key in the message; none | Note in the journal |
+| 4. Grouping | **Later, with the delivery** (recommended); now | Later |
 
-## Décision
+## Decision
 
-1. **Commande** : `tracker commit "<message>" [--ticket <CLÉ>]`, lancée par un agent ou le développeur, sur sa machine ; le serveur n'exécute rien.
-2. **Message** : écrit par l'agent. L'outil retire les lignes de co-auteur et « Generated with », puis refuse un message qui ne tient pas sur une ligne de 72 caractères au plus. Avec la règle gitmoji (par défaut), il refuse aussi un message qui ne commence pas par un emoji suivi d'une espace. La configuration peut l'enlever : `"commit": { "gitmoji": false }`.
-3. **Auteur** : celui de la configuration git, donc le développeur. Aucune mention de l'agent.
-4. **Fichiers** : dans `.worktrees/<CLÉ>`, tout ce qui a changé, dans chaque dépôt touché, avec le même message. Dans le dossier principal, partagé entre tickets, seulement ce qui est déjà indexé. Rien à commiter est refusé.
-5. **Trace** : le ticket est celui de `--ticket`, sinon celui du dossier `.worktrees/<CLÉ>`. Son journal reçoit « Commit a1b2c3d : <message> » (avec le dépôt quand il y en a plusieurs). Sans ticket connu, le commit se fait sans note. La clé n'entre pas dans le message ; la branche `ticket/<CLÉ>` la porte.
-6. **Attribution** : l'installation règle `attribution` à vide (commits et PR) dans `.claude/settings.json` du projet, s'il n'est pas déjà réglé. Le retrait de l'outil le laisse : c'est aussi la consigne du développeur.
-7. **Regroupement** : avec l'étape de livraison, qui réunira la branche du ticket dans la branche principale.
+1. **Command**: `tracker commit "<message>" [--ticket <KEY>]`, run by an agent or the developer, on their machine; the server runs nothing.
+2. **Message**: written by the agent. The tool removes the co-author lines and "Generated with", then refuses a message that does not fit on one line of 72 characters at most. With the gitmoji rule (default), it also refuses a message that does not start with an emoji followed by a space. The configuration can turn it off: `"commit": { "gitmoji": false }`.
+3. **Author**: the one from the git configuration, so the developer. No mention of the agent.
+4. **Files**: in `.worktrees/<KEY>`, everything that changed, in each repository touched, with the same message. In the main folder, shared between tickets, only what is already staged. Committing nothing is refused.
+5. **Trace**: the ticket is the one from `--ticket`, otherwise the one of the folder `.worktrees/<KEY>`. Its journal receives "Commit a1b2c3d : <message>" (with the repository when there are several). Without a known ticket, the commit is made without a note. The key does not go into the message; the branch `ticket/<KEY>` carries it.
+6. **Attribution**: the installation sets `attribution` to empty (commits and PRs) in the project's `.claude/settings.json`, if it is not already set. Removing the tool leaves it in place: this is also the developer's instruction.
+7. **Grouping**: with the delivery step, which will merge the ticket's branch into the main branch.
 
-## Conséquences
+## Consequences
 
-- Pas d'opération nouvelle : la note passe par `recordEntry`.
-- La configuration gagne `commit` : `{ "gitmoji": true }`, facultatif.
-- Les consignes données à l'agent en début de session citent la commande.
+- No new operation: the note goes through `recordEntry`.
+- The configuration gains `commit`: `{ "gitmoji": true }`, optional.
+- The instructions given to the agent at the start of the session cite the command.

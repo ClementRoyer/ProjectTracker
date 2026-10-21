@@ -1,31 +1,31 @@
-# 0030. Installation dans un projet, branchement de Claude Code, sauvegarde à la mise à jour
+# 0030. Installation in a project, hooking up Claude Code, backup on update
 
-- Statut : Acceptée
-- Date : 2026-10-20
-- Décideur : l'utilisateur (questions posées au lancement de l'étape 11)
-- Liens : [plan de l'étape 11](../plan/etape-11.md) ; [ADR 0003](0003-build-a-la-release.md), [0011](0011-interface-des-agents.md), [0013](0013-base-par-projet-et-sauvegarde.md), [0024](0024-migration-des-donnees-v1.md)
+- Status: Accepted
+- Date: 2026-10-20
+- Decider: the user (questions asked at the start of step 11)
+- Links: [plan of step 11](../plan/etape-11.md); [ADR 0003](0003-build-a-la-release.md), [0011](0011-interface-des-agents.md), [0013](0013-base-par-projet-et-sauvegarde.md), [0024](0024-migration-des-donnees-v1.md)
 
-## Contexte
+## Context
 
-L'étape 11 livre l'outil dans les projets de l'utilisateur et fait passer ses trackers V1 en V2. L'ADR 0013 place l'outil et sa base dans `tools/tracker/` de chaque projet et laisse ouverte la sauvegarde avant une mise à jour. Il faut choisir comment l'outil arrive dans un projet, comment Claude Code y est branché, et quand la base est sauvegardée.
+Step 11 delivers the tool into the user's projects and moves their V1 trackers to V2. ADR 0013 places the tool and its database in `tools/tracker/` of each project and leaves open the backup before an update. It is necessary to choose how the tool gets into a project, how Claude Code is hooked up to it, and when the database is backed up.
 
-## Options étudiées
+## Options considered
 
-| Question | Options | Choix |
+| Question | Options | Choice |
 |---|---|---|
-| 1. Installer et mettre à jour | **Commande depuis ce dépôt**, qui copie l'artefact dans le projet (recommandé) ; archive npm installée globalement | Commande depuis ce dépôt |
-| 2. Brancher Claude Code | **Réglages du projet** : `.claude/settings.json` et `.mcp.json` écrits par l'installation (recommandé) ; plugin installé une fois pour l'utilisateur | Réglages du projet |
-| 3. Sauvegarde avant une mise à jour | **Automatique à la mise à jour** (recommandé) ; manuelle seulement, avec un rappel | Automatique |
+| 1. Install and update | **Command run from this repository**, which copies the artefact into the project (recommended); npm package installed globally | Command run from this repository |
+| 2. Hook up Claude Code | **Project settings**: `.claude/settings.json` and `.mcp.json` written by the installation (recommended); plugin installed once for the user | Project settings |
+| 3. Backup before an update | **Automatic on update** (recommended); manual only, with a reminder | Automatic |
 
-## Décision
+## Decision
 
-1. **Une commande d'installation, depuis ce dépôt.** `npm run build` produit `dist/`, avec le numéro de version. `node dist/install.js --root <projet>` copie le serveur, la CLI, la page et les scripts de Claude Code dans `<projet>/tools/tracker/app/`, crée la configuration (port au choix) si elle manque et ignore par git la base, les sauvegardes, le jeton et `app/`. Relancée sur un projet déjà installé, la même commande le met à jour : la configuration et les données restent.
-2. **Claude Code est branché par les réglages du projet.** L'installation ajoute à `.claude/settings.json` les hooks de l'adaptateur (début de session, début de tour, fin de tour) et l'adresse du tracker du projet, et à `.mcp.json` le MCP en HTTP. Ce qui appartient déjà au projet dans ces fichiers est gardé. Le compte rendu d'installation donne aussi l'adresse MCP et la commande de la CLI, pour les autres agents (Codex, OpenCode…).
-3. **La mise à jour sauvegarde la base d'abord**, dans `tools/tracker/backups/`, avant de toucher à quoi que ce soit, et dit où est la copie. Le reste du temps, la sauvegarde reste manuelle (ADR 0013) : une commande de sauvegarde, à chaud, et une commande de restauration, serveur arrêté.
+1. **One installation command, run from this repository.** `npm run build` produces `dist/`, with the version number. `node dist/install.js --root <project>` copies the server, the CLI, the page and the Claude Code scripts into `<project>/tools/tracker/app/`, creates the configuration (port of choice) if it is missing, and ignores in git the database, the backups, the token and `app/`. Run again on an already installed project, the same command updates it: the configuration and the data stay.
+2. **Claude Code is hooked up through the project settings.** The installation adds to `.claude/settings.json` the adapter's hooks (session start, turn start, turn end) and the address of the project's tracker, and to `.mcp.json` the MCP over HTTP. What the project already owns in these files is kept. The installation report also gives the MCP address and the CLI command, for the other agents (Codex, OpenCode...).
+3. **The update backs up the database first**, in `tools/tracker/backups/`, before touching anything, and says where the copy is. The rest of the time, the backup stays manual (ADR 0013): a backup command, hot, and a restore command, with the server stopped.
 
-## Conséquences
+## Consequences
 
-- Pas de registre npm : l'utilisateur garde ce dépôt pour installer et mettre à jour.
-- Chaque projet a sa propre copie de l'outil, à sa version ; une mise à jour se fait projet par projet.
-- Le plugin Claude Code de `dist/claude-plugin` reste utile pour les essais (`--plugin-dir`), mais l'installation ne l'utilise pas.
-- La migration d'un tracker V1 (ADR 0024) passe par la même commande, sur un projet sans base V2.
+- No npm registry: the user keeps this repository to install and update.
+- Each project has its own copy of the tool, at its version; an update is done project by project.
+- The Claude Code plugin in `dist/claude-plugin` stays useful for trials (`--plugin-dir`), but the installation does not use it.
+- The migration of a V1 tracker (ADR 0024) goes through the same command, on a project with no V2 database.

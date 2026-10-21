@@ -1,114 +1,114 @@
 # Architecture
 
-- Statut : **cible arrêtée** (étape 5 du [plan](plan/v2-plan.md), 2026-10-19)
-- Décisions : [ADR](adr/README.md)
+- Status: **target settled** (step 5 of the [plan](plan/v2-plan.md), 2026-10-19)
+- Decisions: [ADR](adr/README.md)
 
-## 1. Aujourd'hui (V1.2, 2026-10-19)
+## 1. Today (V1.2, 2026-10-19)
 
-Description de l'existant, pour servir de point de départ. Ce n'est pas la cible.
+Description of the existing system, to serve as a starting point. It is not the target.
 
 ```
- MACHINE DU DÉVELOPPEUR                                    SERVEUR BACK-END
+ DEVELOPER'S MACHINE                                       BACK-END SERVER 
  ┌──────────────────────────────────────────────────┐      ┌──────────────────────┐
  │                                                  │      │                      │
- │  Navigateur ── page du tableau de bord           │      │  Session Claude Code │
+ │  Browser ── dashboard page                       │      │  Session Claude Code │
  │      │  HTTP + SSE (localhost:9500)              │      │  back-end (unique,   │
- │      ▼                                           │      │  lancée à la main,   │
+ │      ▼                                           │      │  started by hand,    │
  │  ┌────────────── tools/tracker/ ──────────────┐  │      │  remote-control)     │
- │  │ serveur HTTP (node) ──lit──┐               │  │      │      │               │
- │  │                            ▼               │  │      │      │ modifie       │
- │  │ CLI tracker ──écrit──► fichiers JSON/JSONL │  │      │      ▼               │
- │  │   (verrous fichiers,   projects/<id>/…     │  │      │  Miroir du back-end  │
- │  │    intentions .pending)                    │  │      │  (pas de git)        │
- │  │ lecture Jira (API) ◄── config + variables  │  │      │      │               │
+ │  │ server HTTP (node) ──read──┐               │  │      │      │               │
+ │  │                            ▼               │  │      │      │ modifies      │
+ │  │ CLI tracker ──writes──► files JSON/JSONL   │  │      │      ▼               │
+ │  │   (file locks,         projects/<id>/…     │  │      │  Back-end mirror     │
+ │  │    intentions .pending)                    │  │      │  (no git)            │
+ │  │ Jira reading (API) ◄── config + variables  │  │      │      │               │
  │  └──────────────▲─────────────────────────────┘  │      └──────┼───────────────┘
- │                 │ appels CLI                     │             │ report manuel
+ │                 │ CLI calls                      │             │ manual copy  
  │  ┌──────────────┴─────────────────────────────┐  │             ▼
- │  │ Sessions Claude Code front                 │  │      ┌──────────────────────┐
- │  │  • conversation « à l'écoute » (aiguilleur)│  │      │ Serveur back-end     │
- │  │    watch sous Monitor, relancé < 30 min    │  │      │ déployé              │
- │  │  • sous-agents par ticket (≤ 3)            │  │      └──────────────────────┘
- │  │  • hooks : consignes, garde, capture,      │  │
- │  │    usage, réinjection après compaction     │  │
- │  │  un seul dossier de code partagé (git)     │  │
+ │  │ Claude Code front sessions                 │  │      ┌──────────────────────┐
+ │  │  • conversation "listening" (dispatcher)   │  │      │ Back-end server      │
+ │  │    watch under Monitor, relaunched < 30 min│  │      │ deployed             │
+ │  │  • sub-agents per ticket (≤ 3)             │  │      └──────────────────────┘
+ │  │  • hooks: instructions, guard, capture,    │  │
+ │  │    usage, reinjection after compaction     │  │
+ │  │  one shared code folder (git)              │  │
  │  └──────────────────────┬─────────────────────┘  │
  │                         │                        │
  └─────────────────────────┼────────────────────────┘
-                           │  messages entre sessions (remote-control)
+                           │ messages across sessions (remote-control)
                            ▼
                 ┌──────────────────────┐
-                │  Relais Anthropic    │◄──────── session back-end
+                │  Relay Anthropic     │◄──────── session back-end
                 └──────────────────────┘
 ```
 
-Points saillants :
-- **Tout l'outil est local**, copié dans le projet (`tools/tracker/`). Le serveur et la CLI lisent et écrivent les mêmes fichiers, d'où les verrous maison.
-- **Aucun lien réseau direct** entre la machine du développeur et le serveur back-end. Les sessions se parlent par le relais d'Anthropic. Le réseau d'entreprise empêche parfois le SSH.
-- **Le back-end** est une seule session, partagée par tous les tickets. Elle modifie un miroir sans git, que le développeur reporte à la main sur le serveur déployé.
-- **Les échanges avec le back-end** sont captés par des hooks côté front, puis rangés dans le ticket.
+Highlights:
+- **The whole tool is local**, copied into the project (`tools/tracker/`). The server and the CLI read and write the same files, hence the homemade locks.
+- **No direct network link** between the developer's machine and the back-end server. The sessions talk through Anthropic's relay. The corporate network sometimes prevents SSH.
+- **The back-end** is a single session, shared by all tickets. It modifies a mirror without git, which the developer copies by hand to the deployed server.
+- **Exchanges with the back-end** are captured by hooks on the front side, then stored in the ticket.
 
-## 2. Cible (V2)
+## 2. Target (V2)
 
-Les décisions acceptées sont : acheminement des réponses (0007), conflits et dossiers de travail (0008), aperçu et commits (0009), back-end (0010), interface des agents (0011), usage IA (0012), base et sauvegarde (0013), paquets (0014), modèle de données (0015), stack (0016), réponse structurée des agents (0017), suites du POC de connexion (0020, 0021).
+The accepted decisions are: routing of responses (0007), conflicts and working folders (0008), preview and commits (0009), back-end (0010), agents' interface (0011), AI usage (0012), database and backup (0013), packages (0014), data model (0015), stack (0016), structured agent response (0017), follow-ups of the connection POC (0020, 0021).
 
 ### 2.1 Back-end ([ADR 0010](adr/0010-back-end-intervenant-du-ticket.md), [0021](adr/0021-suites-du-poc-reseau-et-lanceur.md))
 
-- Sans TUN, Tailscale en mode userspace : l'outil écoute sur la boucle locale seulement, protégé par une règle d'accès Headscale (le serveur back-end, sur le port de l'outil). Le lanceur peut passer par un proxy HTTP.
-- Demande bloquée par un fichier tenu : relancée automatiquement à la libération, par priorité du ticket puis ordre d'arrivée. Modification non déclarée pendant plusieurs exécutions : signalée sur chaque ticket en cours, « auteur incertain ».
+- Without TUN, Tailscale in userspace mode: the tool listens on the loopback only, protected by a Headscale access rule (the back-end server, on the tool's port). The launcher can go through an HTTP proxy.
+- A request blocked by a held file is automatically re-run when it is released, by ticket priority then arrival order. An undeclared change over several executions is flagged on each ongoing ticket, "auteur incertain".
 
 ```
- MACHINE DU DÉVELOPPEUR                         SERVEUR BACK-END (le code reste ici)
+ DEVELOPER'S MACHINE                            BACK-END SERVER (the code stays here)
  ┌────────────────────────────────────┐        ┌─────────────────────────────────────┐
- │  Page web ──► OUTIL (serveur local)│        │  LANCEUR (démarré une fois à la     │
- │               • base SQLite        │◄──────►│  main)                              │
- │               • API HTTP + MCP     │ réseau │   │ relève les demandes back-end    │
- │                    ▲               │ privé  │   ▼ lance un agent neuf par demande │
- │  Agents front ─────┘ (MCP ou CLI)  │chiffré │  Agent back-end « ticket A » ──┐    │
- │  (tout outil d'agent)              │(Head-  │  Agent back-end « ticket B » ──┤    │
- │  un dossier de travail par ticket  │ scale) │  (commande configurable)       │    │
- └────────────────────────────────────┘        │  verrous .lock (dossier du ◄───┤    │
-                                               │  lanceur, hors miroir)         ▼    │
-                                               │                            Miroir   │
+ │  Web page ──► TOOL (local server)  │        │  LAUNCHER (started once by hand)    │
+ │               • SQLite database    │◄──────►│                                     │
+ │               • HTTP API + MCP     │private │   │ picks up back-end requests      │
+ │                    ▲               │network │   ▼ runs a fresh agent per request  │
+ │  Front agents ─────┘ (MCP or CLI)  │(Head-  │  Back-end agent "ticket A" ────┐    │
+ │  (any agent tool)                  │ scale, │  Back-end agent "ticket B" ────┤    │
+ │  one working folder per ticket     │ encr.) │  (configurable command)        │    │
+ └────────────────────────────────────┘        │  .lock locks (launcher's   ◄───┤    │
+                                               │  folder, off the mirror)       ▼    │
+                                               │                            Mirror   │
                                                └──────────────────┬──────────────────┘
-                                                                  │ report manuel
+                                                                  │ manual copy
                                                                   ▼
-                                                       Serveur back-end déployé
+                                                       Deployed back-end server
 ```
 
-- L'outil écoute sur la boucle locale et sur le réseau privé, jamais sur Internet. Les connexions partent toujours du serveur back-end.
-- Le lanceur n'exécute que la commande d'agent configurée. Il reçoit du texte, jamais de commande.
-- Front et back-end sont deux intervenants du même ticket. Ils échangent par le journal du ticket, avec l'acheminement de l'ADR 0007.
+- The tool listens on the loopback and on the private network, never on the Internet. Connections always start from the back-end server.
+- The launcher only runs the configured agent command. It receives text, never commands.
+- Front and back-end are two assignees of the same ticket. They exchange through the ticket journal, with the routing of ADR 0007.
 
-### 2.2 Interface des agents ([ADR 0011](adr/0011-interface-des-agents.md))
+### 2.2 Agents' interface ([ADR 0011](adr/0011-interface-des-agents.md))
 
 ```
- Agent (tout outil) ──MCP en HTTP──┐
- Agent ── CLI (client mince) ─HTTP─┤
- Lanceur back-end ──HTTP (privé)───┼──► SERVEUR LOCAL ──► SQLite
- Page ──HTTP + flux d'événements───┘    (seul écrivain)
+ Agent (any tool) ──MCP over HTTP──┐
+ Agent ── CLI (thin client)  ─HTTP─┤
+ Back-end launcher ──HTTP (private)┼──► LOCAL SERVER ──► SQLite 
+ Page ──HTTP + event stream────────┘      (only writer)
 ```
 
-- Le serveur est la seule porte d'entrée vers la base. MCP et CLI offrent les mêmes opérations.
-- Un agent se présente avec un nom stable et reçoit un jeton de conversation, joint à chaque appel.
-- Serveur absent : erreur claire, le développeur le lance à la main. Rien n'est démarré implicitement.
+- The server is the only door into the database. MCP and CLI offer the same operations.
+- An agent introduces itself with a stable name and receives a conversation token, attached to each call.
+- Server absent: clear error, the developer starts it by hand. Nothing is started implicitly.
 
-### 2.3 Usage IA ([ADR 0012](adr/0012-mesure-de-l-usage-ia.md))
+### 2.3 AI usage ([ADR 0012](adr/0012-mesure-de-l-usage-ia.md))
 
-- Mesuré par les adaptateurs (hook Claude Code, sortie JSON lue par le lanceur), sinon déclaré par l'agent ; chaque relevé porte sa provenance.
-- Rattaché au ticket en charge de la conversation (jeton de l'ADR 0011).
-- Jetons + coût estimé (table de prix configurable) ; par ticket, et par jour, semaine et mois, dans le fuseau du développeur ([ADR 0022](adr/0022-regles-du-domaine-confirmees.md)).
+- Measured by the adapters (Claude Code hook, JSON output read by the launcher), otherwise declared by the agent; each reading carries its origin.
+- Attached to the ticket in charge of the conversation (token of ADR 0011).
+- Tokens + estimated cost (configurable price table); per ticket, and per day, week and month, in the developer's time zone ([ADR 0022](adr/0022-regles-du-domaine-confirmees.md)).
 
-### 2.4 Base et sauvegarde ([ADR 0013](adr/0013-base-par-projet-et-sauvegarde.md))
+### 2.4 Database and backup ([ADR 0013](adr/0013-base-par-projet-et-sauvegarde.md))
 
-- Une base SQLite par projet, dans `tools/tracker/` du dossier principal, ignoré par git ; un serveur par projet, sur un port configuré.
-- Les dossiers de travail n'ont pas de base : leurs agents passent par le serveur du projet.
-- Sauvegarde et restauration par commande, à la main.
+- One SQLite database per project, in `tools/tracker/` of the main folder, ignored by git; one server per project, on a configured port.
+- Working folders have no database: their agents go through the server of the project.
+- Backup and restore by command, by hand.
 
-### 2.5 Paquets ([ADR 0014](adr/0014-decoupage-en-paquets.md))
+### 2.5 Packages ([ADR 0014](adr/0014-decoupage-en-paquets.md))
 
 ```
                      ┌────────────┐
-                     │  contract  │  formes des échanges (HTTP, MCP, événements)
+                     │  contract  │  shapes of exchanges (HTTP, MCP, events)    
                      └─────┬──────┘
      ┌──────────┬──────────┼──────────┬───────────────┬──────────┐
      ▼          ▼          ▼          ▼               ▼          ▼
@@ -124,27 +124,27 @@ Les décisions acceptées sont : acheminement des réponses (0007), conflits et 
  └───────────────────────────────┘
 ```
 
-- Seul `server` importe `core` et ouvre la base ; les autres passent par `contract` et l'API HTTP. Exception : `install` ouvre `core/domain` et `core/store` pour migrer les données V1, serveur arrêté ([ADR 0024](adr/0024-migration-des-donnees-v1.md)).
-- Le serveur n'exécute aucune commande : la CLI rapporte les fichiers modifiés pour la détection des chevauchements.
+- Only `server` imports `core` and opens the database; the others go through `contract` and the HTTP API. Exception: `install` opens `core/domain` and `core/store` to migrate the V1 data, with the server stopped ([ADR 0024](adr/0024-migration-des-donnees-v1.md)).
+- The server runs no command: the CLI reports the modified files for the detection of overlaps.
 
-### 2.6 Modèle de données ([ADR 0015](adr/0015-modele-de-donnees.md))
+### 2.6 Data model ([ADR 0015](adr/0015-modele-de-donnees.md))
 
 ```
- ticket ──┬── situation (état courant : phase, avancement, attente)
-          ├── entry (journal immuable, texte intégral)
-          ├── assignment (un intervenant par rôle) ── session ── agent
-          ├── question ── delivery (remise, prise en compte)
+ ticket ──┬── situation (current state: phase, progress, wait)     
+          ├── entry (immutable journal, full text)    
+          ├── assignment (one assignee per role) ── session ── agent  
+          ├── question ── delivery (handover, acknowledged) 
           ├── backendRequest ── execution ── launcher
           ├── worktree, changedFile, fileHold, resourceLock / resourceQueue
           ├── testRun, usage, attachment
-          └── deliveryBatch (lot de livraison)
+          └── deliveryBatch (delivery batch)  
 ```
 
-- État courant et journal écrits dans la même transaction ; le journal refuse toute modification.
+- Current state and journal written in the same transaction; the journal refuses any modification.
 
-### 2.7 Stack et réponse des agents ([ADR 0016](adr/0016-stack-serveur-et-validation.md), [0017](adr/0017-reponse-structuree-des-agents.md), [0020](adr/0020-suites-du-poc-de-connexion.md))
+### 2.7 Stack and agent response ([ADR 0016](adr/0016-stack-serveur-et-validation.md), [0017](adr/0017-reponse-structuree-des-agents.md), [0020](adr/0020-suites-du-poc-de-connexion.md))
 
-- Page : Svelte 5 + Vite + TS. Serveur : Hono sur Node, SDK MCP officiel. Validation : Zod dans `contract`.
-- Chaque agent termine par une réponse JSON selon un schéma unique. Le lanceur et l'adaptateur Claude Code la lisent, la valident et l'envoient au serveur ; une sortie invalide est gardée brute. MCP et CLI restent le socle.
-- Réponse complète pour le back-end (lue par le lanceur) ; pour le front, seulement le message lisible et la question (lus par le hook de fin de tour). Le lecteur ajoute lui-même le ticket, la demande et l'exécution : un JSON valide n'est pas forcément vrai.
-- Réponse du développeur : tirée et attendue pour tout agent ; poussée en plus à Claude Code par un channel, envoyé sur la session MCP HTTP de la conversation. L'adaptateur Claude Code est livré comme plugin.
+- Page: Svelte 5 + Vite + TS. Server: Hono on Node, official MCP SDK. Validation: Zod in `contract`.
+- Each agent ends with a JSON response that follows a single schema. The launcher and the Claude Code adapter read it, validate it and send it to the server; an invalid output is kept raw. MCP and CLI remain the foundation.
+- Full response for the back-end (read by the launcher); for the front, only the readable message and the question (read by the end-of-turn hook). The reader adds the ticket, the request and the execution itself: a valid JSON is not necessarily true.
+- Developer's response: pulled and expected for every agent; additionally pushed to Claude Code by a channel, sent on the MCP HTTP session of the conversation. The Claude Code adapter is delivered as a plugin.

@@ -1,37 +1,37 @@
-# 0047. Branche publique des versions stables
+# 0047. Public branch of stable versions
 
-- Statut : Acceptée
-- Date : 2026-10-21
-- Décideur : l'utilisateur (message et réponses du 2026-10-21)
-- Liens : complète l'[ADR 0045](0045-projet-open-source-readme-en-anglais.md) (projet open-source) et l'[ADR 0046](0046-installation-et-lancement-par-scripts.md) (releases) ; [plan de l'étape 19](../plan/etape-19.md)
+- Status: Accepted
+- Date: 2026-10-21
+- Decider: the user (message and answers of 2026-10-21)
+- Links: complements [ADR 0045](0045-projet-open-source-readme-en-anglais.md) (open-source project) and [ADR 0046](0046-installation-et-lancement-par-scripts.md) (releases); [step 19 plan](../plan/etape-19.md)
 
-## Contexte
+## Context
 
-L'utilisateur (2026-10-21) :
+The user (2026-10-21):
 
-> « Pour déployer ce projet on va créer une nouvelle branche remote pour pousser dessus que des versions stables et acceptables. Ce remote n'aura pas tout l'historique de nos commits actuels ni le dossier legacy. »
+> "To deploy this project we will create a new remote branch to push only stable and acceptable versions to. This remote will not have all the history of our current commits, nor the legacy folder."
 
-Le remote est `https://github.com/ClementRoyer/ProjectTracker`. Le développement continue sur `v2`, avec tout son historique, en local.
+The remote is `https://github.com/ClementRoyer/ProjectTracker`. Development continues on `v2`, with its whole history, locally.
 
-## Options étudiées
+## Options considered
 
-| Question | Options | Choix |
+| Question | Options | Choice |
 |---|---|---|
-| 1. Branche et historique | `main`, un commit par version (recommandé) ; `stable`, un commit par version ; un seul commit réécrit | « Crée une branche `master` pour ce remote avec un seul commit et le tag version. » |
-| 2. Passage d'une version | **script local, push sur accord** (recommandé) ; script qui pousse | Script local, push sur accord |
-| 3. Exclus en plus de `legacy/` | `docs/analysis/`, `docs/plan/`, `docs/mockups/` | Les trois |
-| 4. Bascule V1 sans `legacy/` | garder le code et copier les données de test (recommandé) ; retirer la bascule | « Ne rien faire, laisser casser sur le dépôt public : ils n'ont pas eu accès à la V1. » |
+| 1. Branch and history | `main`, one commit per version (recommended); `stable`, one commit per version; a single rewritten commit | "Create a `master` branch for this remote with a single commit and the version tag." |
+| 2. Publishing a version | **local script, push on approval** (recommended); script that pushes | Local script, push on approval |
+| 3. Excluded in addition to `legacy/` | `docs/analysis/`, `docs/plan/`, `docs/mockups/` | All three |
+| 4. V1 switch-over without `legacy/` | keep the code and copy the test data (recommended); remove the switch-over | "Do nothing, let it break on the public repository: they did not have access to V1." |
 
-## Décision
+## Decision
 
-1. **Branche publique `master`** sur le remote, sans lien avec l'historique de `v2`. Elle est préparée en local dans la branche `public` (le `master` local est celui de la V1) et poussée par `git push origin public:master v<version>`.
-2. **Un commit par version**, « 🔖 Release v<version> », portant le tag `v<version>`, qui lance la release (ADR 0046). La première version est le seul commit de la branche ; chaque version suivante en ajoute un.
-3. **Contenu** : l'état de `v2` au moment de la publication, sans `legacy/`, `docs/analysis/`, `docs/plan/` ni `docs/mockups/`.
-4. **`scripts/publish-stable.sh`** : depuis `v2` propre, il lance `npm run verify` et les parcours Playwright, fabrique le commit et le tag en local, puis affiche ce qui partirait et la commande de push. Il ne pousse jamais.
-5. **Bascule V1** : rien n'est changé dans le code. Ses deux tests, qui lisent des données de `legacy/`, sautent quand ce dossier est absent : sans cela, le workflow de release échouerait sur la branche publique.
+1. **Public branch `master`** on the remote, with no link to the history of `v2`. It is prepared locally in the branch `public` (the local `master` is the V1 one) and pushed with `git push origin public:master v<version>`.
+2. **One commit per version**, "🔖 Release v<version>", carrying the tag `v<version>`, which starts the release (ADR 0046). The first version is the only commit of the branch; each following version adds one.
+3. **Contents**: the state of `v2` at the time of publication, without `legacy/`, `docs/analysis/`, `docs/plan/` or `docs/mockups/`.
+4. **`scripts/publish-stable.sh`**: from a clean `v2`, it runs `npm run verify` and the Playwright journeys, builds the commit and the tag locally, then displays what would leave and the push command. It never pushes.
+5. **V1 switch-over**: nothing is changed in the code. Its two tests, which read data from `legacy/`, skip when that folder is absent: without this, the release workflow would fail on the public branch.
 
-## Conséquences
+## Consequences
 
-- Sur la branche publique, `--from-v1` répond que l'installeur V1 est introuvable.
-- Les ADR et documents qui renvoient vers les dossiers exclus ont des liens morts côté public ; le README n'en a pas.
-- Ce choix sur l'historique est à revoir si l'utilisateur veut, à la place, un seul commit réécrit à chaque version (push forcé).
+- On the public branch, `--from-v1` replies that the V1 installer cannot be found.
+- The ADRs and documents that link to the excluded folders have dead links on the public side; the README does not.
+- This choice about the history is to be revisited if the user wants, instead, a single rewritten commit at each version (forced push).

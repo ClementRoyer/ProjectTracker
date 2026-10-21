@@ -1,114 +1,114 @@
-# 0010. Le back-end, intervenant du ticket, lancé sur son serveur
+# 0010. The back-end, an assignee of the ticket, launched on its server
 
-- Statut : Acceptée
-- Date : 2026-10-19
-- Décideur : l'utilisateur (conception construite avec lui, relue et acceptée le 2026-10-19 : « Oui c'est ok pour moi »)
-- Liens : [ADR 0002](0002-perimetre-multi-agents-ouvert.md) (agnostique), [0007](0007-acheminement-des-reponses.md) (acheminement), [0008](0008-eviter-les-conflits-entre-tickets.md) (conflits) ; [features.md](../product/features.md) F6, F7, F14, F16, F33 ; [needs.md](../product/needs.md) M7 ; [architecture.md](../architecture.md) §2.1
+- Status: Accepted
+- Date: 2026-10-19
+- Decider: the user (design built with him, reviewed and accepted on 2026-10-19: "Yes, that's fine with me")
+- Links: [ADR 0002](0002-perimetre-multi-agents-ouvert.md) (agnostic), [0007](0007-acheminement-des-reponses.md) (routing), [0008](0008-eviter-les-conflits-entre-tickets.md) (conflicts); [features.md](../product/features.md) F6, F7, F14, F16, F33; [needs.md](../product/needs.md) M7; [architecture.md](../architecture.md) §2.1
 
-## Contexte
+## Context
 
-Aujourd'hui, le back-end est **une seule conversation Claude Code**, lancée à la main sur le serveur back-end. Les agents front la joignent par le relais d'Anthropic (sessions avec remote-control). L'utilisateur décrit le problème ainsi :
+Today, the back-end is **a single Claude Code conversation**, started by hand on the back-end server. The front agents reach it through Anthropic's relay (sessions with remote-control). The user describes the problem this way:
 
-> « Quand plusieurs agents envoient un message au back-end, le contexte devient confus pour lui ou surchargé. Il répond un message avec plusieurs tickets en réponse dedans, n'utilise pas à son avantage la création de plusieurs sessions uniques. »
+> "When several agents send a message to the back-end, the context becomes confused for it, or overloaded. It answers one message with several tickets in the answer, and does not take advantage of creating several unique sessions."
 
-Sa piste :
+His idea:
 
-> « Le back-end devrait peut-être être un deuxième agent connecté au ticket et géré de la même manière que les agents front (instancié au besoin). »
+> "The back-end should perhaps be a second agent connected to the ticket and handled in the same way as the front agents (instantiated when needed)."
 
-### Contraintes établies avec l'utilisateur (2026-10-19)
+### Constraints agreed with the user (2026-10-19)
 
-| # | Contrainte | Paroles de l'utilisateur |
+| # | Constraint | The user's words |
 |---|---|---|
-| K1 | Le code back-end n'existe que sur son serveur. Ce n'est pas un dépôt git, mais un miroir du serveur déployé. | « Ce n'est pas un dépôt git mais un miroir du serveur back-end déployé. » ; « Le code n'existe que là. » |
-| K2 | Le serveur back-end n'est utilisé que par le développeur. | « Il est uniquement pour moi. » |
-| K3 | Le développeur reporte lui-même les modifications du miroir vers le serveur déployé. Il n'a pas besoin que l'outil suive ces modifications. | « C'est moi qui reprends les modifications du miroir vers le serveur. » ; « Pas besoin de connaître les modifications back-end. » |
-| K4 | Pas de SSH fiable entre les machines. Le seul accès commun est Internet en HTTPS sortant. | « Parfois les réseaux d'entreprise l'empêchent. » |
-| K5 | Pas d'outil hébergé avec des clients distants : trop lourd à déployer. | « J'ai peur que partir sur un serveur déployé et des clients qui s'y connectent alourdissent beaucoup la solution. » |
-| K6 | La solution doit fonctionner avec n'importe quel outil d'agent (ADR 0002). | « Ce n'est pas agnostique du type d'agent IA. » |
-| K7 | Le back-end doit réellement s'améliorer. | « Il n'y a pas d'amélioration pour le back-end. » |
-| K8 | Intermédiaire réseau accepté : un réseau privé chiffré, auto-hébergé. | « Réseau privé chiffré » ; « Pour Tailscale, on va self-host ça avec la solution communautaire. » |
+| K1 | The back-end code only exists on his server. It is not a git repository, but a mirror of the deployed server. | "This is not a git repository but a mirror of the deployed back-end server."; "The code only exists there." |
+| K2 | The back-end server is used only by the developer. | "It is only for me." |
+| K3 | The developer brings the changes of the mirror to the deployed server himself. He does not need the tool to track these changes. | "It's me who takes the changes from the mirror to the server."; "No need to know about the back-end changes." |
+| K4 | No reliable SSH between the machines. The only common access is outgoing HTTPS over the Internet. | "Sometimes company networks prevent it." |
+| K5 | No hosted tool with remote clients: too heavy to deploy. | "I'm afraid that going with a deployed server and clients connecting to it would make the solution much heavier." |
+| K6 | The solution must work with any agent tool (ADR 0002). | "It is not agnostic to the type of AI agent." |
+| K7 | The back-end must really improve. | "There is no improvement for the back-end." |
+| K8 | Network intermediary accepted: a private, encrypted, self-hosted network. | "Private encrypted network"; "For Tailscale, we'll self-host it with the community solution." |
 
-## Options écartées
+## Options set aside
 
-| Option | Raison de l'écart |
+| Option | Reason for setting it aside |
 |---|---|
-| Un back-end unique mieux discipliné | Le contexte reste partagé entre les tickets : c'est le problème observé (K7). |
-| Un agent back-end connecté par tunnel SSH | Pas de SSH fiable (K4). |
-| L'outil hébergé sur un serveur commun | Trop lourd (K5). |
-| Le relais d'Anthropic avec une session back-end « relais » et des sous-agents | Propre à Claude Code (K6), sans vraie amélioration (K7). |
-| Une copie du miroir par ticket | Proposée par l'IA ; l'utilisateur a préféré travailler directement dans le miroir avec des fichiers tenus. |
-| Des verrous de fichiers gérés par l'outil, à travers le réseau | L'utilisateur a proposé des fichiers `.lock` locaux : plus simples, et ils fonctionnent même si sa machine est éteinte. |
+| A single, better-disciplined back-end | The context remains shared between the tickets: this is the observed problem (K7). |
+| A back-end agent connected through an SSH tunnel | No reliable SSH (K4). |
+| The tool hosted on a common server | Too heavy (K5). |
+| Anthropic's relay with a "relay" back-end session and sub-agents | Specific to Claude Code (K6), with no real improvement (K7). |
+| One copy of the mirror per ticket | Proposed by the AI; the user preferred to work directly in the mirror with held files. |
+| File locks managed by the tool, across the network | The user proposed local `.lock` files: simpler, and they work even if his machine is switched off. |
 
-## Décision
+## Decision
 
-### 1. Le back-end est un intervenant du ticket
+### 1. The back-end is an assignee of the ticket
 
-- **Un ticket a un intervenant par rôle** : `front` et `back-end`.
-- Les échanges entre les deux sont des **entrées du journal** du ticket, gardées mot pour mot et acheminées selon l'ADR 0007.
-- Le back-end n'est plus un « partenaire ». F33 (« échanges avec le back-end outillés ») devient la messagerie entre intervenants d'un même ticket.
+- **A ticket has one assignee per role**: `front` and `back-end`.
+- The exchanges between the two are **journal entries** of the ticket, kept word for word and routed according to ADR 0007.
+- The back-end is no longer a "partner". F33 ("tooled exchanges with the back-end") becomes messaging between the assignees of the same ticket.
 
-### 2. Réseau : un réseau privé chiffré, auto-hébergé (K4, K5, K8)
+### 2. Network: a private, encrypted, self-hosted network (K4, K5, K8)
 
-- Les deux machines rejoignent un réseau privé **Headscale** : le serveur de coordination communautaire et auto-hébergé, utilisé avec les clients Tailscale. Ce serveur doit être joignable en HTTPS par les deux machines. Le trafic entre les machines est chiffré de bout en bout.
-- **L'outil reste unique et local**, sur la machine du développeur. Il écoute sur la boucle locale et sur l'interface du réseau privé, **jamais sur Internet**.
-- Le serveur back-end joint l'outil à travers ce réseau. Les connexions partent toujours du serveur back-end.
+- Both machines join a private **Headscale** network: the self-hosted community coordination server, used with Tailscale clients. This server must be reachable over HTTPS by both machines. Traffic between the machines is encrypted end to end.
+- **The tool remains unique and local**, on the developer's machine. It listens on the loopback interface and on the private network interface, **never on the Internet**.
+- The back-end server reaches the tool through this network. Connections always start from the back-end server.
 
-### 3. Le lanceur (K6, K7)
+### 3. The launcher (K6, K7)
 
-Un **lanceur** est un petit programme de l'outil, installé sur le serveur back-end et démarré une fois à la main par le développeur.
+A **launcher** is a small program of the tool, installed on the back-end server and started once by hand by the developer.
 
-- Il **relève les demandes back-end en attente** auprès de l'outil et envoie des **signes de vie** (« lanceur en ligne »).
-- Pour chaque demande, il **démarre un agent neuf** avec une **commande configurable** : `claude -p …`, `codex exec …`, `opencode run …`.
-- Le texte de lancement (fiche du ticket, demande, règles) est fourni par l'outil et passé à l'agent **par un fichier**, jamais dans la ligne de commande.
-- **Reprise d'un échange** : si l'outil d'agent sait reprendre une conversation, le lanceur utilise la **commande de reprise** configurée. Sinon, il démarre un agent neuf, qui relit la fiche ; elle contient déjà les échanges précédents.
-- **Limites configurables** : un seul agent back-end à la fois par ticket, au plus N agents en parallèle (par exemple 3), une durée maximale par exécution.
+- It **picks up pending back-end requests** from the tool and sends **signs of life** ("lanceur en ligne").
+- For each request, it starts a **new agent** with a **configurable command**: `claude -p …`, `codex exec …`, `opencode run …`.
+- The launch text (ticket record, request, rules) is provided by the tool and passed to the agent **through a file**, never on the command line.
+- **Resuming an exchange**: if the agent tool can resume a conversation, the launcher uses the configured **resume command**. Otherwise, it starts a new agent, which rereads the record; the record already contains the previous exchanges.
+- **Configurable limits**: only one back-end agent at a time per ticket, at most N agents in parallel (for example 3), a maximum duration per execution.
 
-### 4. Parcours d'une demande back-end
+### 4. Path of a back-end request
 
-1. L'agent front, ou le développeur, crée une **demande back-end** sur le ticket. Le texte est gardé tel quel dans le journal, et le ticket affiche **« attente : back-end »**.
-2. Le lanceur relève la demande et la **prend en charge** au nom du rôle back-end du ticket.
-3. Il démarre l'agent. Celui-ci lit la fiche et la demande, puis travaille dans le miroir. Il peut aussi poser une question au développeur, comme n'importe quel intervenant.
-4. L'agent **répond par l'outil** (MCP ou CLI). La réponse entre dans le journal, mot pour mot.
-5. L'agent front la reçoit selon l'ADR 0007.
+1. The front agent, or the developer, creates a **back-end request** on the ticket. The text is kept as it is in the journal, and the ticket shows **"attente : back-end"**.
+2. The launcher picks up the request and **takes it on** on behalf of the ticket's back-end role.
+3. It starts the agent. The agent reads the record and the request, then works in the mirror. It can also ask the developer a question, like any assignee.
+4. The agent **answers through the tool** (MCP or CLI). The answer enters the journal, word for word.
+5. The front agent receives it according to ADR 0007.
 
-### 5. Fichiers tenus dans le miroir : des verrous locaux (proposés par l'utilisateur)
+### 5. Held files in the mirror: local locks (proposed by the user)
 
-- **Avant de modifier un fichier du miroir, l'agent le déclare** au moyen d'une petite commande locale du lanceur, utilisable par n'importe quel agent.
-- Les verrous sont des **fichiers `.lock` créés de façon atomique** : un seul agent peut réussir à créer un verrou donné. Chaque verrou indique le ticket et l'exécution qui tiennent le fichier. Les verrous **vivent hors du miroir**, dans le dossier du lanceur, pour ne jamais partir vers le serveur déployé.
-- **Fichier déjà tenu** : la commande indique par quel ticket. L'agent attend ou fait autre chose. L'outil affiche **« attente : fichier tenu par <ticket> »**, information transmise par les signes de vie du lanceur, à titre indicatif seulement.
-- **Le lanceur supprime les verrous d'une exécution dès qu'elle se termine**, normalement ou non. Comme il est le parent de chaque agent, aucun verrou ne reste orphelin.
-- Ce mécanisme **fonctionne même si la machine du développeur est éteinte**.
-- **Garde-fou** : à la fin d'une exécution, le lanceur vérifie qu'aucun fichier du miroir n'a été modifié sans avoir été déclaré. Sinon, il signale « modification non déclarée » sur le ticket. **L'outil n'enregistre ni contenu ni historique des modifications back-end** (K3).
+- **Before changing a file of the mirror, the agent declares it** by means of a small local command of the launcher, usable by any agent.
+- The locks are **`.lock` files created atomically**: only one agent can succeed in creating a given lock. Each lock indicates the ticket and the execution holding the file. The locks **live outside the mirror**, in the launcher's folder, so that they never travel to the deployed server.
+- **File already held**: the command indicates by which ticket. The agent waits or does something else. The tool shows **"attente : fichier tenu par <ticket>"**, information passed on by the launcher's signs of life, for information only.
+- **The launcher removes an execution's locks as soon as it ends**, normally or not. As it is the parent of each agent, no lock stays orphaned.
+- This mechanism **works even if the developer's machine is switched off**.
+- **Safeguard**: at the end of an execution, the launcher checks that no file of the mirror has been changed without being declared. Otherwise, it reports "modification non déclarée" on the ticket. **The tool does not record any content or history of back-end changes** (K3).
 
-### 6. Sécurité
+### 6. Security
 
-- L'outil n'est joignable que depuis la machine du développeur et le réseau privé.
-- **Le lanceur a son propre jeton**, limité au rôle back-end : relever les demandes, écrire dans le journal des tickets concernés, envoyer des signes de vie. La page garde son jeton anti-falsification.
-- **L'outil n'envoie que du texte, jamais de commande.** Le lanceur n'exécute que la commande configurée par le développeur sur le serveur back-end.
-- **Le code back-end ne quitte pas son serveur.** Seuls transitent les messages écrits par les agents.
+- The tool can only be reached from the developer's machine and the private network.
+- **The launcher has its own token**, limited to the back-end role: picking up requests, writing to the journal of the tickets concerned, sending signs of life. The page keeps its anti-forgery token.
+- **The tool only sends text, never commands.** The launcher only runs the command configured by the developer on the back-end server.
+- **The back-end code does not leave its server.** Only the messages written by the agents travel.
 
-### 7. Pannes
+### 7. Failures
 
-| Panne | Comportement |
+| Failure | Behaviour |
 |---|---|
-| Machine du développeur éteinte, ou réseau coupé | Le lanceur réessaie à intervalles croissants. Les demandes attendent, rien n'est perdu. Les verrous locaux continuent de fonctionner. |
-| Lanceur arrêté | La page affiche « lanceur back-end hors ligne ». Les demandes attendent son redémarrage. |
-| Agent planté ou dépassant la durée maximale | Le lanceur l'arrête, l'inscrit au journal et libère ses verrous. La demande est marquée en échec, à relancer par le front ou le développeur. |
-| Perte de contact avec le lanceur pendant une exécution | L'outil marque la demande « en cours, lanceur injoignable ». Le lanceur la reprend ou la clôt à son retour. |
+| Developer's machine switched off, or network cut | The launcher retries at increasing intervals. Requests wait, nothing is lost. Local locks keep working. |
+| Launcher stopped | The page shows "lanceur back-end hors ligne". Requests wait for it to restart. |
+| Agent crashed or exceeding the maximum duration | The launcher stops it, records it in the journal and releases its locks. The request is marked as failed, to be restarted by the front or the developer. |
+| Loss of contact with the launcher during an execution | The tool marks the request "en cours, lanceur injoignable". The launcher picks it up again or closes it when it returns. |
 
 ### 8. Tests
 
-- Le lanceur est testé avec **un faux agent** : une commande factice qui lit son texte de lancement, déclare des fichiers et répond.
-- Les tests utilisent des données d'exemple génériques. Ils couvrent les verrous concurrents, la panne d'un agent et la coupure réseau.
+- The launcher is tested with **a fake agent**: a dummy command that reads its launch text, declares files and answers.
+- The tests use generic sample data. They cover concurrent locks, an agent failure and a network cut.
 
-## Conséquences
+## Consequences
 
-- **Glossaire** :
-  - nouveaux termes : rôle, lanceur, exécution, demande back-end ;
-  - l'intervenant devient « un par rôle » ;
-  - le partenaire ne désigne plus le back-end.
-- **Architecture** : l'outil sert son API et le MCP en HTTP, aussi pour des agents distants. Le lanceur est un nouveau composant, livré avec l'outil.
-- **Installation** : en plus de l'outil local, une installation légère du lanceur sur le serveur back-end, et la mise en place de Headscale, qui se fait hors de l'outil.
-- **Risques à vérifier par un essai** :
-  - le réseau d'entreprise laisse-t-il passer Headscale et Tailscale ?
-  - le mode non interactif de chaque outil d'agent (lancement et reprise) fonctionne-t-il ?
+- **Glossary**:
+  - new terms: role, launcher, execution, back-end request;
+  - the assignee becomes "one per role";
+  - the partner no longer refers to the back-end.
+- **Architecture**: the tool serves its API and the MCP over HTTP, also for remote agents. The launcher is a new component, delivered with the tool.
+- **Installation**: in addition to the local tool, a light installation of the launcher on the back-end server, and the setup of Headscale, which is done outside the tool.
+- **Risks to check through a trial**:
+  - does the company network let Headscale and Tailscale through?
+  - does the non-interactive mode of each agent tool (launch and resume) work?

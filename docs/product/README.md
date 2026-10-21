@@ -1,10 +1,10 @@
-# Produit
+# Product
 
-Ce que project-tracker doit faire, indépendamment de la façon de le construire.
+What project-tracker must do, regardless of how it is built.
 
-| Document | Contenu | Statut |
+| Document | Content | Status |
 |---|---|---|
-| [understanding.md](understanding.md) | Le problème, la réponse, les parcours, les principes | Validé (2026-10-19) |
-| [needs.md](needs.md) | Les besoins du développeur, moment par moment de sa journée, sans parler de solution | Validé (2026-10-18) |
-| [features.md](features.md) | Fonctionnalités **primaires** (indispensables) et **secondaires** (aides), **déduites des besoins** | Validé (2026-10-18) |
-| [glossary.md](glossary.md) | Vocabulaire unique du domaine, pour lever les ambiguïtés de la V1 (item, ticket, tâche, réservation…) | Validé (2026-10-18) |
+| [understanding.md](understanding.md) | The problem, the answer, the paths, the principles | Validated (2026-10-19) |
+| [needs.md](needs.md) | The developer's needs, moment by moment of their day, without talking about solutions | Validated (2026-10-18) |
+| [features.md](features.md) | **Primary** (essential) and **secondary** (helpers) features, **derived from the needs** | Validated (2026-10-18) |
+| [glossary.md](glossary.md) | The single vocabulary of the domain, to clear up the V1 ambiguities (item, ticket, task, booking…) | Validated (2026-10-18) |

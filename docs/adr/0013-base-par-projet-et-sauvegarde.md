@@ -1,49 +1,49 @@
-# 0013. Une base par projet, dans le dépôt, sauvegardée à la main
+# 0013. One database per project, in the repository, backed up by hand
 
-- Statut : Acceptée
-- Date : 2026-10-19
-- Décideur : l'utilisateur (réponses aux deux questions du 2026-10-19)
-- Liens : [ADR 0004](0004-stockage-sqlite.md) (SQLite), [0008](0008-eviter-les-conflits-entre-tickets.md) (dossiers de travail), [0011](0011-interface-des-agents.md) (serveur unique) ; [needs.md](../product/needs.md) (multi-projets en bonus)
+- Status: Accepted
+- Date: 2026-10-19
+- Decider: the user (answers to the two questions of 2026-10-19)
+- Links: [ADR 0004](0004-stockage-sqlite.md) (SQLite), [0008](0008-eviter-les-conflits-entre-tickets.md) (working folders), [0011](0011-interface-des-agents.md) (single server); [needs.md](../product/needs.md) (multi-project as a bonus)
 
-## Contexte
+## Context
 
-La V1 installe l'outil dans chaque projet (`tools/tracker/`, ignoré par git), avec ses fichiers de données, et sauvegarde dans `tools/tracker/backups/` avant chaque mise à jour. Le multi-projets est un bonus (« 95 % du temps ce sera un projet »). Avec les dossiers de travail (ADR 0008), plusieurs dossiers du même dépôt travaillent en même temps.
+V1 installs the tool in each project (`tools/tracker/`, ignored by git), with its data files, and backs up into `tools/tracker/backups/` before each update. Multi-project is a bonus ("95% of the time it will be one project"). With the working folders (ADR 0008), several folders of the same repository work at the same time.
 
-## Options étudiées
+## Options considered
 
-### Emplacement
+### Location
 
-| Option | Avantages | Inconvénients |
+| Option | Advantages | Drawbacks |
 |---|---|---|
-| Une base par développeur, dans son dossier personnel | Un seul serveur pour tous les projets ; multi-projets sans effort ; rien dans le dépôt | L'outil vit loin du projet |
-| **Une base par projet, dans le dépôt** (V1) | Tout ce qui concerne le projet reste au même endroit | Un serveur et un port par projet ; le multi-projets demande d'agréger plusieurs bases |
+| One database per developer, in their home folder | A single server for all projects; multi-project without effort; nothing in the repository | The tool lives far from the project |
+| **One database per project, in the repository** (V1) | Everything about the project stays in the same place | One server and one port per project; multi-project requires aggregating several databases |
 
-L'IA recommandait la base par développeur. L'utilisateur a choisi la base par projet.
+The AI recommended the per-developer database. The user chose the per-project database.
 
-### Sauvegarde
+### Backup
 
-| Option | Avantages | Inconvénients |
+| Option | Advantages | Drawbacks |
 |---|---|---|
-| Copies automatiques datées | Protège sans y penser | Du code et de la place en plus |
-| Copies + export lisible | Données récupérables sans l'outil | Encore plus de code et de place |
-| **Manuelle seulement** | Le plus simple | Rien ne protège contre un oubli |
+| Automatic dated copies | Protects without thinking about it | Extra code and disk space |
+| Copies + readable export | Data recoverable without the tool | Even more code and space |
+| **Manual only** | The simplest | Nothing protects against forgetting |
 
-L'IA recommandait les copies automatiques. L'utilisateur a choisi la sauvegarde manuelle.
+The AI recommended automatic copies. The user chose manual backup.
 
-## Décision
+## Decision
 
-| Question | Choix de l'utilisateur |
+| Question | User's choice |
 |---|---|
-| Emplacement | **Une base par projet, dans le dépôt** |
-| Sauvegarde | **Manuelle seulement** |
+| Location | **One database per project, in the repository** |
+| Backup | **Manual only** |
 
-Fonctionnement retenu :
-- L'outil et sa base vivent dans le **dossier principal du projet** (`tools/tracker/`, ignoré par git), comme en V1.
-- **Les dossiers de travail n'ont pas de base** : leurs agents joignent le serveur du projet en HTTP (ADR 0011). Aucun ne lit ni n'écrit la base directement.
-- **Un serveur par projet**, sur un port configuré par projet.
-- **Une commande de sauvegarde** fait une copie cohérente de la base (sauvegarde SQLite à chaud, possible pendant que le serveur tourne) dans `tools/tracker/backups/`, et une commande de restauration la remet en place. Rien n'est sauvegardé automatiquement.
+Retained operation:
+- The tool and its database live in the **main folder of the project** (`tools/tracker/`, ignored by git), as in V1.
+- **The working folders have no database**: their agents reach the project's server over HTTP (ADR 0011). None of them reads or writes the database directly.
+- **One server per project**, on a port configured per project.
+- **A backup command** makes a consistent copy of the database (SQLite online backup, possible while the server is running) into `tools/tracker/backups/`, and a restore command puts it back in place. Nothing is backed up automatically.
 
-## Conséquences
+## Consequences
 
-- Le multi-projets (bonus) suppose plusieurs serveurs ; une vue commune, si elle est faite un jour, devra les interroger. Ce n'est pas prévu pour l'instant.
-- La sauvegarde avant une mise à jour de l'outil sera tranchée avec la procédure de mise à jour.
+- Multi-project (bonus) implies several servers; a shared view, if it is ever built, will have to query them. This is not planned for now.
+- The backup before a tool update will be decided with the update procedure.

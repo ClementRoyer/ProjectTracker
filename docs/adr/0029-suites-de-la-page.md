@@ -1,32 +1,32 @@
-# 0029. Suites de la page : dossier, nouveautés, devise, livraison
+# 0029. Follow-ups of the page: folder, novelties, currency, delivery
 
-- Statut : Acceptée
-- Date : 2026-10-20
-- Décideur : l'utilisateur (points ouverts de l'étape 10, après la démo de la page)
-- Liens : [plan de l'étape 10](../plan/etape-10.md) ; [ADR 0012](0012-mesure-de-l-usage-ia.md), [0015](0015-modele-de-donnees.md), [0028](0028-page-svelte.md) ; [features.md](../product/features.md) F9, F19, F20
+- Status: Accepted
+- Date: 2026-10-20
+- Decider: the user (open points of step 10, after the demo of the page)
+- Links: [plan of step 10](../plan/etape-10.md); [ADR 0012](0012-mesure-de-l-usage-ia.md), [0015](0015-modele-de-donnees.md), [0028](0028-page-svelte.md); [features.md](../product/features.md) F9, F19, F20
 
-## Contexte
+## Context
 
-La page a été écrite d'après la maquette validée. Quatre points n'avaient pas de réponse dans la maquette ou dans le modèle de données ; ils ont été soumis à l'utilisateur après qu'il a validé la page.
+The page was written from the validated mockup. Four points had no answer in the mockup or in the data model; they were submitted to the user after he validated the page.
 
-## Options étudiées
+## Options considered
 
-| Question | Options | Choix |
+| Question | Options | Choice |
 |---|---|---|
-| 1. Rubriques « Fait », « Reste », « Pièges » du dossier, sans donnée | Les ajouter au journal, rapportées par l'agent (recommandé) ; les retirer | **Les retirer** |
-| 2. Effacement du point « nouveautés » | Ticket par ticket, à l'ouverture (recommandé) ; un bouton « tout marquer lu » | Ticket par ticket |
-| 3. Devise du coût estimé | Une clé dans la configuration (recommandé) ; pas de devise | Devise dans la configuration |
-| 4. Tickets proposés pour la prochaine livraison en qualité | Phase « Test » avec avancement « fait » (proposé par l'IA) ; tous les tickets en « Test » | Phase « Test », avancement « fait » |
+| 1. Sections "Fait", "Reste", "Pièges" of the folder, with no data | Add them to the journal, reported by the agent (recommended); remove them | **Remove them** |
+| 2. Clearing the novelties mark | Ticket by ticket, on opening (recommended); a "tout marquer lu" button | Ticket by ticket |
+| 3. Currency of the estimated cost | A key in the configuration (recommended); no currency | Currency in the configuration |
+| 4. Tickets proposed for the next QA delivery | Phase "Test" with progress "fait" (proposed by the AI); all tickets in "Test" | Phase "Test", progress "fait" |
 
-## Décision
+## Decision
 
-1. **Le dossier ne montre que ce que le modèle connaît** : demande initiale, où on en est, décisions, dernier passage de tests, fichiers en commun, lien Jira. Les rubriques de la maquette sont retirées (choix de l'utilisateur contre la recommandation de l'IA).
-2. **Nouveautés ticket par ticket.** Ouvrir un ticket efface son point, et seulement le sien. La base garde une date de dernière lecture par ticket ; la liste des nouveautés (F9) garde sa propre date de visite.
-3. **Devise dans la configuration** : une clé `currency` (code ISO 4217, par exemple `USD` ou `EUR`) à côté de la table de prix. La page affiche le coût dans cette devise ; sans la clé, elle l'affiche sans symbole.
-4. **Prochaine livraison** : les tickets ouverts en phase « Test » dont l'avancement est « fait ».
+1. **The folder shows only what the model knows**: initial request, where things stand, decisions, last test run, shared files, Jira link. The sections of the mockup are removed (choice of the user against the AI recommendation).
+2. **Novelties ticket by ticket.** Opening a ticket clears its mark, and only its own. The database keeps a last-read date per ticket; the list of novelties (F9) keeps its own visit date.
+3. **Currency in the configuration**: a key `currency` (ISO 4217 code, for example `USD` or `EUR`) next to the price table. The page shows the cost in this currency; without the key, it shows it without a symbol.
+4. **Next delivery**: the open tickets in phase "Test" whose progress is "fait".
 
-## Conséquences
+## Consequences
 
-- Migration 3 de la base : une table de lecture par ticket.
-- Une opération `markTicketRead` (développeur), appelée par la page à l'ouverture d'un ticket et quand de nouvelles entrées y arrivent pendant qu'il est ouvert.
-- `usageSummary` rend la devise configurée.
+- Database migration 3: a read table per ticket.
+- A `markTicketRead` operation (developer), called by the page when a ticket is opened and when new entries arrive there while it is open.
+- `usageSummary` returns the configured currency.

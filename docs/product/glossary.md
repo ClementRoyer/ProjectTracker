@@ -1,133 +1,133 @@
-# Glossaire
+# Glossary
 
-- Statut : **validé par l'utilisateur (2026-10-18)**
-- Date : 2026-10-18
-- Sources : [needs.md](needs.md), [features.md](features.md), ambiguïtés relevées dans l'[audit produit](../analysis/2026-10-16-audit-v1/product.md) §3
+- Status: **validated by the user (2026-10-18)**
+- Date: 2026-10-18
+- Sources: [needs.md](needs.md), [features.md](features.md), ambiguities noted in the [product audit](../analysis/2026-10-16-audit-v1/product.md) §3
 
-## Règles
+## Rules
 
-- **Un mot par notion, une notion par mot.** Les documents, l'interface, les messages des agents et le code emploient ces termes et aucun autre.
-- **Colonne « Code »** : le nom utilisé dans le code, en anglais ([ADR 0006](../adr/0006-langues.md)).
-- **Colonne « Remplace (V1) »** : les mots de la V1 qui ne doivent plus être employés pour cette notion.
+- **One word per notion, one notion per word.** The documents, the interface, the agents' messages and the code use these terms and no others.
+- **"Code" column**: the name used in the code, in English ([ADR 0006](../adr/0006-langues.md)).
+- **"Replaces (V1)" column**: the V1 words that must no longer be used for this notion.
 
-## Personnes et intervenants
+## People and assignees
 
-| Terme | Code | Définition | Remplace (V1) |
-|---|---|---|---|
-| **Développeur** | `developer` | La personne qui utilise l'outil. Il traite des tickets, rapporte ce qu'il apprend, répond aux questions, livre et valide en qualité. C'est le seul à déclarer un ticket terminé. | « l'utilisateur », « page » comme auteur |
-| **Agent** | `agent` | Un intervenant d'IA, identifié par un nom stable. Il peut porter plusieurs tickets et appartenir à n'importe quel outil (Claude Code ou un autre). | owner, label, `--agent` |
-| **Conversation** | `session` | Une exécution concrète d'un agent. Elle peut s'arrêter, et une nouvelle conversation peut reprendre un ticket. | session (au sens d'identité) |
-| **Intervenant** | `assignee` | Celui qui traite un ticket : le développeur ou un agent. Un ticket a au plus **un intervenant par rôle** à la fois ([ADR 0010](../adr/0010-back-end-intervenant-du-ticket.md)). | owner, détenteur, celui qui a « réservé » |
-| **Rôle** | `role` | La part du travail d'un ticket que tient un intervenant : `front` (le dépôt du projet) ou `back-end` (le miroir sur le serveur back-end). | — |
-| **Partenaire** | `partner` | Un acteur extérieur avec qui on échange au sujet d'un ticket. Le back-end n'en est plus un : c'est un intervenant de rôle `back-end`. | partenaire (ne désigne plus le back-end) |
-| **Utilisateur final** | `endUser` | Une personne qui utilise le produit développé : elle teste en qualité et fait des retours. Ne pas confondre avec le développeur. | « user », « utilisateur » sans précision |
+| Term | Code | French (UI) | Definition | Replaces (V1) |
+|---|---|---|---|---|
+| **Developer** | `developer` | Développeur | The person who uses the tool. They handle tickets, report what they learn, answer questions, deliver and validate in QA. They are the only one who can declare a ticket closed. | `"l'utilisateur"`, `"page"` as author |
+| **Agent** | `agent` | Agent | An AI assignee, identified by a stable name. It can handle several tickets and belong to any tool (Claude Code or another). | owner, label, `--agent` |
+| **Conversation** | `session` | Conversation | One concrete run of an agent. It can stop, and a new conversation can resume a ticket. | session (in the sense of identity) |
+| **Assignee** | `assignee` | Intervenant | The one who handles a ticket: the developer or an agent. A ticket has at most **one assignee per role** at a time ([ADR 0010](../adr/0010-back-end-intervenant-du-ticket.md)). | owner, détenteur, celui qui a "réservé" |
+| **Role** | `role` | Rôle | The part of a ticket's work held by an assignee: `front` (the project's repository) or `back-end` (the mirror on the back-end server). | — |
+| **Partner** | `partner` | Partenaire | An outside actor we exchange with about a ticket. The back-end is no longer one: it is an assignee with role `back-end`. | partenaire (no longer means the back-end) |
+| **End user** | `endUser` | Utilisateur final | A person who uses the product being developed: they test in QA and give feedback. Do not confuse with the developer. | `"user"`, `"utilisateur"` without qualification |
 
-## Le ticket
+## The ticket
 
-| Terme | Code | Définition | Remplace (V1) |
-|---|---|---|---|
-| **Projet** | `project` | Un ensemble de tickets, rattaché à un dépôt de code. Le cas normal est un seul projet. | — |
-| **Ticket** | `ticket` | L'unité de travail suivie. Tout se rattache à un ticket. | item, carte, card, tâche (`kind: task`) |
-| **Origine** | `origin` | D'où vient le ticket : `jira` (chargé depuis Jira) ou `local` (créé dans l'outil, et il le reste). | — |
-| **Clé** | `key` | L'identifiant lisible d'un ticket : la clé Jira (`ABC-123`) ou une clé locale. | id, ticket id |
-| **Demande initiale** | `initialRequest` | Ce qui a été demandé au départ : la description Jira, ou la phrase qui a créé le ticket local. | description, contexte |
-| **Statut Jira** | `jiraStatus` | Le statut du ticket dans Jira, affiché tel quel. Distinct de la phase. | issueStatus |
+| Term | Code | French (UI) | Definition | Replaces (V1) |
+|---|---|---|---|---|
+| **Project** | `project` | Projet | A set of tickets, attached to a code repository. The normal case is a single project. | — |
+| **Ticket** | `ticket` | Ticket | The unit of work tracked. Everything is attached to a ticket. | item, carte, card, tâche (`kind: task`) |
+| **Origin** | `origin` | Origine | Where the ticket comes from: `jira` (imported from Jira) or `local` (created in the tool, and it stays so). | — |
+| **Key** | `key` | Clé | The readable identifier of a ticket: the Jira key (`ABC-123`) or a local key. | id, ticket id |
+| **Initial request** | `initialRequest` | Demande initiale | What was asked at the start: the Jira description, or the sentence that created the local ticket. | description, contexte |
+| **Jira status** | `jiraStatus` | Statut Jira | The status of the ticket in Jira, shown as it is. Distinct from the phase. | issueStatus |
 
-## La situation d'un ticket
+## A ticket's situation
 
-| Terme | Code | Définition | Remplace (V1) |
-|---|---|---|---|
-| **Situation** | `situation` | Où en est un ticket, en quatre éléments : **phase**, **avancement**, **attente** et **intervenant**. | stage, column, standing, status, activity (cinq mots pour une notion) |
-| **Phase** | `phase` | L'étape du cycle de vie, dans cet ordre : **À faire** (`todo`, ticket pas encore commencé) → **Analyse** (`analysis`) → **Développement** (`development`) → **Test** (`test`) → **Livraison en qualité** (`qaDelivery`) → **Validation en qualité** (`qaValidation`). | stage, colonne |
-| **Avancement** | `progress` | Où on en est dans la phase : **pas démarré** (`notStarted`), **en cours** (`inProgress`, avec une phrase qui dit où), **fait** (`done`). | activity, standing |
-| **Attente** | `wait` | Ce que le ticket attend pour avancer, et depuis quand : le développeur, un autre intervenant (le back-end), un partenaire, un utilisateur final, une ressource, un fichier tenu. Aucune attente = le ticket peut avancer. | blockedBy, blocking, waiting |
-| **Terminé** | `closed` | L'état final, déclaré par le développeur seul, après la validation en qualité. | done (colonne) |
-| **Sans nouvelles** | `stale` | Un ticket en cours dont rien n'a bougé depuis un délai configurable. | noNews, standing `noNewsAt` |
+| Term | Code | French (UI) | Definition | Replaces (V1) |
+|---|---|---|---|---|
+| **Situation** | `situation` | Situation | Where a ticket stands, in four elements: **phase**, **progress**, **wait** and **assignee**. | stage, column, standing, status, activity (five words for one notion) |
+| **Phase** | `phase` | Phase | The lifecycle step, in this order: **To do** (`todo`, ticket not started yet) → **Analysis** (`analysis`) → **Development** (`development`) → **Test** (`test`) → **QA delivery** (`qaDelivery`) → **QA validation** (`qaValidation`). | stage, colonne |
+| **Progress** | `progress` | Avancement | Where things stand within the phase: **not started** (`notStarted`), **in progress** (`inProgress`, with a sentence saying where), **done** (`done`). | activity, standing |
+| **Wait** | `wait` | Attente | What the ticket waits for in order to move on, and since when: the developer, another assignee (the back-end), a partner, an end user, a resource, a held file. No wait = the ticket can move on. | blockedBy, blocking, waiting |
+| **Closed** | `closed` | Terminé | The final state, declared by the developer alone, after QA validation. | done (colonne) |
+| **Stale** | `stale` | Sans nouvelles | An ongoing ticket where nothing has moved for a configurable delay. | noNews, standing `noNewsAt` |
 
-## Le dossier du ticket
+## The ticket's record
 
-| Terme | Code | Définition | Remplace (V1) |
-|---|---|---|---|
-| **Journal** | `journal` | La suite datée de tout ce qui s'est passé sur un ticket, en texte intégral. Chaque élément est une **entrée**. | history, events, messages, exchanges, notes (huit flux) |
-| **Entrée** | `entry` | Un élément du journal, avec un auteur, une date et un **type** (ci-dessous). Une entrée n'est jamais modifiée : on la corrige par une entrée plus récente. | event, message, note, memory |
-| **Type d'entrée** | `entryType` | `progress` (point d'avancement : fait, en cours, reste, pièges), `decision` (une décision et sa raison), `exchange` (un échange entre intervenants ou avec un partenaire, mot pour mot), `feedback` (un retour d'un utilisateur final), `question`, `answer`, `request`, `situationChange` (changement de situation), `testRun` (un passage de test), `jiraImport` (ce qu'a apporté un chargement Jira). | — |
-| **Fiche** | `sheet` | La lecture du ticket en trois temps : la demande initiale, l'histoire jusqu'à la prise en main, la situation aujourd'hui. Elle est construite à partir du journal et sert aussi bien au développeur qu'à un agent qui reprend le ticket. | brief, brief.md, fiche |
+| Term | Code | French (UI) | Definition | Replaces (V1) |
+|---|---|---|---|---|
+| **Journal** | `journal` | Journal | The dated follow-up of everything that happened on a ticket, in full text. Each item is an **entry**. | history, events, messages, exchanges, notes (huit flux) |
+| **Entry** | `entry` | Entrée | An item of the journal, with an author, a date and a **type** (below). An entry is never modified: it is corrected by a more recent entry. | event, message, note, memory |
+| **Entry type** | `entryType` | Type d'entrée | `progress` (progress update: done, in progress, remaining, pitfalls), `decision` (a decision and its reason), `exchange` (an exchange between assignees or with a partner, word for word), `feedback` (feedback from an end user), `question`, `answer`, `request`, `situationChange` (change of situation), `testRun` (a test run), `jiraImport` (what a Jira import brought). | — |
+| **Sheet** | `sheet` | Fiche | The reading of the ticket in three parts: the initial request, the history up to the takeover, the situation today. It is built from the journal and serves both the developer and an agent who picks up the ticket. | brief, brief.md, fiche |
 
-## Échanger avec le développeur
+## Talking with the developer
 
-| Terme | Code | Définition | Remplace (V1) |
-|---|---|---|---|
-| **Question** | `question` | Une demande d'un intervenant **au développeur**, avec le contexte, les options et une recommandation. Tant qu'elle est ouverte, le ticket attend le développeur. | question (inchangé) |
-| **Réponse** | `answer` | La réponse du développeur à une question. Elle est acheminée à l'intervenant, qui en accuse réception. | answer |
-| **Demande** | `request` | Une action demandée **par le développeur** à un intervenant : « Où en est-on ? », relancer les tests… | request stockée comme une answer, action, statusRequest, rerun |
-| **Prise en compte** | `acknowledgement` | La confirmation que l'intervenant a reçu une réponse ou une demande. | accusé, claim d'une réponse |
-| **À traiter** | `inbox` | Tout ce qui attend le développeur : questions ouvertes, validations, demandes d'action, du plus ancien au plus récent. | « ce qui m'attend », vue « Tout » |
-| **Nouveautés** | `updates` | Ce qui a changé depuis la **dernière visite** (`lastVisit`) du développeur : nouveaux tickets, mises à jour Jira, travail des agents. | notifications, « Nouveau » |
+| Term | Code | French (UI) | Definition | Replaces (V1) |
+|---|---|---|---|---|
+| **Question** | `question` | Question | A request from an assignee **to the developer**, with context, options and a recommendation. While it is open, the ticket waits for the developer. | question (unchanged) |
+| **Answer** | `answer` | Réponse | The developer's answer to a question. It is routed to the assignee, who acknowledges it. | answer |
+| **Request** | `request` | Demande | An action asked **by the developer** of an assignee: `"Où en est-on ?"`, rerun the tests… | request stored as an answer, action, statusRequest, rerun |
+| **Acknowledgement** | `acknowledgement` | Prise en compte | The confirmation that the assignee received an answer or a request. | accusé, claim d'une réponse |
+| **Inbox** | `inbox` | À traiter | Everything that waits for the developer: open questions, validations, action requests, from the oldest to the newest. | `"ce qui m'attend"`, view `"Tout"` |
+| **Updates** | `updates` | Nouveautés | What has changed since the developer's **last visit** (`lastVisit`): new tickets, Jira updates, the agents' work. | notifications, `"Nouveau"` |
 
 ## Jira
 
-| Terme | Code | Définition | Remplace (V1) |
-|---|---|---|---|
-| **Chargement Jira** | `jiraImport` | Lecture des tickets Jira assignés au développeur sur le projet, lancée par lui. Elle apporte la demande initiale, le statut et les commentaires. Elle n'écrit jamais dans Jira. | issue tracker sync, refresh |
-| **Écart Jira** | `jiraDrift` | Une différence entre le statut Jira et la phase locale, simplement affichée. | gap, mismatch |
+| Term | Code | French (UI) | Definition | Replaces (V1) |
+|---|---|---|---|---|
+| **Jira import** | `jiraImport` | Chargement Jira | Reading of the Jira tickets assigned to the developer on the project, started by them. It brings the initial request, the status and the comments. It never writes to Jira. | issue tracker sync, refresh |
+| **Jira gap** | `jiraDrift` | Écart Jira | A difference between the Jira status and the local phase, simply shown. | gap, mismatch |
 
-## Travailler en parallèle
+## Working in parallel
 
-| Terme | Code | Définition | Remplace (V1) |
-|---|---|---|---|
-| **Prise en charge** | `assignment` | Le fait de devenir l'intervenant d'un ticket. Elle reste valable tant que l'intervenant donne des signes de vie. | claim, lease, réservation |
-| **Fichier tenu** | `fileHold` | Un fichier déclaré par l'intervenant d'un ticket avant de le modifier. Un autre ticket ne peut pas le modifier pendant ce temps. | hold, files |
-| **Priorité** | `priority` | L'ordre d'importance d'un ticket, réglé par le développeur : urgente (`urgent`), haute (`high`), normale (`normal`, par défaut), basse (`low`) (ADR 0032). Quand plusieurs demandes attendent le même fichier tenu, celle du ticket le plus prioritaire passe en premier (ADR 0021). | — |
-| **Ressource partagée** | `resource` | Un bien utilisé par un seul ticket à la fois, par exemple l'environnement de tests e2e. | — |
-| **Verrou** | `lock` | L'usage exclusif d'une ressource partagée pendant une opération. Le mot est réservé à cet usage. | lock (aussi employé pour les fichiers de données) |
-| **Dossier de travail** | `worktree` | Le dossier git propre à un ticket, avec sa branche, où son intervenant travaille sans gêner les autres tickets ([ADR 0008](../adr/0008-eviter-les-conflits-entre-tickets.md)). Optionnel : un ticket peut aussi être traité dans le dossier principal. | — |
-| **Chevauchement** | `overlap` | Un risque de conflit détecté : deux tickets ont modifié le même fichier. C'est un signal, pas un blocage. | overlap (même mot, sens précisé) |
-| **Demande back-end** | `backendRequest` | Une demande adressée au rôle `back-end` d'un ticket, par l'agent front ou par le développeur. Le ticket attend alors le back-end. | message au partenaire back-end |
-| **Lanceur** | `launcher` | Le petit programme de l'outil installé sur le serveur back-end. Il relève les demandes back-end et démarre un agent neuf pour chacune, avec la commande configurée. Il gère les fichiers tenus du miroir par des fichiers `.lock` locaux. | — |
-| **Exécution** | `execution` | Le passage d'un agent démarré par le lanceur pour une demande back-end, du lancement à la fin. Les fichiers qu'il tient sont libérés à la fin de l'exécution. | — |
-| **Conflit** | `conflict` | Deux tickets qui veulent le même fichier ou la même ressource au même moment. | overlap |
-| **Garde** | `guard` | Le contrôle qui refuse une action interdite avant qu'elle ait lieu : écrire un fichier tenu par un autre ticket, utiliser une ressource sans son verrou. | guard (inchangé) |
+| Term | Code | French (UI) | Definition | Replaces (V1) |
+|---|---|---|---|---|
+| **Assignment** | `assignment` | Prise en charge | Becoming the assignee of a ticket. It stays valid as long as the assignee gives signs of life. | claim, lease, réservation |
+| **Held file** | `fileHold` | Fichier tenu | A file declared by a ticket's assignee before changing it. Another ticket cannot change it in the meantime. | hold, files |
+| **Priority** | `priority` | Priorité | The order of importance of a ticket, set by the developer: urgent (`urgent`), high (`high`), normal (`normal`, default), low (`low`) (ADR 0032). When several requests wait for the same held file, the one of the most important ticket goes first (ADR 0021). | — |
+| **Shared resource** | `resource` | Ressource partagée | An asset used by one ticket at a time, for example the e2e test environment. | — |
+| **Lock** | `lock` | Verrou | Exclusive use of a shared resource during an operation. The word is reserved for this use. | lock (also used for data files) |
+| **Working folder** | `worktree` | Dossier de travail | The git folder of its own for a ticket, with its branch, where its assignee works without disturbing the other tickets ([ADR 0008](../adr/0008-eviter-les-conflits-entre-tickets.md)). Optional: a ticket can also be handled in the main folder. | — |
+| **Overlap** | `overlap` | Chevauchement | A detected risk of conflict: two tickets changed the same file. It is a signal, not a block. | overlap (same word, meaning specified) |
+| **Back-end request** | `backendRequest` | Demande back-end | A request addressed to the `back-end` role of a ticket, by the front agent or by the developer. The ticket then waits for the back-end. | message au partenaire back-end |
+| **Launcher** | `launcher` | Lanceur | The small program of the tool installed on the back-end server. It picks up back-end requests and starts a new agent for each one, with the configured command. It manages the held files of the mirror through local `.lock` files. | — |
+| **Execution** | `execution` | Exécution | The run of an agent started by the launcher for a back-end request, from start to end. The files it holds are released at the end of the execution. | — |
+| **Conflict** | `conflict` | Conflit | Two tickets that want the same file or the same resource at the same time. | overlap |
+| **Guard** | `guard` | Garde | The check that refuses a forbidden action before it happens: writing a file held by another ticket, using a resource without its lock. | guard (unchanged) |
 
-## Terminer et livrer
+## Finishing and delivering
 
-| Terme | Code | Définition | Remplace (V1) |
-|---|---|---|---|
-| **Passage de test** | `testRun` | Une exécution de tests pour un ticket, avec son résultat (réussi, échoué) et sa date. | run, campaign |
-| **Test manuel** | `manualTest` | Un test fait à la main : **visuel** (par le développeur) ou **utilisateur** (par un utilisateur final), avec son retour. | — |
-| **Livraison** | `delivery` | Un ensemble de tickets livrés ensemble en qualité, puis validés. | lot (au sens de livraison), delivery |
-| **Changelog** | `changelog` | Le texte qui décrit une livraison, produit en option. | — |
-| **Modèle** | `template` | Un fichier gabarit du projet, servant à générer un export. | — |
-| **Export** | `export` | Un fichier généré pour un ticket à partir d'un modèle. | — |
+| Term | Code | French (UI) | Definition | Replaces (V1) |
+|---|---|---|---|---|
+| **Test run** | `testRun` | Passage de test | One test run for a ticket, with its result (passed, failed) and its date. | run, campaign |
+| **Manual test** | `manualTest` | Test manuel | A test done by hand: **visual** (by the developer) or **user** (by an end user), with its feedback. | — |
+| **Delivery** | `delivery` | Livraison | A set of tickets delivered together in QA, then validated. | lot (au sens de livraison), delivery |
+| **Changelog** | `changelog` | Changelog | The text describing a delivery, produced as an option. | — |
+| **Template** | `template` | Modèle | A template file of the project, used to generate an export. | — |
+| **Export** | `export` | Export | A file generated for a ticket from a template. | — |
 
-## Autour du projet
+## Around the project
 
-| Terme | Code | Définition | Remplace (V1) |
-|---|---|---|---|
-| **Usage** | `usage` | La consommation estimée de l'IA, par ticket et par période (jour, semaine, mois). | coût, costs |
-| **Pièce jointe** | `attachment` | Un fichier attaché à un ticket : capture d'écran ou autre. | capture d'écran, screenshot |
-| **Dépôt** | `repository` | Un dépôt de code du projet. | repo |
-| **Groupe** | `group` | Un regroupement libre de tickets, par exemple un thème. | lot (au sens de regroupement) |
-| **Document** | `document` | Un document de référence du projet, consultable depuis l'outil. | doc |
+| Term | Code | French (UI) | Definition | Replaces (V1) |
+|---|---|---|---|---|
+| **AI usage** | `usage` | Usage | The estimated AI consumption, per ticket and per period (day, week, month). | coût, costs |
+| **Attachment** | `attachment` | Pièce jointe | A file attached to a ticket: a screenshot or another file. | capture d'écran, screenshot |
+| **Repository** | `repository` | Dépôt | A code repository of the project. | repo |
+| **Group** | `group` | Groupe | A free grouping of tickets, for example by theme. | lot (au sens de regroupement) |
+| **Document** | `document` | Document | A reference document of the project, readable from the tool. | doc |
 
-## Mots à ne plus employer
+## Words no longer to use
 
-| Mot V1 | Problème | À la place |
+| V1 word | Problem | Instead |
 |---|---|---|
-| item, carte | Deux noms pour le ticket | **Ticket** |
-| tâche (`kind: task`) | Les « tâches du développeur » de la V1 ne correspondent à aucun besoin | Supprimé (décision de l'utilisateur, 2026-10-18) |
-| stage, column, standing, status, activity | Cinq mots pour « où en est-il ? » | **Situation** (phase, avancement, attente, intervenant) |
-| blockedBy | Mélangé avec le statut | **Attente** |
-| claim, lease, hold, reservation | Recouvrements | **Prise en charge**, **fichier tenu**, **verrou** |
-| listener, dispatcher, aiguilleur | Mécanisme d'un seul outil d'agents | Notion technique, hors du vocabulaire du domaine |
-| capture | Brut d'un hook | Notion technique ; le résultat est une **entrée** `exchange` |
-| memory, brief | Doublons du journal et de la fiche | **Entrée** et **fiche** |
-| lot | Désignait trois choses | **Livraison**, **groupe**, et « étape du plan » pour le développement de l'outil |
+| item, carte | Two names for the ticket | **Ticket** |
+| tâche (`kind: task`) | The V1 `"tâches du développeur"` match no need | Removed (user's decision, 2026-10-18) |
+| stage, column, standing, status, activity | Five words for "where is it?" | **Situation** (phase, progress, wait, assignee) |
+| blockedBy | Mixed up with the status | **Wait** |
+| claim, lease, hold, reservation | Overlaps | **Assignment**, **held file**, **lock** |
+| listener, dispatcher, aiguilleur | The mechanism of a single agent tool | A technical notion, outside the domain vocabulary |
+| capture | Raw output of a hook | A technical notion; the result is an **entry** `exchange` |
+| memory, brief | Duplicates of the journal and the sheet | **Entry** and **sheet** |
+| lot | Meant three things | **Delivery**, **group**, and "plan step" for the development of the tool |
 
-## Décisions de l'utilisateur (2026-10-18)
+## User decisions (2026-10-18)
 
-| Question | Réponse | Effet |
+| Question | Answer | Effect |
 |---|---|---|
-| Code en anglais, interface et documents en français ? | « Oui. » | [ADR 0006](../adr/0006-langues.md) |
-| « Fiche » pour la lecture en trois temps ? | « OK pour fiche. » | Terme retenu |
-| Supprimer les « tâches » de la V1 ? | « Oui, supprime. » | La notion disparaît |
-| Une phase avant l'analyse ? | « Oui, un truc du style. » | Phase **À faire** (`todo`) ajoutée en tête du cycle |
+| Code in English, interface and documents in French? | "Yes." | [ADR 0006](../adr/0006-langues.md) |
+| "Fiche" for the three-part reading? | "OK for fiche." | Term kept |
+| Remove the V1 "tâches"? | "Yes, remove it." | The notion disappears |
+| One phase before analysis? | "Yes, something like that." | Phase **To do** (`todo`) added at the head of the cycle |

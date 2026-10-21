@@ -1,59 +1,59 @@
-# 0011. Interface des agents : un serveur unique, une identité par conversation
+# 0011. Agent interface: a single server, one identity per conversation
 
-- Statut : Acceptée
-- Date : 2026-10-19
-- Décideur : l'utilisateur (réponses aux trois questions du 2026-10-19)
-- Liens : [ADR 0002](0002-perimetre-multi-agents-ouvert.md) (agnostique), [0004](0004-stockage-sqlite.md) (SQLite), [0007](0007-acheminement-des-reponses.md) (acheminement), [0010](0010-back-end-intervenant-du-ticket.md) (lanceur distant) ; [architecture.md](../architecture.md) §2.2 ; [glossaire](../product/glossary.md) (agent, conversation, intervenant)
+- Status: Accepted
+- Date: 2026-10-19
+- Decider: the user (answers to the three questions of 2026-10-19)
+- Links: [ADR 0002](0002-perimetre-multi-agents-ouvert.md) (agnostic), [0004](0004-stockage-sqlite.md) (SQLite), [0007](0007-acheminement-des-reponses.md) (routing), [0010](0010-back-end-intervenant-du-ticket.md) (remote launcher); [architecture.md](../architecture.md) §2.2; [glossary](../product/glossary.md) (agent, conversation, assignee)
 
-## Contexte
+## Context
 
-Les agents, quel que soit leur outil (ADR 0002), doivent lire et écrire les tickets. La V1 n'a qu'une CLI, qui écrit directement dans les fichiers de données en concurrence avec le serveur : d'où les verrous maison et les intentions `.pending/`. L'agent s'y identifie par un nom déclaré à chaque appel (`--agent`).
+Agents, whatever their tool (ADR 0002), must read and write the tickets. V1 has only a CLI, which writes directly into the data files in competition with the server: hence the home-made locks and the `.pending/` intentions. The agent identifies itself there by a name declared on each call (`--agent`).
 
-Depuis l'ADR 0010, un client distant (le lanceur) passe déjà par HTTP. Trois questions restaient ouvertes : par où passent les agents, comment ils s'identifient, et que faire si le serveur n'est pas lancé.
+Since ADR 0010, a remote client (the launcher) already goes through HTTP. Three questions remained open: how agents get through, how they identify themselves, and what to do if the server is not running.
 
-## Options étudiées
+## Options considered
 
-### 1. Par où passent les agents
+### 1. How agents get through
 
-| Option | Avantages | Inconvénients |
+| Option | Advantages | Drawbacks |
 |---|---|---|
-| **Serveur unique HTTP** : la page, l'API, le MCP (en HTTP) et la CLI passent par le serveur local, seul à écrire dans la base | Un seul écrivain ; une seule logique métier ; déjà nécessaire pour le lanceur distant | Le serveur doit tourner pour que les agents travaillent |
-| MCP en stdio et CLI qui écrivent directement dans SQLite | Pas besoin du serveur pour les agents locaux | Plusieurs écrivains concurrents (le problème des verrous V1) ; il faut quand même le HTTP pour le lanceur |
-| CLI seulement | Le plus simple, fonctionne partout | Pas d'outils typés pour les agents qui gèrent le MCP ; sortie texte à interpréter |
+| **Single HTTP server**: the page, the API, the MCP (over HTTP) and the CLI go through the local server, the only one writing to the database | A single writer; a single business logic; already needed for the remote launcher | The server must run for the agents to work |
+| MCP over stdio and a CLI that write directly to SQLite | No server needed for local agents | Several competing writers (the V1 lock problem); HTTP is still needed for the launcher |
+| CLI only | The simplest, works everywhere | No typed tools for agents that handle MCP; text output to interpret |
 
-### 2. Identification d'un agent
+### 2. Identification of an agent
 
-| Option | Avantages | Inconvénients |
+| Option | Advantages | Drawbacks |
 |---|---|---|
-| **Nom stable + jeton de conversation** | Distingue deux conversations du même agent ; rattache sans erreur réponses, prise en charge et usage | Une étape de présentation au démarrage, faite par les adaptateurs |
-| Nom seul à chaque appel (V1) | Le plus simple | Deux conversations de même nom sont confondues ; une faute de frappe crée un faux intervenant |
-| Jeton fixe par agent, configuré | Le plus strict | Lourd : tout configurer avant de lancer un agent |
+| **Stable name + conversation token** | Distinguishes two conversations of the same agent; links answers, assignments and usage without error | A registration step at start-up, done by the adapters |
+| Name only, on each call (V1) | The simplest | Two conversations with the same name are confused; a typo creates a false assignee |
+| Fixed token per agent, configured | The strictest | Heavy: configure everything before launching an agent |
 
-### 3. Serveur non lancé
+### 3. Server not running
 
-| Option | Avantages | Inconvénients |
+| Option | Advantages | Drawbacks |
 |---|---|---|
-| La CLI démarre le serveur | Transparent pour les agents | Un processus lancé implicitement, plus difficile à suivre |
-| **Erreur claire, démarrage à la main** | Simple et prévisible ; le développeur sait toujours ce qui tourne | Un agent est bloqué tant que le serveur n'est pas lancé |
-| Service système permanent | Toujours disponible | Dépend du système d'exploitation ; installation plus lourde |
+| The CLI starts the server | Transparent for the agents | A process started implicitly, harder to track |
+| **Clear error, manual start** | Simple and predictable; the developer always knows what is running | An agent is blocked as long as the server is not started |
+| Permanent system service | Always available | Depends on the operating system; heavier installation |
 
-## Décision
+## Decision
 
-| Question | Choix de l'utilisateur |
+| Question | User's choice |
 |---|---|
-| Par où passent les agents | **Serveur unique HTTP** (proposition de l'IA) |
-| Identification | **Nom stable + jeton de conversation** (proposition de l'IA) |
-| Serveur non lancé | **Erreur claire, démarrage à la main** (et non le démarrage automatique proposé par l'IA) |
+| How agents get through | **Single HTTP server** (AI proposal) |
+| Identification | **Stable name + conversation token** (AI proposal) |
+| Server not running | **Clear error, manual start** (and not the automatic start proposed by the AI) |
 
-Fonctionnement retenu :
-- **Le serveur local est la seule porte d'entrée vers la base.** Il sert la page (HTTP + flux d'événements), l'API HTTP, le MCP en HTTP et l'accès du lanceur. Lui seul ouvre la base SQLite.
-- **La CLI est un client mince de l'API HTTP.** MCP et CLI offrent les mêmes opérations, avec la même logique côté serveur.
-- **Au démarrage, un agent se présente** avec un nom stable (par exemple `front-1`) et reçoit un **jeton de conversation**. Ce jeton accompagne chaque appel : en-tête pour le MCP, variable d'environnement pour la CLI. Une reprise ouvre une nouvelle conversation avec le même nom. Les adaptateurs (Claude Code, lanceur) font la présentation automatiquement.
-- **Si le serveur ne répond pas**, la CLI et le MCP échouent avec un message clair qui dit comment le lancer. Rien n'est démarré implicitement. Le lanceur distant réessaie, comme prévu par l'ADR 0010.
+Retained operation:
+- **The local server is the only entry point to the database.** It serves the page (HTTP + event stream), the HTTP API, the MCP over HTTP and the launcher's access. It alone opens the SQLite database.
+- **The CLI is a thin client of the HTTP API.** MCP and CLI offer the same operations, with the same server-side logic.
+- **On start-up, an agent introduces itself** with a stable name (for example `front-1`) and receives a **conversation token**. This token goes with each call: header for the MCP, environment variable for the CLI. A resumption opens a new conversation with the same name. The adapters (Claude Code, launcher) do the introduction automatically.
+- **If the server does not answer**, the CLI and the MCP fail with a clear message that says how to start it. Nothing is started implicitly. The remote launcher retries, as planned by ADR 0010.
 
-## Conséquences
+## Consequences
 
-- Les verrous de fichiers de données et les intentions `.pending/` de la V1 disparaissent : SQLite et un seul écrivain les remplacent.
-- Le jeton de conversation est distinct du jeton de la page et de celui du lanceur ; chacun n'ouvre que ses opérations.
-- Les consignes données aux agents disent quoi faire si le serveur ne répond pas : signaler au développeur, ne pas contourner.
-- Le développeur lance le serveur lui-même (`tracker serve`) ; l'installation et la documentation le disent dès le début.
+- The V1 data file locks and `.pending/` intentions disappear: SQLite and a single writer replace them.
+- The conversation token is distinct from the page's token and from the launcher's token; each one only opens its own operations.
+- The instructions given to the agents say what to do if the server does not answer: report to the developer, do not work around it.
+- The developer starts the server himself (`tracker serve`); the installation and the documentation say so from the start.

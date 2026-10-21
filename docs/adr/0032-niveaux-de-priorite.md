@@ -1,34 +1,34 @@
-# 0032. Niveaux de priorité d'un ticket
+# 0032. Priority levels of a ticket
 
-- Statut : Acceptée
-- Date : 2026-10-20
-- Décideur : l'utilisateur
-- Liens : [ADR 0021](0021-suites-du-poc-reseau-et-lanceur.md) (la priorité départage les demandes back-end), [0024](0024-migration-des-donnees-v1.md) (priorité V1 écartée en attendant), [0028](0028-page-svelte.md) ; [glossaire](../product/glossary.md) `priority`
+- Status: Accepted
+- Date: 2026-10-20
+- Decider: the user
+- Links: [ADR 0021](0021-suites-du-poc-reseau-et-lanceur.md) (priority breaks ties between back-end requests), [0024](0024-migration-des-donnees-v1.md) (V1 priority set aside for now), [0028](0028-page-svelte.md); [glossary](../product/glossary.md) `priority`
 
-## Contexte
+## Context
 
-L'ADR 0021 a créé la priorité du ticket, réglée par le développeur : quand plusieurs demandes back-end attendent le même fichier tenu, celle du ticket le plus prioritaire passe en premier. Les niveaux et la valeur par défaut restaient à fixer, ainsi que la reprise des priorités que l'outil connaît déjà (Jira, V1) et leur place dans la page.
+ADR 0021 created the ticket's priority, set by the developer: when several back-end requests wait for the same held file, the one of the highest-priority ticket goes first. The levels and the default value remained to be set, as well as the taking over of the priorities the tool already knows (Jira, V1) and their place in the page.
 
-## Options étudiées
+## Options considered
 
-| Question | Options | Choix |
+| Question | Options | Choice |
 |---|---|---|
-| 1. Niveaux | 3 : haute, normale, basse (recommandé) ; **4 : urgente, haute, normale, basse** ; 5, comme Jira | 4 niveaux (choix de l'utilisateur contre la recommandation) |
-| 2. Ticket chargé de Jira | **Reprise à la création** (recommandé) ; toujours suivre Jira ; ignorer Jira | Reprise à la création |
-| 3. Priorité des tickets V1 | **Convertie à la migration** (recommandé) ; non reprise | Convertie |
-| 4. Place dans la page | **Discrète, sauf si écartée de « normale »** (recommandé) ; toujours visible | Discrète |
+| 1. Levels | 3: high, normal, low (recommended); **4: urgent, high, normal, low**; 5, like Jira | 4 levels (user's choice against the recommendation) |
+| 2. Ticket loaded from Jira | **Taken over at creation** (recommended); always follow Jira; ignore Jira | Taken over at creation |
+| 3. Priority of V1 tickets | **Converted at migration** (recommended); not taken over | Converted |
+| 4. Place in the page | **Discreet, unless set away from "normal"** (recommended); always visible | Discreet |
 
-## Décision
+## Decision
 
-- **Quatre niveaux**, du plus au moins prioritaire : urgente (`urgent`), haute (`high`), normale (`normal`), basse (`low`). **Par défaut : normale.**
-- **Jira** : au premier chargement d'un ticket, sa priorité Jira donne la valeur de départ ; ensuite elle n'appartient qu'au développeur, un chargement suivant ne l'écrase jamais. Rien n'est écrit dans Jira.
-- **V1** : la migration convertit la priorité V1 ; un ticket V1 sans priorité prend « normale ».
-- **Conversion de l'échelle à cinq niveaux** de Jira et de la V1, proposée par l'IA : Highest → urgente ; High → haute ; Medium → normale ; Low et Lowest → basse ; un nom inconnu (priorité Jira personnalisée) → normale.
-- **Page** : une marque sur la ligne et la carte quand la priorité n'est pas « normale », un tri « Priorité » dans la liste, un choix dans l'en-tête du ticket pour la changer. Chaque changement est noté au journal.
-- **Demandes back-end** (ADR 0021) : à fichier tenu libéré, la demande du ticket le plus prioritaire passe en premier ; à priorité égale, la plus ancienne.
+- **Four levels**, from the most to the least priority: urgent (`urgent`), high (`high`), normal (`normal`), low (`low`). **Default: normal.**
+- **Jira**: at the first loading of a ticket, its Jira priority gives the starting value; after that it belongs only to the developer, and a later loading never overwrites it. Nothing is written to Jira.
+- **V1**: the migration converts the V1 priority; a V1 ticket with no priority takes "normal".
+- **Conversion of the five-level scale** of Jira and V1, proposed by the AI: Highest → urgent; High → high; Medium → normal; Low and Lowest → low; an unknown name (custom Jira priority) → normal.
+- **Page**: a mark on the row and the card when the priority is not "normal", a "Priorité" sort in the list, a choice in the ticket header to change it. Each change is noted in the journal.
+- **Back-end requests** (ADR 0021): when a held file is released, the request of the highest-priority ticket goes first; at equal priority, the oldest.
 
-## Conséquences
+## Consequences
 
-- Migration de la base : une colonne `priority` sur `ticket`, « normale » pour les tickets existants.
-- Une opération `setPriority` réservée au développeur ; les agents voient la priorité dans le résumé du ticket.
-- Le client Jira lit aussi le champ `priority` (lecture seule).
+- Database migration: a `priority` column on `ticket`, "normal" for existing tickets.
+- A `setPriority` operation reserved for the developer; agents see the priority in the ticket summary.
+- The Jira client also reads the `priority` field (read-only).

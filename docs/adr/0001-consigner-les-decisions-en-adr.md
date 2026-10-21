@@ -1,26 +1,26 @@
-# 0001. Consigner les décisions de la V2 en ADR
+# 0001. Recording V2 decisions as ADRs
 
-- Statut : Acceptée
-- Date : 2026-10-16
-- Décideur : l'utilisateur (demande du 2026-10-16 : « que tout soit bien structuré afin de pouvoir suivre ces choses-là plus tard et retrouver pourquoi ça a été fait »)
-- Liens : [audit outillage](../analysis/2026-10-16-audit-v1/tooling.md) §4
+- Status: Accepted
+- Date: 2026-10-16
+- Decider: the user (request of 2026-10-16: "make sure everything is well structured, so that these things can be tracked later and we can find out why something was done")
+- Links: [tooling audit](../analysis/2026-10-16-audit-v1/tooling.md) §4
 
-## Contexte
+## Context
 
-En V1, les décisions vivent dans `references/review-2026-10-12.md`, un journal chronologique en ajout seul où « la décision la plus récente gagne ». Pour connaître la règle en vigueur, il faut tout relire. Les décisions n'ont ni identifiant ni statut, et des propositions de l'IA y figurent sans validation explicite de l'utilisateur.
+In V1, decisions live in `references/review-2026-10-12.md`, a chronological journal that only grows, where "the most recent decision wins". To know the rule in force, you have to reread everything. Decisions have no identifier and no status, and AI proposals appear there without explicit validation by the user.
 
-## Options étudiées
+## Options considered
 
-1. **Continuer le journal unique** : simple, mais le problème de lecture empire avec le temps.
-2. **ADR numérotées, une décision par fichier**, avec statut et lien « remplacée par » : format standard, chaque décision est trouvable et sa validité est explicite.
-3. **Issues ou discussions sur une plateforme** : nécessite un dépôt distant, qui n'existe pas encore, et sépare les décisions du code.
+1. **Keep the single journal**: simple, but the reading problem gets worse over time.
+2. **Numbered ADRs, one decision per file**, with a status and a "superseded by" link: a standard format, where each decision can be found and its validity is explicit.
+3. **Issues or discussions on a platform**: needs a remote repository, which does not exist yet, and separates decisions from the code.
 
-## Décision
+## Decision
 
-Option 2. Les décisions de la V2 sont consignées dans `docs/adr/`. Le journal V1 reste en place comme historique et n'est plus alimenté pour la V2.
+Option 2. The V2 decisions are recorded in `docs/adr/`. The V1 journal stays in place as history and is no longer fed for V2.
 
-## Conséquences
+## Consequences
 
-- Toute décision prise avec l'utilisateur donne une ADR. Une proposition reste `Proposée` tant qu'il ne l'a pas validée.
-- `docs/README.md` explique comment retrouver une décision.
-- Le `CLAUDE.md` de la branche V2 renvoie vers `docs/` pour que les sessions suivent cette règle.
+- Any decision taken with the user gets an ADR. A proposal stays `Proposed` until the user has validated it.
+- `docs/README.md` explains how to find a decision.
+- The `CLAUDE.md` of the V2 branch points to `docs/` so that sessions follow this rule.

@@ -1,35 +1,35 @@
-# 0042. Aperçu par branche d'intégration : mise en œuvre
+# 0042. Preview by integration branch: implementation
 
-- Statut : Acceptée
-- Date : 2026-10-20
-- Décideur : l'utilisateur (réponses du 2026-10-20)
-- Liens : met en œuvre l'[ADR 0009](0009-apercu-et-commits-des-dossiers-de-travail.md) (branche d'intégration, un seul serveur, reconstruction par commande, conflits signalés) ; [ADR 0041](0041-dossier-de-travail-par-ticket.md) (dossiers de travail) ; [plan de l'étape 15](../plan/etape-15.md)
+- Status: Accepted
+- Date: 2026-10-20
+- Decider: the user (answers of 2026-10-20)
+- Links: implements [ADR 0009](0009-apercu-et-commits-des-dossiers-de-travail.md) (integration branch, one server, rebuild by command, conflicts flagged); [ADR 0041](0041-dossier-de-travail-par-ticket.md) (working folders); [step 15 plan](../plan/etape-15.md)
 
-## Contexte
+## Context
 
-L'ADR 0009 a retenu une branche d'intégration `preview`, reconstruite à partir de la branche principale en y réunissant les branches des tickets en cours, avec un seul serveur de développement dessus. Restaient à dire : quels tickets entrent, que faire d'un conflit, qui fait tourner le serveur, et où la page le montre.
+ADR 0009 chose an integration branch `preview`, rebuilt from the main branch by bringing together the branches of the tickets in progress, with a single development server on top. What remained to be said: which tickets go in, what to do with a conflict, who runs the server, and where the page shows it.
 
-## Options étudiées
+## Options considered
 
-| Question | Options | Choix |
+| Question | Options | Choice |
 |---|---|---|
-| 1. Tickets réunis | **ouverts avec un dossier de travail** (recommandé) ; choisis à chaque reconstruction ; ouverts sauf exclus | Ouverts avec un dossier |
-| 2. Conflit de réunion | **laisser la branche de côté** (recommandé) ; tout arrêter | La laisser de côté |
-| 3. Serveur de développement | **lancé une fois par le développeur** (recommandé) ; relancé par la CLI | Lancé une fois par le développeur |
-| 4. Affichage | **en-tête et ticket** (recommandé) ; bilan et ticket ; ticket seulement | En-tête et ticket |
+| 1. Tickets brought together | **Open with a working folder** (recommended); chosen at each rebuild; open except excluded | Open with a folder |
+| 2. Merge conflict | **Leave the branch aside** (recommended); stop everything | Leave it aside |
+| 3. Development server | **Started once by the developer** (recommended); restarted by the CLI | Started once by the developer |
+| 4. Display | **Header and ticket** (recommended); summary and ticket; ticket only | Header and ticket |
 
-## Décision
+## Decision
 
-1. **Reconstruire** : `tracker preview build [--base <branche>]`, lancée par le développeur ou un agent, jamais par la page. Le dossier est `.worktrees/preview`, sur la branche `preview` remise à la base (`--base`, sinon `main`) à chaque reconstruction. La branche `preview` est jetable : jamais poussée, ses commits de réunion sont signés `project-tracker`.
-2. **Tickets réunis** : les tickets ouverts qui ont un dossier de travail, dans l'ordre de leurs clés. Seul le code commité entre.
-3. **Conflit** : la réunion de la branche est annulée et les autres entrent quand même. Le ticket est signalé « conflit avec l'aperçu », avec les fichiers en cause et les tickets déjà réunis qui les modifient. Le journal du ticket le note quand le conflit apparaît ou change, pas à chaque reconstruction.
-4. **Plusieurs dépôts** : la même chose dans chaque dépôt, sous `.worktrees/preview/<chemin du dépôt>`. Un conflit dans un dépôt laisse le ticket de côté dans tous.
-5. **Serveur** : le développeur le lance lui-même dans `.worktrees/preview` ; la reconstruction met les fichiers à jour et le rechargement à chaud suit. La configuration peut donner `preview.setup` (par exemple `npm ci`), lancée dans le dossier après chaque reconstruction.
-6. **Page** : une pastille dans l'en-tête (« Aperçu : 4 tickets · il y a 5 min », en alerte s'il y a un conflit) ; le dossier du ticket dit « Dans l'aperçu » ou « Conflit avec l'aperçu ».
+1. **Rebuild**: `tracker preview build [--base <branch>]`, run by the developer or an agent, never from the page. The folder is `.worktrees/preview`, on the branch `preview` reset to the base (`--base`, otherwise `main`) at each rebuild. The `preview` branch is disposable: never pushed, its merge commits are signed `project-tracker`.
+2. **Tickets brought together**: the open tickets that have a working folder, in the order of their keys. Only committed code gets in.
+3. **Conflict**: the branch's merge is cancelled and the others get in anyway. The ticket is flagged "conflit avec l'aperçu", with the files involved and the tickets already brought together that modify them. The ticket's journal notes it when the conflict appears or changes, not at each rebuild.
+4. **Several repositories**: the same thing in each repository, under `.worktrees/preview/<repository path>`. A conflict in one repository leaves the ticket aside in all of them.
+5. **Server**: the developer starts it themselves in `.worktrees/preview`; the rebuild updates the files and hot reload follows. The configuration can give `preview.setup` (for example `npm ci`), run in the folder after each rebuild.
+6. **Page**: a badge in the header ("Aperçu : 4 tickets · il y a 5 min", in alert if there is a conflict); the ticket record says "Dans l'aperçu" or "Conflit avec l'aperçu".
 
-## Conséquences
+## Consequences
 
-- Opérations nouvelles : lister les dossiers de travail des tickets ouverts ; noter une reconstruction ; lire l'état de l'aperçu.
-- La base garde la dernière reconstruction, dans la table `preview` prévue dès le schéma initial (ADR 0015).
-- La configuration gagne `preview` : `{ "setup": "npm ci" }`, facultatif.
-- La commande de commit de l'ADR 0009 reste à faire.
+- New operations: list the working folders of open tickets; record a rebuild; read the state of the preview.
+- The database keeps the last rebuild, in the `preview` table planned from the initial schema (ADR 0015).
+- The configuration gains `preview`: `{ "setup": "npm ci" }`, optional.
+- The commit command of ADR 0009 remains to be done.

@@ -1,91 +1,91 @@
-# 0007. Acheminement de la réponse du développeur à l'agent
+# 0007. Routing the developer's answer to the agent
 
-- Statut : Acceptée
-- Date : 2026-10-18
-- Décideur : l'utilisateur (réponses aux trois questions du 2026-10-18)
-- Liens : [features.md](../product/features.md) F14 (B5.3, B5.4, primaires), F15 ; [ADR 0002](0002-perimetre-multi-agents-ouvert.md) ; vérification de la documentation de Claude Code du 2026-10-18 (ci-dessous)
+- Status: Accepted
+- Date: 2026-10-18
+- Decider: the user (answers to the three questions of 2026-10-18)
+- Links: [features.md](../product/features.md) F14 (B5.3, B5.4, primary), F15; [ADR 0002](0002-perimetre-multi-agents-ouvert.md); check of the Claude Code documentation of 2026-10-18 (below)
 
-## Contexte
+## Context
 
-Le développeur répond à une question depuis l'outil. La réponse doit **arriver à l'agent qui l'attend**, sans que le développeur passe par la conversation (B5.4). Il doit aussi **voir qu'elle a été prise en compte** (B5.3).
+The developer answers a question from the tool. The answer must **reach the agent that is waiting for it**, without the developer going through the conversation (B5.4). The developer must also **see that it has been taken into account** (B5.3).
 
-Deux cas se présentent :
-1. **La conversation qui a posé la question est encore ouverte** : il faut la « réveiller ».
-2. **Elle est fermée** (arrêtée, compactée, abandonnée) : la réponse doit attendre la prochaine conversation qui reprend le ticket (F15).
+Two cases arise:
+1. **The conversation that asked the question is still open**: it must be "woken up".
+2. **It is closed** (stopped, compacted, abandoned): the answer must wait for the next conversation that resumes the ticket (F15).
 
-La V1 traite le cas 1 avec une conversation « à l'écoute » qui surveille un flux avec l'outil Monitor (relancé avant 30 minutes) et transmet aux sous-agents. Le mécanisme fonctionne, mais il est fragile et coûteux, et il est propre à Claude Code.
+V1 handles case 1 with a "listening" conversation that watches a stream with the Monitor tool (restarted before 30 minutes) and passes the messages on to sub-agents. The mechanism works, but it is fragile and costly, and it is specific to Claude Code.
 
-### Ce que permet Claude Code (documentation officielle, vérifiée le 2026-10-18)
+### What Claude Code allows (official documentation, checked on 2026-10-18)
 
-| Mécanisme | Ce qu'il fait | Limites |
+| Mechanism | What it does | Limits |
 |---|---|---|
-| **Channel** (`claude/channel`) | Un serveur MCP **pousse** un message dans la session ouverte ; le modèle le reçoit au tour suivant. | **Aperçu de recherche.** Il faut lancer `claude --channels …` ; un serveur local maison exige `--dangerously-load-development-channels` (sauf s'il est publié en plugin). Fonctionne en interactif uniquement, avec une connexion claude.ai ou une clé Console. Les messages sont perdus si le channel n'est pas chargé. |
-| **Monitor** | Surveille la sortie d'une commande ; chaque ligne réveille le modèle. | 30 minutes au plus (10 en `-p`), puis il faut relancer : c'est le mécanisme de la V1. |
-| **Hook `asyncRewake`** | Un hook en arrière-plan réveille le modèle quand il se termine avec le code 2. | Durée maximale non documentée (600 s par défaut) ; ce n'est pas prévu pour une longue attente. |
-| **Hook Stop `block`** | Empêche l'agent de s'arrêter et lui donne une raison de continuer. | Attendre dans un hook n'est pas un usage documenté. |
-| **`claude -p --resume <id>`** | Ajoute un tour à une conversation enregistrée, sans interface. | Si la conversation est ouverte ailleurs, les messages s'entremêlent, sans verrou. |
-| **Notification MCP classique** | — | Le modèle ne voit rien sans appel d'outil, sauf avec un channel. |
-| **Messagerie entre sessions** | Remet un texte entre deux appels d'outil. | Le texte est traité comme venant d'une autre session, pas du développeur. |
+| **Channel** (`claude/channel`) | An MCP server **pushes** a message into the open session; the model receives it on the next turn. | **Research preview.** You must start `claude --channels …`; a home-made local server requires `--dangerously-load-development-channels` (unless it is published as a plugin). Works in interactive mode only, with a claude.ai login or a Console key. Messages are lost if the channel is not loaded. |
+| **Monitor** | Watches the output of a command; each line wakes the model. | 30 minutes at most (10 with `-p`), then it must be restarted: this is the V1 mechanism. |
+| **`asyncRewake` hook** | A background hook wakes the model when it ends with exit code 2. | Maximum duration not documented (600 s by default); not meant for a long wait. |
+| **Stop hook `block`** | Prevents the agent from stopping and gives it a reason to continue. | Waiting inside a hook is not a documented use. |
+| **`claude -p --resume <id>`** | Adds a turn to a saved conversation, without interface. | If the conversation is open elsewhere, the messages get mixed up, with no lock. |
+| **Classic MCP notification** | — | The model sees nothing without a tool call, unless there is a channel. |
+| **Messaging between sessions** | Puts a text in between two tool calls. | The text is treated as coming from another session, not from the developer. |
 
-Rien de tout cela n'existe de façon garantie chez les autres outils d'agents (Codex, Cursor, OpenCode).
+None of this is guaranteed to exist in the same way in other agent tools (Codex, Cursor, OpenCode).
 
-## Options étudiées
+## Options considered
 
-**A. Tout en « tirer » (neutre)**
-L'outil garde la réponse, et l'agent la récupère lui-même :
-- à chaque appel à l'outil : toute réponse de l'outil signale « une réponse t'attend » ;
-- par une commande d'attente qu'il appelle quand il n'a plus rien à faire (attente bornée, qu'il peut relancer) ;
-- à la reprise du ticket.
+**A. All "pull" (neutral)**
+The tool keeps the answer, and the agent fetches it itself:
+- on each tool call: any tool response signals "une réponse t'attend";
+- through a wait command that it calls when it has nothing left to do (bounded wait, which it can restart);
+- when the ticket is resumed.
 
-Avantages : fonctionne avec tout agent, ne perd rien, sans mécanisme fragile. Inconvénient : un agent inactif qui n'est pas en attente ne voit la réponse qu'au prochain contact.
+Advantages: works with any agent, loses nothing, no fragile mechanism. Drawback: an idle agent that is not waiting only sees the answer at the next contact.
 
-**B. Pousser par un channel (Claude Code)**
-Le serveur de l'outil est aussi un channel. La réponse est poussée dans la conversation qui a posé la question, qui la reçoit tout de suite.
+**B. Push through a channel (Claude Code)**
+The tool's server is also a channel. The answer is pushed into the conversation that asked the question, which receives it straight away.
 
-Avantages : c'est le vrai mécanisme prévu pour cet usage, la réception est immédiate, et l'utilisateur emploie déjà un channel pour joindre le back-end. Inconvénients : aperçu de recherche, option de lancement obligatoire, interactif seulement, propre à Claude Code.
+Advantages: it is the real mechanism intended for this use, reception is immediate, and the user already uses a channel to reach the back-end. Drawbacks: research preview, mandatory launch option, interactive only, specific to Claude Code.
 
-**C. Surveiller par Monitor (Claude Code, comme la V1)**
-L'agent lance une surveillance qui le réveille à l'arrivée d'une réponse.
+**C. Watch with Monitor (Claude Code, as in V1)**
+The agent starts a watch that wakes it when an answer arrives.
 
-Avantage : mécanisme stable et documenté. Inconvénient : relance obligatoire toutes les 30 minutes, ce qui ajoute du bruit et des coûts.
+Advantage: stable and documented mechanism. Drawback: mandatory restart every 30 minutes, which adds noise and costs.
 
-**D. Relancer la conversation fermée (`--resume`)**
-Un processus local reprend automatiquement la conversation avec la réponse.
+**D. Resume the closed conversation (`--resume`)**
+A local process automatically resumes the conversation with the answer.
 
-Avantage : rien ne reste en attente. Inconvénients : l'outil devrait exécuter des commandes, ce qui va contre le principe de sécurité « la page ne fait rien elle-même », et c'est risqué si la conversation est encore ouverte.
+Advantage: nothing stays pending. Drawbacks: the tool would have to run commands, which goes against the security principle "the page does nothing itself", and it is risky if the conversation is still open.
 
-**E. Aiguilleur (V1)**
-Une conversation dédiée reçoit toutes les réponses et les transmet.
+**E. Dispatcher (V1)**
+A dedicated conversation receives all the answers and forwards them.
 
-Avantage : déjà fait. Inconvénients : c'est le mécanisme le plus lourd et le plus fragile de la V1.
+Advantage: already done. Drawbacks: it is the heaviest and most fragile mechanism of V1.
 
-## Proposition de l'IA
+## AI proposal
 
-Des couches complémentaires plutôt qu'un seul mécanisme :
+Complementary layers rather than a single mechanism:
 
-1. **Socle neutre, toujours actif (option A)** :
-   - la réponse est enregistrée, donc jamais perdue ;
-   - elle est signalée dans chaque réponse de l'outil à l'agent concerné ;
-   - une commande d'attente est disponible ;
-   - elle est remise à la reprise du ticket.
+1. **Neutral base, always active (option A)**:
+   - the answer is recorded, so it is never lost;
+   - it is signalled in each tool response to the agent concerned;
+   - a wait command is available;
+   - it is handed over when the ticket is resumed.
 
-   **La prise en compte est un acte explicite de l'agent** (« réponse reçue »), visible par le développeur.
-2. **Accélérateur Claude Code : channel (option B)** quand il est activé, avec **Monitor (option C) en secours** si le channel n'est pas disponible.
-3. **Cas des conversations fermées** : la réponse attend la prochaine conversation qui prend le ticket ; l'outil le montre (« réponse en attente d'un intervenant »). La relance automatique (option D) est écartée pour l'instant.
-4. **L'aiguilleur (option E) est abandonné** au profit de 1 et 2.
+   **Taking it into account is an explicit act of the agent** ("answer received"), visible to the developer.
+2. **Claude Code accelerator: channel (option B)** when it is enabled, with **Monitor (option C) as fallback** if the channel is not available.
+3. **Closed conversations**: the answer waits for the next conversation that takes the ticket; the tool shows it ("réponse en attente d'un intervenant"). Automatic resumption (option D) is set aside for now.
+4. **The dispatcher (option E) is dropped** in favour of 1 and 2.
 
-## Décision
+## Decision
 
-La proposition de l'IA est retenue telle quelle. Réponses de l'utilisateur :
+The AI proposal is kept as it is. The user's answers:
 
-| Question | Choix |
+| Question | Choice |
 |---|---|
-| Approche | « Oui, en couches » : un socle neutre, plus un accélérateur pour Claude Code |
-| Réveiller une conversation Claude Code ouverte | « Channel + Monitor en secours » |
-| Conversation fermée | « Elle attend une reprise » |
+| Approach | "Yes, in layers": a neutral base, plus an accelerator for Claude Code |
+| Waking an open Claude Code conversation | "Channel + Monitor as fallback" |
+| Closed conversation | "It waits for a resumption" |
 
-## Conséquences
+## Consequences
 
-- L'interface des agents (MCP et CLI) renvoie systématiquement les réponses en attente de l'intervenant, et offre une commande d'attente.
-- L'adaptateur Claude Code contient un serveur channel et une procédure de secours par Monitor.
-- Il faudra suivre l'évolution des channels, puisqu'il s'agit d'un aperçu de recherche.
+- The agent interface (MCP and CLI) systematically returns the answers waiting for the assignee, and offers a wait command.
+- The Claude Code adapter contains a channel server and a Monitor fallback procedure.
+- The evolution of channels will have to be followed, since they are a research preview.

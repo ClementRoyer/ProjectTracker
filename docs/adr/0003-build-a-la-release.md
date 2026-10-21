@@ -1,28 +1,28 @@
-# 0003. Dépendances et build dans le dépôt, artefact autonome livré
+# 0003. Dependencies and build in the repository, standalone artefact delivered
 
-- Statut : Acceptée
-- Date : 2026-10-16
-- Décideur : l'utilisateur (réponse à la question « Que fait-on de la contrainte "zéro dépendance, copié tel quel" ? »)
-- Liens : [audit outillage](../analysis/2026-10-16-audit-v1/tooling.md) §3, [audit backend](../analysis/2026-10-16-audit-v1/backend.md) §5
+- Status: Accepted
+- Date: 2026-10-16
+- Decider: the user (answer to the question "What do we do with the constraint 'zero dependency, copied as is'?")
+- Links: [tooling audit](../analysis/2026-10-16-audit-v1/tooling.md) §3, [backend audit](../analysis/2026-10-16-audit-v1/backend.md) §5
 
-## Contexte
+## Context
 
-La V1 impose « aucune dépendance, copié tel quel » à la fois au produit installé **et** au dépôt de développement. Cela a obligé à réimplémenter le typage (absent), la validation (`schema.mjs`), une base transactionnelle (`transaction.mjs`), un framework de rendu (`dom.js`) et un analyseur JavaScript (`check.mjs`).
+V1 imposes "no dependency, copied as is" on both the installed product **and** the development repository. This forced the team to reimplement typing (absent), validation (`schema.mjs`), a transactional base (`transaction.mjs`), a rendering framework (`dom.js`) and a JavaScript parser (`check.mjs`).
 
-## Options étudiées
+## Options considered
 
-1. **Build à la release** : TypeScript et dépendances dans le dépôt. On livre un artefact compilé et autonome, toujours sans `npm install` chez l'utilisateur.
-2. **Paquet npm** installé globalement (`npx project-tracker`) : plus de copie dans chaque projet, mais une dépendance au registre npm.
-3. **Garder le zéro-dépendance** : JSDoc + `tsc --checkJs`, bibliothèques vendorisées. Les gains sont limités.
+1. **Build at release**: TypeScript and dependencies in the repository. We deliver a compiled, standalone artefact, still without `npm install` on the user's side.
+2. **npm package** installed globally (`npx project-tracker`): no more copy in each project, but a dependency on the npm registry.
+3. **Keep zero dependencies**: JSDoc + `tsc --checkJs`, vendored libraries. The gains are limited.
 
-## Décision
+## Decision
 
-**Option 1 : build à la release.**
+**Option 1: build at release.**
 
-## Conséquences
+## Consequences
 
-- Le dépôt devient un projet TypeScript avec des dépendances de développement et d'exécution, une compilation, un lint standard et des outils d'analyse.
-- La contrainte « zéro dépendance » ne porte plus que sur **l'artefact livré** : un dossier compilé et embarqué, qui tourne avec Node seul.
-- Une étape de release produit cet artefact, versionné et tagué. L'installation et la mise à jour copient l'artefact, plus jamais le dossier de travail.
-- `check.mjs` est réduit aux règles métier ; le reste passe à des outils standard.
-- La version minimale de Node est relevée à **22.13** (voir [0004](0004-stockage-sqlite.md)).
+- The repository becomes a TypeScript project with development and runtime dependencies, a compilation step, standard linting and analysis tools.
+- The "zero dependency" constraint now only applies to **the delivered artefact**: a compiled folder, embedded, that runs with Node alone.
+- A release step produces this artefact, versioned and tagged. Installation and update copy the artefact, never the working folder again.
+- `check.mjs` is reduced to the business rules; the rest moves to standard tools.
+- The minimum Node version is raised to **22.13** (see [0004](0004-stockage-sqlite.md)).

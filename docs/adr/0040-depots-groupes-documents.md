@@ -1,29 +1,29 @@
-# 0040. Dépôts, groupes de tickets, documents de référence
+# 0040. Repositories, ticket groups, reference documents
 
-- Statut : Acceptée
-- Date : 2026-10-20
-- Décideur : l'utilisateur (sous-étape 13g)
-- Liens : [features.md](../product/features.md) F31, F23 ; [ADR 0014](0014-decoupage-en-paquets.md) (la CLI lit git, le serveur jamais) ; [plan de l'étape 13](../plan/etape-13.md)
+- Status: Accepted
+- Date: 2026-10-20
+- Decider: the user (sub-step 13g)
+- Links: [features.md](../product/features.md) F31, F23; [ADR 0014](0014-decoupage-en-paquets.md) (the CLI reads git, the server never does); [step 13 plan](../plan/etape-13.md)
 
-## Contexte
+## Context
 
-F31 réunit trois besoins de la V1 : les fichiers modifiés par dépôt, les regroupements de tickets et les documents de référence du projet. L'utilisateur a un projet à plusieurs dépôts.
+F31 brings together three needs from V1: the modified files per repository, the ticket groupings and the project's reference documents. The user has a project with several repositories.
 
-## Options étudiées
+## Options considered
 
-| Question | Options | Choix |
+| Question | Options | Choice |
 |---|---|---|
-| 1. Plusieurs dépôts | Oui ; non, un seul | **Oui, plusieurs** |
-| 2. Groupes de tickets | **Étiquette et filtre** (recommandé) ; un niveau de plus dans la liste ; pas de groupes | Étiquette et filtre |
-| 3. Documents de référence | **Liste lisible par tous** (recommandé) ; documents par ticket ; pas de documents | Liste lisible par tous |
+| 1. Several repositories | Yes; no, only one | **Yes, several** |
+| 2. Ticket groups | **Label and filter** (recommended); one more level in the list; no groups | Label and filter |
+| 3. Reference documents | **List readable by everyone** (recommended); documents per ticket; no documents | List readable by everyone |
 
-## Décision
+## Decision
 
-1. **Dépôts.** La configuration nomme les dépôts du projet : `repos`, une liste de `{ "name": "front", "path": "front" }`, chemins relatifs à la racine du projet. La CLI rapporte les fichiers modifiés de chaque dépôt (elle lit git ; le serveur jamais), chemins relatifs à la racine ; le dossier du ticket les range par dépôt. Sans `repos`, rien ne change.
-2. **Groupes.** Le développeur range un ticket dans un groupe nommé (créé à la première utilisation) ou l'en sort. La ligne et la carte montrent le groupe ; la liste et le tableau se filtrent par groupe.
-3. **Documents.** La configuration donne des motifs de fichiers (`documents`, par exemple `["README.md", "docs/**/*.md"]`), relatifs à la racine du projet. La page les liste et les affiche en texte ; les agents en reçoivent la liste au début de leur session, et peuvent en lire un par l'outil MCP ou la CLI. Seuls les fichiers que donnent les motifs sont lisibles par l'outil.
+1. **Repositories.** The configuration names the project's repositories: `repos`, a list of `{ "name": "front", "path": "front" }`, paths relative to the project root. The CLI reports the modified files of each repository (it reads git; the server never does), paths relative to the root; the ticket record sorts them by repository. Without `repos`, nothing changes.
+2. **Groups.** The developer puts a ticket in a named group (created on first use) or takes it out. The row and the card show the group; the list and the table can be filtered by group.
+3. **Documents.** The configuration gives file patterns (`documents`, for example `["README.md", "docs/**/*.md"]`), relative to the project root. The page lists them and shows them as text; agents receive the list at the start of their session, and can read one through the MCP tool or the CLI. Only the files matched by the patterns can be read through the tool.
 
-## Conséquences
+## Consequences
 
-- Opérations nouvelles : ranger un ticket dans un groupe ; lister et lire les documents.
-- Le serveur lit les documents du projet (lecture seule), comme il écrit déjà le changelog (ADR 0037).
+- New operations: put a ticket in a group; list and read the documents.
+- The server reads the project's documents (read-only), as it already writes the changelog (ADR 0037).

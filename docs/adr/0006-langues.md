@@ -1,26 +1,26 @@
-# 0006. Code en anglais, interface et documents en français
+# 0006. Code in English, interface and documents in French
 
-- Statut : Acceptée
-- Date : 2026-10-18
-- Décideur : l'utilisateur (réponse « oui » à la question 1 du [glossaire](../product/glossary.md))
-- Liens : [audit outillage](../analysis/2026-10-16-audit-v1/tooling.md) §4, [glossaire](../product/glossary.md)
+- Status: Accepted; partly superseded by [ADR 0048](0048-documentation-en-anglais.md) (documents in English)
+- Date: 2026-10-18
+- Decider: the user (answer "yes" to question 1 of the [glossary](../product/glossary.md))
+- Links: [tooling audit](../analysis/2026-10-16-audit-v1/tooling.md) §4, [glossary](../product/glossary.md)
 
-## Contexte
+## Context
 
-En V1, les langues sont mélangées : contrats en anglais, architecture et décisions en français, et des termes de domaine tantôt en anglais, tantôt en français. Le glossaire V2 fixe un mot par notion, ce qui oblige à choisir une langue par usage.
+In V1, the languages are mixed: contracts in English, architecture and decisions in French, and domain terms sometimes in English, sometimes in French. The V2 glossary sets one word per notion, which forces a choice of language for each use.
 
-## Options étudiées
+## Options considered
 
-1. **Tout en anglais** : c'est l'usage courant pour le code, mais le développeur travaille en français.
-2. **Tout en français**, y compris le code : identifiants accentués ou approximatifs, et un écart avec l'écosystème.
-3. **Code en anglais ; interface et documents en français** : chaque terme du glossaire a un nom français et un nom de code anglais.
+1. **Everything in English**: the common practice for code, but the developer works in French.
+2. **Everything in French**, including the code: accented or approximate identifiers, and a gap with the ecosystem.
+3. **Code in English; interface and documents in French**: each term of the glossary has a French name and an English code name.
 
-## Décision
+## Decision
 
-**Option 3.** Le code (identifiants, schémas, messages de commit) est en anglais. Les documents du projet et l'interface sont en français. L'anglais reste disponible comme seconde langue de l'interface (F27).
+**Option 3.** The code (identifiers, schemas, commit messages) is in English. The project documents and the interface are in French. English remains available as a second interface language (F27).
 
-## Conséquences
+## Consequences
 
-- Le glossaire est la table de correspondance entre le terme français et le nom dans le code.
-- Les textes d'interface passent par les fichiers de traduction, avec le français comme langue par défaut.
-- Les contrats techniques de la V2 (données, interfaces) sont rédigés en français, avec les noms de code en anglais.
+- The glossary is the lookup table between the French term and the name in the code.
+- Interface texts go through the translation files, with French as the default language.
+- The V2 technical contracts (data, interfaces) are written in French, with the code names in English.

@@ -1,28 +1,28 @@
-# 0002. Périmètre V2 : local, multi-agents ouvert
+# 0002. V2 scope: local, open to multiple agents
 
-- Statut : Acceptée
-- Date : 2026-10-16
-- Décideur : l'utilisateur (réponse à la question « Quel périmètre produit vises-tu pour la nouvelle version ? »)
-- Liens : [audit produit](../analysis/2026-10-16-audit-v1/product.md) §6
+- Status: Accepted
+- Date: 2026-10-16
+- Decider: the user (answer to the question "What product scope are you aiming for with the new version?")
+- Links: [product audit](../analysis/2026-10-16-audit-v1/product.md) §6
 
-## Contexte
+## Context
 
-La V1 est entièrement liée à Claude Code : hooks, outil Monitor pour l'écoute, SendMessage et sous-agents pour l'aiguillage, format du transcript pour le coût. Plusieurs de ces dépendances reposent sur des champs non documentés. Elles doivent être revérifiées à chaque mise à jour de Claude Code.
+V1 is entirely tied to Claude Code: hooks, the Monitor tool for listening, SendMessage and sub-agents for routing, the transcript format for cost. Several of these dependencies rely on undocumented fields. They must be checked again at each Claude Code update.
 
-## Options étudiées
+## Options considered
 
-1. **Local, mono-utilisateur, lié à Claude Code** : on structure et on élague sans changer la nature du produit.
-2. **Local, multi-agents ouvert** : toujours un seul développeur sur sa machine, mais le cœur est découplé de Claude Code. Les agents passent par une interface neutre (serveur MCP et CLI), et Claude Code devient un adaptateur parmi d'autres (Codex, Cursor, OpenCode…).
-3. **Multi-utilisateurs, équipe** : serveur partagé, identités, droits, synchronisation entre machines. Change profondément l'architecture.
+1. **Local, single user, tied to Claude Code**: structure and prune the code without changing the nature of the product.
+2. **Local, open to multiple agents**: still a single developer on their own machine, but the core is decoupled from Claude Code. Agents go through a neutral interface (MCP server and CLI), and Claude Code becomes one adapter among others (Codex, Cursor, OpenCode…).
+3. **Multiple users, team**: shared server, identities, rights, synchronisation between machines. Changes the architecture deeply.
 
-## Décision
+## Decision
 
-**Option 2 : multi-agents ouvert.**
+**Option 2: open to multiple agents.**
 
-## Conséquences
+## Consequences
 
-- Le domaine (items, questions, réponses, réservations…) ne connaît aucun runtime d'agent.
-- Une **interface MCP** devient l'entrée principale des agents. La CLI reste pour les scripts et les hooks. Les deux appellent les mêmes cas d'usage.
-- Tout ce qui est propre à Claude Code passe dans un **adaptateur** : hooks, écoute via Monitor, coût depuis le transcript, captures, garde. On profite du passage pour réévaluer les mécanismes chers ou fragiles.
-- L'**identité d'un agent** (agent, session, runtime) devient un vrai concept du domaine, au lieu d'un nom de session complété par `--agent`.
-- Hors périmètre : plusieurs utilisateurs humains, la synchronisation entre machines.
+- The domain (items, questions, answers, reservations…) knows nothing about any agent runtime.
+- An **MCP interface** becomes the main entry point for agents. The CLI stays for scripts and hooks. Both call the same use cases.
+- Everything specific to Claude Code goes into an **adapter**: hooks, listening via Monitor, cost from the transcript, captures, guard. This is the chance to reassess expensive or fragile mechanisms.
+- The **identity of an agent** (agent, session, runtime) becomes a real concept of the domain, instead of a session name completed by `--agent`.
+- Out of scope: several human users, synchronisation between machines.

@@ -1,36 +1,36 @@
-# 0004. Stockage en SQLite natif (`node:sqlite`)
+# 0004. Native SQLite storage (`node:sqlite`)
 
-- Statut : Acceptée
-- Date : 2026-10-16
-- Décideur : l'utilisateur (réponse à la question « Quel stockage pour les données du tracker ? »)
-- Liens : [audit backend](../analysis/2026-10-16-audit-v1/backend.md) §2 et §5
+- Status: Accepted
+- Date: 2026-10-16
+- Decider: the user (answer to the question "Which storage for the tracker's data?")
+- Links: [backend audit](../analysis/2026-10-16-audit-v1/backend.md) §2 and §5
 
-## Contexte
+## Context
 
-La V1 stocke tout en fichiers JSON et JSONL (schéma 4 : `project.json`, `tickets/<ID>/item.json`, journaux, fichiers globaux `listeners.json` et `locks.json`). Pour que plusieurs agents et le serveur écrivent sans se marcher dessus, elle réimplémente une base transactionnelle :
-- verrous fichiers avec détection de vie par pid ;
-- intentions `.pending/` rejouées ;
-- lectures « settled » avec nouvelles tentatives ;
-- validation et diff du projet entier à chaque écriture.
+V1 stores everything in JSON and JSONL files (schema 4: `project.json`, `tickets/<ID>/item.json`, journals, global files `listeners.json` and `locks.json`). So that several agents and the server can write without getting in each other's way, it reimplements a transactional base:
+- file locks with liveness detection by pid;
+- replayed `.pending/` intentions;
+- "settled" reads with retries;
+- validation and a diff of the whole project on every write.
 
-## Options étudiées
+## Options considered
 
-1. **SQLite natif (`node:sqlite`)** :
-   - transactions ACID, mode WAL, plusieurs processus gérés par `busy_timeout` ;
-   - écritures ciblées ;
-   - pas de dépendance native à distribuer ;
-   - en contrepartie, les données ne sont plus lisibles ni comparables dans git.
-2. **Garder les fichiers JSON** : lisibles et versionnables, mais la mini-base maison reste à maintenir.
+1. **Native SQLite (`node:sqlite`)**:
+   - ACID transactions, WAL mode, several processes handled by `busy_timeout`;
+   - targeted writes;
+   - no native dependency to distribute;
+   - in return, the data can no longer be read or compared in git.
+2. **Keep the JSON files**: readable and versionable, but the home-made mini-base remains to be maintained.
 
-## Décision
+## Decision
 
-**Option 1 : SQLite natif.**
+**Option 1: native SQLite.**
 
-## Conséquences
+## Consequences
 
-- Node **22.13 ou plus** est requis : `node:sqlite` y est disponible sans option. Node 18 n'est plus maintenu.
-- Une couche `storage` derrière une interface de dépôt de données. Les journaux en ajout seul (events, exchanges, test-runs, answers) deviennent des tables en ajout seul.
-- Un **outbox d'événements** écrit dans la même transaction alimente le flux temps réel de la page, à la place de la surveillance de fichiers.
-- La lisibilité est compensée par la fiche générée (`brief.md`) et une commande d'export.
-- L'installeur fait une **dernière migration** des fichiers (schéma 4) vers SQLite, testée sur les fixtures existantes et vérifiée par empreintes.
-- Il faudra trancher l'emplacement de la base (dans le projet ou hors du dépôt) et sa sauvegarde.
+- Node **22.13 or later** is required: `node:sqlite` is available there without any option. Node 18 is no longer maintained.
+- A `storage` layer behind a data repository interface. The append-only journals (events, exchanges, test-runs, answers) become append-only tables.
+- An **event outbox** written in the same transaction feeds the page's real-time stream, instead of file watching.
+- Readability is offset by the generated record (`brief.md`) and an export command.
+- The installer performs a **last migration** of the files (schema 4) to SQLite, tested on the existing fixtures and checked by fingerprints.
+- The location of the database (inside the project or outside the repository) and its backup still need to be decided.
