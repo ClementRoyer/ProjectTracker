@@ -23,39 +23,51 @@ const projectList = z.object({
   projects: z.array(z.object({ name: z.string(), url: z.string(), current: z.boolean() })),
 });
 
-/** The page talks to the server through the operation catalogue only, like the CLI (ADR 0026). */
-export function createApi(token: string): Api {
+/**
+ * The page talks to the server through the operation catalogue only, like the CLI (ADR 0026).
+ * The server makes a new token at each start: a page opened before gets refused, and `onStale` reloads it.
+ */
+export function createApi(token: string, onStale: () => void): Api {
+  const fresh = (response: Response): Response => {
+    if (response.status !== 401) return response;
+    onStale();
+    throw new Error('The server restarted: reloading the page.');
+  };
   return {
     call: async (operation, input) => {
-      const response = await fetch(`/api/${operation.name}`, {
-        method: 'POST',
-        headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
-        body: JSON.stringify(input),
-      });
-      const body: unknown = await response.json();
+      const response = fresh(
+        await fetch(`/api/${operation.name}`, {
+          method: 'POST',
+          headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+          body: JSON.stringify(input),
+        }),
+      );
+      const body: unknown = await response.json().catch(() => null);
       if (response.status === 409) return { ok: false, error: refusalCode(body) };
       if (!response.ok) throw new Error(`${operation.name}: response ${String(response.status)}`);
       return { ok: true, value: operation.output.parse(body) };
     },
     upload: async (key, file) => {
       const query = `key=${encodeURIComponent(key)}&name=${encodeURIComponent(file.name || 'capture.png')}`;
-      const response = await fetch(`/api/attachments?${query}`, {
-        method: 'POST',
-        headers: {
-          authorization: `Bearer ${token}`,
-          'content-type': file.type || 'application/octet-stream',
-        },
-        body: file,
-      });
+      const response = fresh(
+        await fetch(`/api/attachments?${query}`, {
+          method: 'POST',
+          headers: {
+            authorization: `Bearer ${token}`,
+            'content-type': file.type || 'application/octet-stream',
+          },
+          body: file,
+        }),
+      );
       const body: unknown = await response.json().catch(() => null);
       if (!response.ok) return { ok: false, error: refusalCode(body) };
       return { ok: true, value: attachment.parse(body) };
     },
     fileUrl: (url) => `${url}?token=${encodeURIComponent(token)}`,
     projects: async () => {
-      const response = await fetch('/api/projects', {
-        headers: { authorization: `Bearer ${token}` },
-      });
+      const response = fresh(
+        await fetch('/api/projects', { headers: { authorization: `Bearer ${token}` } }),
+      );
       const body: unknown = await response.json().catch(() => null);
       const parsed = projectList.safeParse(body);
       return parsed.success ? parsed.data.projects : [];
@@ -68,6 +80,21 @@ export function createApi(token: string): Api {
       };
     },
   };
+}
+
+const RELOADED_AT = 'tracker-reloaded-at';
+
+/** Reloads the page for the new token, at most once every 10 seconds, so that a lasting refusal never loops. */
+export function reloadForNewToken(): void {
+  const now = Date.now();
+  let last = 0;
+  try {
+    last = Number(sessionStorage.getItem(RELOADED_AT) ?? 0);
+    sessionStorage.setItem(RELOADED_AT, String(now));
+  } catch {
+    // Without session storage, reload anyway: the next page gets the server's current token.
+  }
+  if (now - last > 10_000) location.reload();
 }
 
 /** The developer token the server wrote into the page (ADR 0027). */

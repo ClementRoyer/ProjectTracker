@@ -36,3 +36,28 @@ test('the dark theme follows the system until the developer chooses', async ({ p
   await page.reload();
   expect(await background()).toBe('rgb(18, 18, 20)');
 });
+
+test('a page left open across a server restart reloads itself with the new token', async ({
+  page,
+  request,
+}) => {
+  const key = await createTicket(request, 'Survive a restart');
+  // The first load gets a token the server no longer knows, as after a restart.
+  let stale = true;
+  await page.route('/', async (route) => {
+    const response = await route.fetch();
+    const html = await response.text();
+    await route.fulfill({
+      response,
+      body: stale
+        ? html.replace(
+            /name="tracker-token" content="[^"]+"/,
+            'name="tracker-token" content="stale"',
+          )
+        : html,
+    });
+    stale = false;
+  });
+  await page.goto('/');
+  await expect(page.getByText(key)).toBeVisible();
+});

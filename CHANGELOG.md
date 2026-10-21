@@ -4,6 +4,12 @@ Every published version of project-tracker, newest first. The format follows [Ke
 
 ## [Unreleased]
 
+## [2.0.6] - 2026-10-21
+
+### Fixed
+
+- A page left open while the server restarts (an update, for one) reloads itself with the new token, instead of failing every call with 401.
+
 ## [2.0.5] - 2026-10-21
 
 ### Added
@@ -68,7 +74,8 @@ First public version: a full rewrite of project-tracker.
 - Back-end agents on another machine through a launcher, without SSH.
 - Install and start scripts from the GitHub releases, with a checksum check.
 
-[Unreleased]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.5...HEAD
+[Unreleased]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.6...HEAD
+[2.0.6]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.4...v2.0.5
 [2.0.4]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.3...v2.0.4
 [2.0.3]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.2...v2.0.3
