@@ -106,20 +106,16 @@ project-tracker puts **the ticket at the centre**. Agents report their progress,
 Requirements: **Node 22.13+**, **git** and **curl**.
 
 ```bash
-# 1. Install into your project (or update it: same command)
 cd ~/code/my-project
 curl -fsSL https://github.com/ClementRoyer/ProjectTracker/releases/latest/download/install-front.sh | bash
-
-# 2. Start the server, then open the address it prints
-tools/tracker/app/start-front.sh
 ```
 
-The installer downloads the latest release, checks its SHA-256 checksum, and asks only what it needs: the port, Jira (optional), and whether back-end agents run on another machine. On first start, `start-front.sh` asks for the missing secrets once and keeps them in `tools/tracker/secrets.env`, readable by you only and ignored by git.
+The installer downloads the latest release, checks its SHA-256 checksum, and asks only what it needs: the port, Jira (optional), and whether back-end agents run on another machine. Then it starts the server and prints the page's address; on this first start it asks for the missing secrets once and keeps them in `tools/tracker/secrets.env`, readable by you only and ignored by git. Later, start it again with `tools/tracker/app/start-front.sh`.
 
-That's it: open a Claude Code session in the project and it is tracked. Run the install again at any time to update; the database is backed up first.
+That's it: open a Claude Code session in the project and it is tracked. Run the same command at any time to update; the database is backed up first.
 
 > [!TIP]
-> Every question has a variable, for scripted installs: `PROJECT_TRACKER_ROOT`, `PROJECT_TRACKER_PORT`, `PROJECT_TRACKER_JIRA_URL`, `PROJECT_TRACKER_JIRA_PROJECT`, `PROJECT_TRACKER_PRIVATE_ADDRESS`. `PROJECT_TRACKER_YES=1` takes the defaults, `PROJECT_TRACKER_VERSION=2.1.0` pins a version.
+> Every question has a variable, for scripted installs: `PROJECT_TRACKER_ROOT`, `PROJECT_TRACKER_PORT`, `PROJECT_TRACKER_JIRA_URL`, `PROJECT_TRACKER_JIRA_PROJECT`, `PROJECT_TRACKER_PRIVATE_ADDRESS`. `PROJECT_TRACKER_YES=1` takes the defaults, `PROJECT_TRACKER_VERSION=2.1.0` pins a version, `PROJECT_TRACKER_NO_START=1` installs without starting.
 
 <details>
 <summary><b>What the installer adds to your project</b></summary>
@@ -194,19 +190,13 @@ For a back-end that lives on a separate server, reachable without SSH and withou
 
 1. **Private network** between both machines (for example Tailscale or Headscale). Nothing is opened to the Internet.
 2. **On your machine**, answer the installer's back-end question with your private address (for example `100.64.0.1`). On first start, `start-front.sh` creates the launcher token and shows it once.
-3. **On the back-end server**, install the launcher (or update it: same command):
+3. **On the back-end server**, install and start the launcher (or update it: same command):
 
    ```bash
    curl -fsSL https://github.com/ClementRoyer/ProjectTracker/releases/latest/download/install-back.sh | bash
    ```
 
-   It asks where to install, the tool's address (`http://100.64.0.1:9620`), the mirror folder, the agent command (default `claude -p --output-format json --json-schema @SCHEMA@`), how many agents may run at once, and an optional HTTP proxy (Tailscale in userspace mode).
-
-4. **Start it**; the first time, it asks for the launcher token and keeps it next to it:
-
-   ```bash
-   ~/project-tracker-back/start-back.sh
-   ```
+   It asks where to install, the tool's address (`http://100.64.0.1:9620`), the mirror folder, the agent command (default `claude -p --output-format json --json-schema @SCHEMA@`), how many agents may run at once, an optional HTTP proxy (Tailscale in userspace mode), and on first start the launcher token, kept next to it. Later, start it again with `~/project-tracker-back/start-back.sh`.
 
 The agent command reads the request on its standard input; `@SCHEMA@` becomes the JSON Schema of the expected reply. The launcher only ever runs its configured command and receives plain text, never commands. Two back-end agents never edit the same file at once: a held file blocks the request, which is retried as soon as the file is released.
 
@@ -246,10 +236,11 @@ Before opening a pull request:
 
 - read [`AGENTS.md`](AGENTS.md) and the [code style](docs/code-style.md): they apply to humans and AI agents alike;
 - write the failing test first, named after the rule it states;
+- add a line to the [changelog](CHANGELOG.md) under `[Unreleased]` for any change a user would notice;
 - keep the tool generic: no customer, company or product names in code or fixtures;
 - a choice with trade-offs is discussed first and recorded as an [ADR](docs/adr/README.md).
 
-**Releasing**: bump `version` in `package.json`, then push the tag `v<version>`. A [workflow](.github/workflows/release.yml) runs every check, builds, and publishes the release with `project-tracker.tar.gz`, its `SHA256SUMS` and both install scripts. `npm run build && scripts/package-release.sh` builds the same release locally, in `release/`. Maintainers prepare each stable version with `scripts/publish-stable.sh`, which shows the push to run.
+**Releasing**: each user-visible change adds a line under `[Unreleased]` in the [changelog](CHANGELOG.md). To release, bump `version` in `package.json`, rename `[Unreleased]` to `[<version>] - <date>`, then push the tag `v<version>`; the version's section becomes the release notes. A [workflow](.github/workflows/release.yml) runs every check, builds, and publishes the release with `project-tracker.tar.gz`, its `SHA256SUMS` and both install scripts. `npm run build && scripts/package-release.sh` builds the same release locally, in `release/`. Maintainers prepare each stable version with `scripts/publish-stable.sh`, which shows the push to run.
 
 ## License
 

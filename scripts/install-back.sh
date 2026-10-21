@@ -110,5 +110,18 @@ if [ "$fresh" = true ]; then
 fi
 
 say ""
-say "Lance le lanceur : $dir/start-back.sh"
-say "Au premier lancement, il demande le jeton du lanceur, affiché par start-front.sh sur la machine du développeur."
+if [ "${PROJECT_TRACKER_NO_START:-}" = 1 ]; then
+  say "Lance le lanceur : $dir/start-back.sh"
+  say "Au premier lancement, il demande le jeton du lanceur, affiché par start-front.sh sur la machine du développeur."
+  exit 0
+fi
+if command -v pgrep >/dev/null && pgrep -f "$dir/launcher.js" >/dev/null; then
+  say "Le lanceur de $dir tourne déjà : arrête-le (Ctrl+C), puis relance-le pour passer à $version :"
+  say "  $dir/start-back.sh"
+  exit 0
+fi
+say "Démarrage du lanceur (Ctrl+C pour l'arrêter ; pour le relancer : $dir/start-back.sh)"
+# exec replaces this shell: the downloaded files go first.
+rm -rf "$work"
+trap - EXIT
+exec bash "$dir/start-back.sh"

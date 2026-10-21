@@ -55,6 +55,8 @@ An ADR (*Architecture Decision Record*) records **one** decision: the context, t
 | [0047](0047-branche-publique-des-versions-stables.md) | Public branch of stable versions | Accepted | 2026-10-21 |
 | [0048](0048-documentation-en-anglais.md) | Documentation in English | Accepted | 2026-10-21 |
 | [0049](0049-v1-mise-de-cote-sans-migration.md) | V1 set aside without migration | Accepted | 2026-10-21 |
+| [0050](0050-installer-et-lancer-en-une-commande.md) | Install and start in one command | Accepted | 2026-10-21 |
+| [0051](0051-changelog-des-versions.md) | A changelog for each published version | Accepted | 2026-10-21 |
 
 ## Rules
 

@@ -24,6 +24,7 @@ function repository(): string {
   const files: Record<string, string> = {
     'package.json': JSON.stringify({ version: '2.0.0' }),
     'README.md': '# project-tracker\n',
+    'CHANGELOG.md': '# Changelog\n\n## [Unreleased]\n\n## [2.0.0] - 2026-10-21\n\n- First.\n',
     'docs/adr/0001-decision.md': 'kept\n',
     'docs/plan/v2-plan.md': 'private\n',
     'docs/analysis/audit.md': 'private\n',
@@ -58,6 +59,7 @@ describe('publishing a stable version (ADR 0047)', () => {
     expect(git(repo, 'log', '--format=%s|%P', 'public')).toBe('🔖 Release v2.0.0|');
     expect(git(repo, 'rev-parse', 'v2.0.0')).toBe(git(repo, 'rev-parse', 'public'));
     expect(git(repo, 'ls-tree', '-r', '--name-only', 'public').split('\n')).toEqual([
+      'CHANGELOG.md',
       'README.md',
       'docs/adr/0001-decision.md',
       'package.json',
@@ -73,6 +75,10 @@ describe('publishing a stable version (ADR 0047)', () => {
     publish(repo);
     const first = git(repo, 'rev-parse', 'public');
     writeFileSync(join(repo, 'package.json'), JSON.stringify({ version: '2.1.0' }));
+    writeFileSync(
+      join(repo, 'CHANGELOG.md'),
+      '# Changelog\n\n## [2.1.0] - 2026-10-22\n\n- Next.\n',
+    );
     git(repo, 'commit', '-qam', 'next version');
     const { code, out } = publish(repo);
     expect(code, out).toBe(0);
@@ -90,6 +96,16 @@ describe('publishing a stable version (ADR 0047)', () => {
     expect(git(repo, 'log', '-1', '--format=%an <%ae> | %cn <%ce>', 'public')).toBe(
       'Developer <developer@users.noreply.example.test> | Developer <developer@users.noreply.example.test>',
     );
+  });
+
+  it('refuses a version that has no section in the changelog (ADR 0051)', () => {
+    const repo = repository();
+    writeFileSync(join(repo, 'package.json'), JSON.stringify({ version: '2.0.1' }));
+    git(repo, 'commit', '-qam', 'bump without changelog');
+    const { code, out } = publish(repo);
+    expect(code).not.toBe(0);
+    expect(out).toMatch(/CHANGELOG\.md/);
+    expect(() => git(repo, 'rev-parse', '--verify', 'public')).toThrow();
   });
 
   it('refuses a version already published, or uncommitted changes', () => {

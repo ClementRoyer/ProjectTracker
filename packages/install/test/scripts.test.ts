@@ -1,4 +1,4 @@
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import {
   copyFileSync,
   existsSync,
@@ -26,14 +26,20 @@ const folder = (): string => {
 };
 
 // Stand-ins for the built programs: each one writes down how it was called.
-const FAKE_INSTALL = `import { existsSync, mkdirSync, writeFileSync, cpSync } from 'node:fs';
+// The server only leaves a mark next to its configuration.
+const FAKE_SERVER = "require('node:fs').writeFileSync(process.argv[2] + '.started', '')";
+const FAKE_INSTALL = `const FAKE_SERVER = ${JSON.stringify(FAKE_SERVER)};
+import { existsSync, mkdirSync, writeFileSync, cpSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 const root = process.argv[process.argv.indexOf('--root') + 1];
 const tracker = join(root, 'tools', 'tracker');
 mkdirSync(join(tracker, 'app'), { recursive: true });
 cpSync(join(dirname(process.argv[1]), 'VERSION'), join(tracker, 'app', 'VERSION'));
+cpSync(join(dirname(process.argv[1]), 'start-front.sh'), join(tracker, 'app', 'start-front.sh'));
+writeFileSync(join(tracker, 'app', 'server.js'), FAKE_SERVER);
+const port = process.argv.includes('--port') ? Number(process.argv[process.argv.indexOf('--port') + 1]) : 9620;
 if (!existsSync(join(tracker, 'tracker.config.json'))) {
-  writeFileSync(join(tracker, 'tracker.config.json'), JSON.stringify({ port: 9620 }));
+  writeFileSync(join(tracker, 'tracker.config.json'), JSON.stringify({ port }));
 }
 writeFileSync(join(tracker, 'install-args.json'), JSON.stringify(process.argv.slice(2)));
 `;
@@ -70,11 +76,33 @@ function release(version: string, { corrupt = false } = {}): string {
 
 function run(script: string, env: Record<string, string>): { code: number; out: string } {
   const done = spawnSync('bash', [join(SCRIPTS, script)], {
-    env: { PATH: process.env.PATH ?? '', HOME: folder(), PROJECT_TRACKER_YES: '1', ...env },
+    env: {
+      PATH: process.env.PATH ?? '',
+      HOME: folder(),
+      PROJECT_TRACKER_YES: '1',
+      PROJECT_TRACKER_NO_START: '1',
+      ...env,
+    },
     encoding: 'utf8',
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   return { code: done.status ?? 1, out: `${done.stdout}${done.stderr}` };
+}
+
+/** A process that stays up while the test runs; stopped by the cleanup. */
+function background(command: string, args: string[]): void {
+  const child = spawn(command, args, { stdio: 'ignore' });
+  stops.push(() => child.kill());
+}
+const stops: (() => void)[] = [];
+afterEach(() => {
+  for (const stop of stops.splice(0)) stop();
+});
+
+async function waitFor(check: () => boolean): Promise<void> {
+  for (let tries = 0; tries < 50 && !check(); tries += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
 }
 
 const json = (path: string): Record<string, unknown> =>
@@ -165,6 +193,39 @@ describe('install-front.sh (ADR 0046)', () => {
     expect(code).not.toBe(0);
     expect(out).toMatch(/V1 gardée/);
     expect(existsSync(join(root, 'tools/tracker/install-args.json'))).toBe(false);
+  });
+
+  it('starts the server once installed, in one command (ADR 0050)', () => {
+    const root = folder();
+    const { code, out } = run('install-front.sh', {
+      PROJECT_TRACKER_BASE_URL: release('2.1.0'),
+      PROJECT_TRACKER_ROOT: root,
+      PROJECT_TRACKER_NO_START: '',
+    });
+    expect(code, out).toBe(0);
+    expect(existsSync(join(root, 'tools/tracker/tracker.config.json.started'))).toBe(true);
+  });
+
+  it('does not start a second server when one already answers on the port', async () => {
+    const root = folder();
+    run('install-front.sh', {
+      PROJECT_TRACKER_BASE_URL: release('2.0.0'),
+      PROJECT_TRACKER_ROOT: root,
+      PROJECT_TRACKER_PORT: '9665',
+    });
+    background('node', [
+      '-e',
+      "require('node:http').createServer((q, r) => r.end('ok')).listen(9665, '127.0.0.1')",
+    ]);
+    await waitFor(() => spawnSync('curl', ['-fsS', 'http://127.0.0.1:9665/']).status === 0);
+    const { code, out } = run('install-front.sh', {
+      PROJECT_TRACKER_BASE_URL: release('2.1.0'),
+      PROJECT_TRACKER_ROOT: root,
+      PROJECT_TRACKER_NO_START: '',
+    });
+    expect(code, out).toBe(0);
+    expect(out).toMatch(/tourne déjà/);
+    expect(existsSync(join(root, 'tools/tracker/tracker.config.json.started'))).toBe(false);
   });
 
   it('refuses an archive whose checksum does not match, and installs nothing', () => {
@@ -299,6 +360,42 @@ describe('install-back.sh and start-back.sh (ADR 0046)', () => {
     expect(readFileSync(join(dir, 'VERSION'), 'utf8').trim()).toBe('2.1.0');
     expect(json(join(dir, 'launcher.config.json')).tracker).toBe('http://kept');
     expect(readFileSync(join(dir, 'secrets.env'), 'utf8')).toContain('kept');
+  });
+
+  it('starts the launcher once installed, in one command (ADR 0050)', () => {
+    const dir = join(folder(), 'back');
+    const called = join(folder(), 'called.json');
+    const { code, out } = run('install-back.sh', {
+      PROJECT_TRACKER_BASE_URL: release('2.1.0'),
+      ...answers(dir, folder()),
+      PROJECT_TRACKER_NO_START: '',
+      TRACKER_LAUNCHER_TOKEN: 'abc',
+      CALLED: called,
+    });
+    expect(code, out).toBe(0);
+    expect((json(called) as { args: string[] }).args).toEqual([join(dir, 'launcher.config.json')]);
+  });
+
+  it('does not start a second launcher when the one of this folder runs', async () => {
+    const dir = join(folder(), 'back');
+    run('install-back.sh', {
+      PROJECT_TRACKER_BASE_URL: release('2.0.0'),
+      ...answers(dir, folder()),
+    });
+    // Two commands, so that bash stays the process, named after the launcher.
+    background('bash', ['-c', 'sleep 30; true', join(dir, 'launcher.js')]);
+    await waitFor(() => spawnSync('pgrep', ['-f', join(dir, 'launcher.js')]).status === 0);
+    const called = join(folder(), 'called.json');
+    const { code, out } = run('install-back.sh', {
+      PROJECT_TRACKER_BASE_URL: release('2.1.0'),
+      PROJECT_TRACKER_DIR: dir,
+      PROJECT_TRACKER_NO_START: '',
+      TRACKER_LAUNCHER_TOKEN: 'abc',
+      CALLED: called,
+    });
+    expect(code, out).toBe(0);
+    expect(out).toMatch(/tourne déjà/);
+    expect(existsSync(called)).toBe(false);
   });
 
   it('refuses a new install without the address of the tool when nobody can answer', () => {

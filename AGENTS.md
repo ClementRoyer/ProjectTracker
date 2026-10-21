@@ -45,6 +45,7 @@ Adapted from the guidelines drawn from Andrej Karpathy's notes on LLM coding mis
 - **Test first.** Write the failing test that states the rule, then the code. Tests are named after the rule.
 - **Security.** The server never executes a command. The tool listens on loopback and the private network only, never on the Internet. Jira is read-only; its URL and token come from configuration and environment, never from code. Never log or return secrets.
 - **Languages** (ADR 0006, 0045, 0048): code, commit messages and documents in English; the UI in French. Talk to the user in their language.
+- **Changelog** (ADR 0051): a user-visible change adds a line under `[Unreleased]` in `CHANGELOG.md`, in the same commit.
 - Do not commit unless the user asks.
 
 ## Blocking checks

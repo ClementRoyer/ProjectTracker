@@ -20,6 +20,10 @@ tag="v$version"
 if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
   fail "le tag $tag existe déjà : change la version dans package.json, puis commite."
 fi
+# Each version says what it changes (ADR 0051): its section becomes the release notes.
+if ! grep -q "^## \[$version\]" CHANGELOG.md 2>/dev/null; then
+  fail "CHANGELOG.md n'a pas de section [$version] : renomme [Unreleased] en [$version] - $(date +%F), puis commite."
+fi
 
 if [ "${PUBLISH_SKIP_CHECKS:-}" != 1 ]; then
   npm run verify

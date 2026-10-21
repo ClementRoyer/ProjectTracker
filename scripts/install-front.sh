@@ -121,5 +121,21 @@ else
   fi
 fi
 
+start="$root/tools/tracker/app/start-front.sh"
 say ""
-say "Lance le serveur : cd \"$root\" && tools/tracker/app/start-front.sh"
+if [ "${PROJECT_TRACKER_NO_START:-}" = 1 ]; then
+  say "Lance le serveur : cd \"$root\" && tools/tracker/app/start-front.sh"
+  exit 0
+fi
+port=$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8")).port ?? 9620)' "$config")
+if curl -fsS -o /dev/null -m 2 "http://127.0.0.1:$port/" 2>/dev/null; then
+  say "Le serveur tourne déjà sur le port $port : arrête-le (Ctrl+C), puis relance-le pour passer à $version :"
+  say "  cd \"$root\" && tools/tracker/app/start-front.sh"
+  exit 0
+fi
+say "Démarrage du serveur (Ctrl+C pour l'arrêter ; pour le relancer : cd \"$root\" && tools/tracker/app/start-front.sh)"
+# exec replaces this shell: the downloaded files go first.
+rm -rf "$work"
+trap - EXIT
+cd "$root"
+exec bash "$start"
