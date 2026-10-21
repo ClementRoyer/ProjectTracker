@@ -428,6 +428,19 @@ describe('start-front.sh and stop-front.sh (ADR 0046, 0052)', () => {
     expect(out).toMatch(/already answers/);
   });
 
+  it('shows only the log lines of this start when the server stops at start', () => {
+    const root = project({ port: 9675 });
+    writeFileSync(join(root, 'tools/tracker/server.log'), 'line from an earlier start\n');
+    writeFileSync(
+      join(root, 'tools/tracker/app/server.js'),
+      "console.error('Invalid configuration: jira.parents'); process.exit(1);",
+    );
+    const { code, out } = start(root);
+    expect(code).not.toBe(0);
+    expect(out).toContain('Invalid configuration: jira.parents');
+    expect(out).not.toContain('line from an earlier start');
+  });
+
   it('takes the Jira credentials from the environment first', () => {
     const root = project({ port: 9673, jira: JIRA });
     writeFileSync(

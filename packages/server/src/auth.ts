@@ -72,6 +72,14 @@ export function resolveCaller(options: AppOptions, token: string | null): Caller
   return actor ? { kind: 'agent', actor } : null;
 }
 
+/**
+ * The token of a request: `Authorization: Bearer …`, or `X-Tracker-Token` for the page, since some proxies (cloud
+ * IDEs' port forwarding) keep the Authorization header for their own login (ADR 0055).
+ */
+export function requestToken(header: (name: string) => string | undefined): string | null {
+  return bearerToken(header('authorization')) ?? (header('x-tracker-token') || null);
+}
+
 export function bearerToken(header: string | undefined | null): string | null {
   return header?.startsWith('Bearer ') ? header.slice('Bearer '.length) : null;
 }

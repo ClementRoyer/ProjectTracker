@@ -56,6 +56,19 @@ describe('configuration (ADR 0026)', () => {
     expect(jira(['DEMO-10) OR project = OTHER'])).toBe(false);
   });
 
+  it('also takes the parent tickets as one text, comma-separated, as people write it by hand', () => {
+    const config = parseConfig({
+      jira: {
+        baseUrl: 'https://jira.example.test',
+        project: 'DEMO',
+        emailEnv: 'JIRA_EMAIL',
+        tokenEnv: 'JIRA_API_TOKEN',
+        parents: 'DEMO-10, demo-20',
+      },
+    });
+    expect(config.ok && config.value.jira?.parents).toEqual(['DEMO-10', 'DEMO-20']);
+  });
+
   it('never listens on every interface', () => {
     const config = parseConfig({ host: '0.0.0.0' });
     expect(config.ok ? '' : config.error).toMatch(/0\.0\.0\.0/);

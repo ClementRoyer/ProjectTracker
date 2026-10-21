@@ -47,6 +47,20 @@ describe('HTTP API (ADR 0026, 0027)', () => {
     expect(await response.json()).toEqual({ key: 'LOC-1' });
   });
 
+  it('takes the token from X-Tracker-Token too, for proxies that keep Authorization (ADR 0055)', async () => {
+    const app = setUp();
+    const response = await app.request('/api/listTickets', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        host: '127.0.0.1:9620',
+        'x-tracker-token': DEVELOPER,
+      },
+      body: '{}',
+    });
+    expect(response.status).toBe(200);
+  });
+
   it('refuses a request without a token', async () => {
     const response = await call(setUp(), 'listTickets', {}, { token: null });
     expect(response.status).toBe(401);

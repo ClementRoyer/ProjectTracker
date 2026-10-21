@@ -61,3 +61,20 @@ test('a page left open across a server restart reloads itself with the new token
   await page.goto('/');
   await expect(page.getByText(key)).toBeVisible();
 });
+
+test('the page works behind a proxy that keeps the Authorization header for itself (ADR 0055)', async ({
+  page,
+  request,
+}) => {
+  const key = await createTicket(request, 'Work behind a cloud proxy');
+  // Like a cloud IDE's port proxy: a request with an Authorization header is refused, empty, before the server.
+  await page.route('**/api/**', async (route) => {
+    if (route.request().headers().authorization) {
+      await route.fulfill({ status: 401, body: '' });
+      return;
+    }
+    await route.continue();
+  });
+  await page.goto('/');
+  await expect(page.getByText(key)).toBeVisible();
+});

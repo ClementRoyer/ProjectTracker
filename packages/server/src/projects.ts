@@ -2,14 +2,19 @@ import { existsSync, readFileSync } from 'node:fs';
 import { registryEntry } from '@project-tracker/contract';
 import type { Hono } from 'hono';
 import { z } from 'zod';
-import { bearerToken, resolveCaller, type AppOptions } from './auth';
+import { requestToken, resolveCaller, type AppOptions } from './auth';
 
 const PING_MS = 500;
 
 /** GET /api/projects: the projects of the machine whose tracker answers, for the menu (ADR 0039). */
 export function mountProjects(app: Hono, options: AppOptions, ownUrl: string): void {
   app.get('/api/projects', async (c) => {
-    if (resolveCaller(options, bearerToken(c.req.header('authorization')))?.kind !== 'developer') {
+    if (
+      resolveCaller(
+        options,
+        requestToken((name) => c.req.header(name)),
+      )?.kind !== 'developer'
+    ) {
       return c.json({ error: 'unauthorized' }, 401);
     }
     const entries = readEntries(options.registryFile);

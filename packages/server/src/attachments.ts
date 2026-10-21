@@ -3,7 +3,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, posix } from 'node:path';
 import { addAttachment, attachmentFile } from '@project-tracker/core/usecases';
 import type { Context, Hono } from 'hono';
-import { bearerToken, resolveCaller, usecaseContext, type AppOptions, type Caller } from './auth';
+import { requestToken, resolveCaller, usecaseContext, type AppOptions, type Caller } from './auth';
 
 /** Up to 20 MB per file (ADR 0035). */
 const MAX_BYTES = 20 * 1024 * 1024;
@@ -13,7 +13,10 @@ const INLINE = new Set(['image/png', 'image/jpeg', 'image/gif', 'image/webp']);
 /** POST /api/attachments?key=&name= (raw content) and GET /api/attachments/<id>. */
 export function mountAttachments(app: Hono, options: AppOptions, notify: () => void): void {
   app.post('/api/attachments', async (c) => {
-    const caller = resolveCaller(options, bearerToken(c.req.header('authorization')));
+    const caller = resolveCaller(
+      options,
+      requestToken((name) => c.req.header(name)),
+    );
     if (!caller) return c.json({ error: 'unauthorized' }, 401);
     const content = await readContent(c);
     if (content === null) return c.json({ error: 'tooLarge' }, 413);
@@ -23,7 +26,7 @@ export function mountAttachments(app: Hono, options: AppOptions, notify: () => v
   });
 
   app.get('/api/attachments/:id', (c) => {
-    const token = bearerToken(c.req.header('authorization')) ?? c.req.query('token') ?? null;
+    const token = requestToken((name) => c.req.header(name)) ?? c.req.query('token') ?? null;
     const caller = resolveCaller(options, token);
     if (!caller) return c.json({ error: 'unauthorized' }, 401);
     const record = attachmentFile(usecaseContext(options, caller.actor), c.req.param('id'));

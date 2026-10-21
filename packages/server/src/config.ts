@@ -25,7 +25,17 @@ const configSchema = z
         baseUrl: z.url(),
         project: z.string().min(1),
         parents: z
-          .array(z.string().regex(/^[A-Z][A-Z0-9_]*-\d+$/, 'a ticket key, for example PROJ-12'))
+          .preprocess(
+            // A list, or one text as people write it by hand: "PROJ-1, PROJ-2".
+            (value) =>
+              typeof value === 'string'
+                ? value
+                    .split(',')
+                    .map((key) => key.trim().toUpperCase())
+                    .filter((key) => key !== '')
+                : value,
+            z.array(z.string().regex(/^[A-Z][A-Z0-9_]*-\d+$/, 'a ticket key, for example PROJ-12')),
+          )
           .optional()
           .describe('Only the children of these tickets (ADR 0052)'),
         emailEnv: z.string().min(1),

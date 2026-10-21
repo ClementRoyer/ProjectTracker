@@ -60,6 +60,7 @@ An ADR (*Architecture Decision Record*) records **one** decision: the context, t
 | [0052](0052-installation-retours-du-premier-deploiement.md) | Installation: feedback from the first real deployment | Accepted | 2026-10-21 |
 | [0053](0053-tout-en-anglais.md) | Everything in English | Accepted | 2026-10-21 |
 | [0054](0054-detection-des-depots.md) | The installer finds the project's repositories | Accepted | 2026-10-21 |
+| [0055](0055-jeton-de-la-page-hors-authorization.md) | The page's token travels outside the Authorization header | Accepted | 2026-10-21 |
 
 ## Rules
 

@@ -4,6 +4,14 @@ Every published version of project-tracker, newest first. The format follows [Ke
 
 ## [Unreleased]
 
+## [2.0.7] - 2026-10-21
+
+### Fixed
+
+- The page works through a cloud IDE's port proxy (SAP Business Application Studio, for one): its token travels in `X-Tracker-Token`, since such proxies keep the `Authorization` header for their own login ([ADR 0055](docs/adr/0055-jeton-de-la-page-hors-authorization.md)).
+- `jira.parents` also takes one text, comma-separated ("PROJ-1, PROJ-2"), as people write it by hand.
+- When the server or the launcher stops at start, only the log lines of that start are shown.
+
 ## [2.0.6] - 2026-10-21
 
 ### Fixed
@@ -74,7 +82,8 @@ First public version: a full rewrite of project-tracker.
 - Back-end agents on another machine through a launcher, without SSH.
 - Install and start scripts from the GitHub releases, with a checksum check.
 
-[Unreleased]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.6...HEAD
+[Unreleased]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.7...HEAD
+[2.0.7]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.6...v2.0.7
 [2.0.6]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.5...v2.0.6
 [2.0.5]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.4...v2.0.5
 [2.0.4]: https://github.com/ClementRoyer/ProjectTracker/compare/v2.0.3...v2.0.4

@@ -63,13 +63,15 @@ fi
 
 cd "$dir"
 # In the background, its output in the log; Node's experimental-feature warning is not for the user.
+# What this start writes in the log begins here: only that is shown if it fails.
+logged=$(wc -c <"$log" 2>/dev/null || echo 0)
 nohup node --disable-warning=ExperimentalWarning "$dir/launcher.js" "$config" >>"$log" 2>&1 </dev/null &
 echo $! >"$pidfile"
 sleep 1
 if ! running; then
   rm -f "$pidfile"
-  warn "The launcher stopped at start. Last lines of $log:"
-  tail -n 15 "$log" | sed 's/^/    /' >&2
+  warn "The launcher stopped at start ($log):"
+  tail -c +"$((logged + 1))" "$log" | tail -n 15 | sed 's/^/    /' >&2
   exit 1
 fi
 ok "Launcher running"

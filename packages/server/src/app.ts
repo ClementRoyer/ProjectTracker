@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { CATALOG, findBinding, type Binding } from './catalog';
 import {
   ANONYMOUS,
-  bearerToken,
+  requestToken,
   resolveCaller,
   usecaseContext,
   type AppOptions,
@@ -17,6 +17,8 @@ import { mountPage } from './page';
 import { mountProjects } from './projects';
 
 export type { AppOptions } from './auth';
+
+const tokenOf = (c: Context): string | null => requestToken((name) => c.req.header(name));
 
 /** The HTTP server of ADR 0011: the only door to the database. */
 export function createApp(options: AppOptions): Hono {
@@ -36,7 +38,7 @@ export function createApp(options: AppOptions): Hono {
   mountPage(app, options.webRoot, options.developerToken);
 
   app.get('/api', (c) => {
-    if (!resolveCaller(options, bearerToken(c.req.header('authorization')))) {
+    if (!resolveCaller(options, tokenOf(c))) {
       return c.json({ error: 'unauthorized' }, 401);
     }
     return c.json({ operations: CATALOG.map((binding) => describe(binding)) });
@@ -120,7 +122,7 @@ async function prepare(c: Context, options: AppOptions): Promise<Prepared | Resp
   const caller =
     binding.operation.name === 'introduce'
       ? { kind: 'agent' as const, actor: ANONYMOUS }
-      : resolveCaller(options, bearerToken(c.req.header('authorization')));
+      : resolveCaller(options, tokenOf(c));
   if (!caller) return c.json({ error: 'unauthorized' }, 401);
   if (!binding.operation.callers.includes(caller.kind)) return c.json({ error: 'forbidden' }, 403);
   const input = binding.operation.input.safeParse(await c.req.json().catch(() => undefined));

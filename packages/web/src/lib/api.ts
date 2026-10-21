@@ -38,7 +38,7 @@ export function createApi(token: string, onStale: () => void): Api {
       const response = fresh(
         await fetch(`/api/${operation.name}`, {
           method: 'POST',
-          headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+          headers: { 'x-tracker-token': token, 'content-type': 'application/json' },
           body: JSON.stringify(input),
         }),
       );
@@ -53,7 +53,7 @@ export function createApi(token: string, onStale: () => void): Api {
         await fetch(`/api/attachments?${query}`, {
           method: 'POST',
           headers: {
-            authorization: `Bearer ${token}`,
+            'x-tracker-token': token,
             'content-type': file.type || 'application/octet-stream',
           },
           body: file,
@@ -66,7 +66,7 @@ export function createApi(token: string, onStale: () => void): Api {
     fileUrl: (url) => `${url}?token=${encodeURIComponent(token)}`,
     projects: async () => {
       const response = fresh(
-        await fetch('/api/projects', { headers: { authorization: `Bearer ${token}` } }),
+        await fetch('/api/projects', { headers: { 'x-tracker-token': token } }),
       );
       const body: unknown = await response.json().catch(() => null);
       const parsed = projectList.safeParse(body);
