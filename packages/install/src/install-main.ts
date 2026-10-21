@@ -5,14 +5,17 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
 import { installProject } from './project/install';
 import { defaultRegistryFile } from './project/registry';
+import { setV1AsideAndInstall } from './project/set-v1-aside';
 import { rollBackToV1, switchOverToV2, type RunV1 } from './project/switch-over';
 
 // Usage: node dist/install.js --root <project> [--port <n>] [--from-v1 [--v1-project <id>]] [--rollback-v1]
+//        [--set-v1-aside]
 const USAGE = `Usage : node dist/install.js --root <projet> [options]
   --port <n>            port du serveur, pour une nouvelle installation (par défaut 9620)
   --from-v1             bascule un projet V1 : V1 mise de côté dans tools/tracker-v1, V2 installée et migrée
   --v1-project <id>     le projet V1 à migrer, si le tracker V1 en suit plusieurs
   --rollback-v1         remet la V1 en place ; la V2 est gardée à côté
+  --set-v1-aside        met la V1 de côté dans tools/tracker-legacy, sans migrer ses données, et installe la V2
 Relancée sur un projet déjà installé, la commande le met à jour, après une sauvegarde de la base.`;
 
 const artefactDir = dirname(fileURLToPath(import.meta.url));
@@ -39,6 +42,7 @@ async function main(): Promise<string[]> {
       'from-v1': { type: 'boolean' },
       'v1-project': { type: 'string' },
       'rollback-v1': { type: 'boolean' },
+      'set-v1-aside': { type: 'boolean' },
       help: { type: 'boolean' },
     },
   });
@@ -48,6 +52,9 @@ async function main(): Promise<string[]> {
   const port = values.port === undefined ? {} : { port: Number(values.port) };
   const registryFile = defaultRegistryFile(process.env);
   if (values['rollback-v1'] === true) return rollBackToV1({ root, now, runV1, registryFile });
+  if (values['set-v1-aside'] === true) {
+    return setV1AsideAndInstall({ root, artefactDir, now, registryFile, ...port });
+  }
   if (values['from-v1'] === true) {
     const projectId = values['v1-project'] === undefined ? {} : { projectId: values['v1-project'] };
     return switchOverToV2({ root, artefactDir, now, runV1, registryFile, ...port, ...projectId });

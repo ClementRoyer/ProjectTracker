@@ -70,12 +70,25 @@ download "$work"
 release="$work/project-tracker"
 version=$(cat "$release/VERSION")
 
-if [ -f "$installed" ]; then
+# An installed V2 is updated; V1 has its own app/VERSION (1.x) and is set aside below (ADR 0049).
+if [ -f "$installed" ] && [ ! -f "$root/tools/tracker/tracker.mjs" ]; then
   say "Mise à jour de project-tracker dans $root : $(cat "$installed") → $version"
   node "$release/install.js" --root "$root"
 else
+  aside=()
+  port=9620
+  if [ -f "$root/tools/tracker/tracker.mjs" ]; then
+    say "Une V1 de project-tracker est installée dans ce projet."
+    ask PROJECT_TRACKER_SET_V1_ASIDE \
+      "La mettre de côté dans tools/tracker-legacy (ses données gardées, rien de migré, ses hooks et commandes retirés) et installer la V2 ? (oui/non)" oui
+    case "$PROJECT_TRACKER_SET_V1_ASIDE" in
+      o | O | oui | Oui | OUI | y | Y | yes | Yes) aside=(--set-v1-aside) ;;
+      *) fail "V1 gardée en place : rien n'est installé." ;;
+    esac
+    port=$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync(process.argv[1], "utf8")).port ?? 9620)' "$config")
+  fi
   say "Installation de project-tracker $version dans $root"
-  ask PROJECT_TRACKER_PORT "Port du serveur" 9620
+  ask PROJECT_TRACKER_PORT "Port du serveur" "$port"
   ask PROJECT_TRACKER_JIRA_URL "Adresse de Jira, lue seulement (vide : sans Jira)" ""
   if [ -n "$PROJECT_TRACKER_JIRA_URL" ]; then
     ask PROJECT_TRACKER_JIRA_PROJECT "Clé du projet Jira (par exemple PROJ)" ""
@@ -83,7 +96,7 @@ else
   fi
   ask PROJECT_TRACKER_PRIVATE_ADDRESS \
     "Un agent back-end sur une autre machine ? Adresse de cette machine sur le réseau privé (vide : non)" ""
-  node "$release/install.js" --root "$root" --port "$PROJECT_TRACKER_PORT"
+  node "$release/install.js" --root "$root" --port "$PROJECT_TRACKER_PORT" ${aside[@]+"${aside[@]}"}
   JIRA_URL=${PROJECT_TRACKER_JIRA_URL} JIRA_PROJECT=${PROJECT_TRACKER_JIRA_PROJECT:-} \
     PRIVATE_ADDRESS=${PROJECT_TRACKER_PRIVATE_ADDRESS} node -e '
       const fs = require("node:fs");

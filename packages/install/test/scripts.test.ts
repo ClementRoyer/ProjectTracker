@@ -129,6 +129,44 @@ describe('install-front.sh (ADR 0046)', () => {
     expect(readFileSync(join(root, 'tools/tracker/tracker.config.json'), 'utf8')).toBe(config);
   });
 
+  it('sets a V1 aside before installing, on the port of V1 (ADR 0049)', () => {
+    const root = folder();
+    mkdirSync(join(root, 'tools/tracker'), { recursive: true });
+    writeFileSync(join(root, 'tools/tracker/tracker.mjs'), '// V1\n');
+    writeFileSync(join(root, 'tools/tracker/tracker.config.json'), JSON.stringify({ port: 9610 }));
+    // A real V1 has its own app/VERSION, which is no V2 to update.
+    mkdirSync(join(root, 'tools/tracker/app'));
+    writeFileSync(join(root, 'tools/tracker/app/VERSION'), '1.2.0\n');
+    const { code, out } = run('install-front.sh', {
+      PROJECT_TRACKER_BASE_URL: release('2.1.0'),
+      PROJECT_TRACKER_ROOT: root,
+    });
+    expect(code, out).toBe(0);
+    expect(out).toContain('V1');
+    expect(json(join(root, 'tools/tracker/install-args.json'))).toEqual([
+      '--root',
+      root,
+      '--port',
+      '9610',
+      '--set-v1-aside',
+    ]);
+  });
+
+  it('leaves a V1 in place, and installs nothing, when told not to set it aside', () => {
+    const root = folder();
+    mkdirSync(join(root, 'tools/tracker'), { recursive: true });
+    writeFileSync(join(root, 'tools/tracker/tracker.mjs'), '// V1\n');
+    writeFileSync(join(root, 'tools/tracker/tracker.config.json'), JSON.stringify({ port: 9610 }));
+    const { code, out } = run('install-front.sh', {
+      PROJECT_TRACKER_BASE_URL: release('2.1.0'),
+      PROJECT_TRACKER_ROOT: root,
+      PROJECT_TRACKER_SET_V1_ASIDE: 'non',
+    });
+    expect(code).not.toBe(0);
+    expect(out).toMatch(/V1 gardée/);
+    expect(existsSync(join(root, 'tools/tracker/install-args.json'))).toBe(false);
+  });
+
   it('refuses an archive whose checksum does not match, and installs nothing', () => {
     const root = folder();
     const { code, out } = run('install-front.sh', {
