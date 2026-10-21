@@ -1,0 +1,15 @@
+{
+  "name": "@project-tracker/core",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./domain": "./src/domain/index.ts",
+    "./store": "./src/store/index.ts",
+    "./usecases": "./src/usecases/index.ts",
+    "./jira": "./src/jira/index.ts"
+  },
+  "dependencies": {
+    "zod": "4.6.5",
+    "@project-tracker/contract": "*"
+  }
+}

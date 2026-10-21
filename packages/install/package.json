@@ -1,0 +1,13 @@
+{
+  "name": "@project-tracker/install",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@project-tracker/contract": "*",
+    "@project-tracker/core": "*",
+    "zod": "4.6.5"
+  }
+}

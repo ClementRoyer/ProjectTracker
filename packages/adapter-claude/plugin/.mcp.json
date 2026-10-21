@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "tracker": {
+      "type": "http",
+      "url": "${TRACKER_URL:-http://127.0.0.1:9620}/mcp",
+      "headers": { "x-tracker-channel": "${TRACKER_CHANNEL:-off}" }
+    }
+  }
+}

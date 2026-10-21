@@ -1,0 +1,5 @@
+{
+  "name": "project-tracker",
+  "description": "Relie les conversations Claude Code au tracker de tickets local : présentation, réponse de fin de tour, usage mesuré, réponses du développeur.",
+  "version": "2.0.0"
+}

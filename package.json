@@ -1,0 +1,41 @@
+{
+  "name": "project-tracker",
+  "version": "2.0.0",
+  "private": true,
+  "license": "MIT",
+  "description": "Local ticket tracker for one developer working with several AI agents.",
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json && tsc -p packages/web/e2e/tsconfig.json && svelte-check --tsconfig packages/web/tsconfig.json --threshold warning",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "verify": "npm run typecheck && npm run lint && npm run format:check && npm test",
+    "build": "node build.mjs && vite build --config packages/web/vite.config.ts --logLevel warn",
+    "start": "npm run build && node dist/server.js",
+    "e2e": "playwright test"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.63.0",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "@types/node": "22.20.5",
+    "esbuild": "0.28.2",
+    "eslint": "10.12.0",
+    "eslint-plugin-svelte": "3.23.0",
+    "prettier": "3.9.9",
+    "prettier-plugin-svelte": "4.1.1",
+    "svelte-check": "4.7.6",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.0",
+    "vite": "8.3.2",
+    "vitest": "5.0.3"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@project-tracker/launcher",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@project-tracker/contract": "*",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@project-tracker/server": "*"
+  }
+}

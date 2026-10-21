@@ -1,0 +1,201 @@
+/* Colours of the validated mockup (docs/mockups/fidele): blue = waits for you, amber = waits for someone else or no news. */
+:root {
+  --bg: #f6f5f1;
+  --rail: #efeee8;
+  --surface: #ffffff;
+  --surface-2: #fbfaf7;
+  --sunken: #f1f0ea;
+  --line: #e6e5de;
+  --line-strong: #c9c8c1;
+  --text: #18181b;
+  --text-2: #3d3d38;
+  --muted: #5b5b55;
+  --blue: #2350c8;
+  --blue-soft: #eef2fc;
+  --on-blue: #ffffff;
+  --amber: #9a4a0b;
+  --amber-soft: #fbf0e6;
+  --ink: #18181b;
+  --on-ink: #ffffff;
+  --on-ink-muted: #d6d5cd;
+  --head: #18181b;
+  --head-text: #f6f5f1;
+  --head-2: #2a2a2f;
+  --head-muted: #c9c8c1;
+  --track: #d6d5cd;
+  --bar: #18181b;
+  --bar-2: #9b9a92;
+  --shadow: rgba(24, 24, 27, 0.12);
+  --scrim: rgba(24, 24, 27, 0.5);
+  --sans: 'IBM Plex Sans', system-ui, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #121214;
+    --rail: #16161a;
+    --surface: #1c1c20;
+    --surface-2: #18181c;
+    --sunken: #26262b;
+    --line: #2e2e33;
+    --line-strong: #4a4a51;
+    --text: #ecebe6;
+    --text-2: #cfcec8;
+    --muted: #a8a7a0;
+    --blue: #8fb0ff;
+    --blue-soft: #1d2640;
+    --on-blue: #0f1220;
+    --amber: #f0a35e;
+    --amber-soft: #2e2216;
+    --ink: #ecebe6;
+    --on-ink: #121214;
+    --on-ink-muted: #3d3d38;
+    --head: #0b0b0d;
+    --head-text: #ecebe6;
+    --head-2: #1f1f24;
+    --head-muted: #a8a7a0;
+    --track: #3a3a40;
+    --bar: #ecebe6;
+    --bar-2: #6e6d68;
+    --shadow: rgba(0, 0, 0, 0.45);
+    --scrim: rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --bg: #121214;
+  --rail: #16161a;
+  --surface: #1c1c20;
+  --surface-2: #18181c;
+  --sunken: #26262b;
+  --line: #2e2e33;
+  --line-strong: #4a4a51;
+  --text: #ecebe6;
+  --text-2: #cfcec8;
+  --muted: #a8a7a0;
+  --blue: #8fb0ff;
+  --blue-soft: #1d2640;
+  --on-blue: #0f1220;
+  --amber: #f0a35e;
+  --amber-soft: #2e2216;
+  --ink: #ecebe6;
+  --on-ink: #121214;
+  --on-ink-muted: #3d3d38;
+  --head: #0b0b0d;
+  --head-text: #ecebe6;
+  --head-2: #1f1f24;
+  --head-muted: #a8a7a0;
+  --track: #3a3a40;
+  --bar: #ecebe6;
+  --bar-2: #6e6d68;
+  --shadow: rgba(0, 0, 0, 0.45);
+  --scrim: rgba(0, 0, 0, 0.6);
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+}
+
+a {
+  color: var(--blue);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+::placeholder {
+  color: var(--muted);
+}
+
+.visually-hidden {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.key {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+/* The wait pill, coloured by who must act (validated mockup). */
+.pill {
+  align-self: flex-start;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+}
+
+.wait-me {
+  background: var(--blue-soft);
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.wait-agent {
+  background: var(--sunken);
+  color: var(--text);
+}
+
+.wait-other {
+  background: var(--amber-soft);
+  color: var(--amber);
+}
+
+.wait-stale {
+  background: transparent;
+  color: var(--amber);
+  border: 1px dashed var(--amber);
+}
+
+.wait-none,
+.wait-done {
+  background: var(--sunken);
+  color: var(--text-2);
+}
+
+/* A white panel of the summary screen. */
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-sizing: border-box;
+}
+
+.panel h1 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.panel h2 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.muted {
+  font-size: 13px;
+  color: var(--muted);
+}
